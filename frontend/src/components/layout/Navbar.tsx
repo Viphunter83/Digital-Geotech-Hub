@@ -1,0 +1,68 @@
+"use client";
+
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+
+export function Navbar() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-primary/5">
+            <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2 group">
+                    <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg group-hover:bg-accent transition-colors">
+                        <span className="text-white font-black text-xl">G</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase">Geotech Hub</span>
+                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Engineering Group</span>
+                    </div>
+                </Link>
+
+                {/* Desktop Menu */}
+                <div className="hidden md:flex items-center gap-10">
+                    <NavLink href="/services">Услуги</NavLink>
+                    <NavLink href="/machinery">Техника</NavLink>
+                    <NavLink href="/cases">Проекты</NavLink>
+                    <NavLink href="/contacts">Контакты</NavLink>
+                    <button className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all">
+                        Личный кабинет
+                    </button>
+                </div>
+
+                {/* Mobile Toggle */}
+                <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)}>
+                    {isOpen ? <X /> : <Menu />}
+                </button>
+            </div>
+
+            {/* Mobile Menu */}
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-primary/10 p-6 flex flex-col gap-4 shadow-2xl"
+                >
+                    <Link href="/services" className="font-bold py-2">Услуги</Link>
+                    <Link href="/machinery" className="font-bold py-2">Техника</Link>
+                    <Link href="/cases" className="font-bold py-2">Проекты</Link>
+                    <Link href="/contacts" className="font-bold py-2">Контакты</Link>
+                </motion.div>
+            )}
+        </nav>
+    );
+}
+
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+    return (
+        <Link
+            href={href}
+            className="text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors relative group"
+        >
+            {children}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all group-hover:w-full" />
+        </Link>
+    );
+}
