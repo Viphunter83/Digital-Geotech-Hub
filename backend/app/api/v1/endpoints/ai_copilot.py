@@ -9,7 +9,7 @@ router = APIRouter()
 @router.post("/parse-document", response_model=DraftProposalResponse)
 async def parse_document(file: UploadFile = File(...)):
     """
-    Endpoint for AI parsing of uploaded technical documents and matching with Directus data.
+    Endpoint for professional technical audit of uploaded documents.
     """
     # 1. Extract text from PDF/Excel
     try:
@@ -17,11 +17,11 @@ async def parse_document(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error extracting text: {str(e)}")
     
-    # 2. AI Parsing
+    # 2. AI Parsing & Technical Audit
     try:
-        parsed_data = await parse_text_with_ai(raw_text)
+        parsed_data, technical_summary, confidence_score = await parse_text_with_ai(raw_text)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI parsing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"AI technical audit failed: {str(e)}")
     
     # 3. Directus Lookup
     shpunts, machinery = await fetch_matching_data(
@@ -31,12 +31,14 @@ async def parse_document(file: UploadFile = File(...)):
     
     # 4. Calculate Estimate (simplistic logic)
     estimated_total = 0
-    if shpunts:
-        estimated_total += shpunts[0].price * parsed_data.volume
+    if shpunts and parsed_data.volume:
+        estimated_total = shpunts[0].price * parsed_data.volume
     
     return DraftProposalResponse(
         parsed_data=parsed_data,
+        technical_summary=technical_summary,
         matched_shpunts=shpunts,
         recommended_machinery=machinery,
-        estimated_total=estimated_total
+        estimated_total=estimated_total if estimated_total > 0 else None,
+        confidence_score=confidence_score
     )

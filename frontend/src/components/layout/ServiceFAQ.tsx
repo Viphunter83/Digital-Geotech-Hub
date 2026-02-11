@@ -29,7 +29,8 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
         async function fetchFAQ() {
             try {
                 // Query FAQ from Directus. If serviceSlug provided, filter by it.
-                let url = `${process.env.NEXT_PUBLIC_CMS_URL}/items/faq?fields=id,question,answer,service_relation.slug`;
+                const CMS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:8055';
+                let url = `${CMS_URL}/items/faq?fields=id,question,answer,service_relation.slug`;
                 if (serviceSlug) {
                     url += `&filter[service_relation][slug][_eq]=${serviceSlug}`;
                 }

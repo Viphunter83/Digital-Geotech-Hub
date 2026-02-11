@@ -7,10 +7,14 @@ import { useState, useRef } from "react";
 interface DraftProposal {
     parsed_data: {
         work_type: string;
-        volume: number;
+        volume: number | null;
         soil_type: string | null;
         required_profile: string | null;
+        depth: number | null;
+        groundwater_level: number | null;
+        special_conditions: string[];
     };
+    technical_summary: string;
     matched_shpunts: Array<{
         name: string;
         price: number;
@@ -22,7 +26,8 @@ interface DraftProposal {
         description: string | null;
         category: string;
     }>;
-    estimated_total: number;
+    estimated_total: number | null;
+    confidence_score: number;
 }
 
 export function SmartDropzone() {
@@ -78,16 +83,16 @@ export function SmartDropzone() {
                             <Sparkles className="w-3 h-3" /> AI Copilot v1.0
                         </div>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-8 leading-tight">
-                            Smart <span className="text-orange-500">Dropzone</span><br />для сметчиков
+                            AI Technical <span className="text-orange-500">Audit</span><br />Assistant
                         </h2>
                         <p className="text-lg text-white/70 mb-10 max-w-xl">
-                            Загрузите спецификацию проекта. AI распознает объемы, номенклатуру шпунта и сформирует КП с актуальными ценами из нашей базы.
+                            Загрузите спецификацию проекта. Наш AI-инженер проведет технический аудит, выделит ключевые параметры и подготовит структурированное резюме для ваших специалистов.
                         </p>
 
                         <ul className="space-y-4 mb-10">
-                            <FeatureItem text="Парсинг сложных PDF таблиц" />
-                            <FeatureItem text="Автоматический подбор техники" />
-                            <FeatureItem text="Расчет сметы за 30 секунд" />
+                            <FeatureItem text="Технический аудит PDF/Excel" />
+                            <FeatureItem text="Извлечение геологических параметров" />
+                            <FeatureItem text="Оценка инженерных рисков" />
                         </ul>
 
                         {proposal && (
@@ -97,38 +102,65 @@ export function SmartDropzone() {
                                 className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md"
                             >
                                 <div className="flex justify-between items-start mb-6">
-                                    <h3 className="text-xl font-bold text-orange-500 uppercase tracking-tight">Черновик предложения</h3>
-                                    <span className="text-xs bg-orange-500/20 text-orange-500 px-2 py-1 rounded">Сгенерировано AI</span>
+                                    <h3 className="text-xl font-bold text-orange-500 uppercase tracking-tight">Результаты аудита</h3>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[10px] bg-orange-500/20 text-orange-500 px-2 py-1 rounded mb-1">AI Senior Engineer</span>
+                                        <span className="text-[9px] text-white/40">Confidence: {(proposal.confidence_score * 100).toFixed(0)}%</span>
+                                    </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+                                {/* Markdown Summary Component Section */}
+                                <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/5">
+                                    <p className="text-[10px] font-bold text-white/40 uppercase mb-3 flex items-center gap-2">
+                                        <FileText className="w-3 h-3" /> Техническое резюме
+                                    </p>
+                                    <div className="text-sm text-white/80 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed">
+                                        {/* Simple manual render for common markdown since we don't have a library installed yet, 
+                                            or just render as text with white-space-pre-wrap */}
+                                        <div className="whitespace-pre-wrap font-sans">
+                                            {proposal.technical_summary}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8 text-sm">
                                     <div className="space-y-1">
                                         <p className="text-white/40 uppercase text-[10px] font-bold">Тип работ</p>
                                         <p className="font-medium">{proposal.parsed_data.work_type}</p>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-white/40 uppercase text-[10px] font-bold">Объем</p>
-                                        <p className="font-medium">{proposal.parsed_data.volume} ед.</p>
+                                        <p className="font-medium text-orange-400">
+                                            {proposal.parsed_data.volume ? `${proposal.parsed_data.volume} ед.` : "Не указан"}
+                                        </p>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Профиль</p>
+                                        <p className="text-white/40 uppercase text-[10px] font-bold">Марка шпунта</p>
                                         <p className="font-medium text-orange-400">{proposal.parsed_data.required_profile || "Не указан"}</p>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Итого (ориент.)</p>
-                                        <p className="font-bold text-lg text-green-400">
-                                            {proposal.estimated_total.toLocaleString()} ₽
+                                        <p className="text-white/40 uppercase text-[10px] font-bold">Глубина</p>
+                                        <p className="font-medium">{proposal.parsed_data.depth ? `${proposal.parsed_data.depth} м` : "—"}</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-white/40 uppercase text-[10px] font-bold">УГВ</p>
+                                        <p className="font-medium">{proposal.parsed_data.groundwater_level ? `${proposal.parsed_data.groundwater_level} м` : "—"}</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-white/40 uppercase text-[10px] font-bold">Ориент. бюджет</p>
+                                        <p className="font-bold text-green-400">
+                                            {proposal.estimated_total ? `${proposal.estimated_total.toLocaleString()} ₽` : "Требует расчета"}
                                         </p>
                                     </div>
                                 </div>
 
-                                {proposal.recommended_machinery.length > 0 && (
+                                {proposal.parsed_data.special_conditions.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-white/10">
-                                        <p className="text-[10px] font-bold text-white/40 uppercase mb-3">Рекомендуемая техника</p>
-                                        <div className="flex gap-2">
-                                            {proposal.recommended_machinery.map(m => (
-                                                <div key={m.id} className="text-[11px] bg-white/10 px-2 py-1 rounded">
-                                                    {m.name}
+                                        <p className="text-[10px] font-bold text-white/40 uppercase mb-3">Особые условия</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {proposal.parsed_data.special_conditions.map((cond, idx) => (
+                                                <div key={idx} className="text-[11px] bg-orange-500/10 text-orange-300 border border-orange-500/20 px-2 py-1 rounded">
+                                                    {cond}
                                                 </div>
                                             ))}
                                         </div>

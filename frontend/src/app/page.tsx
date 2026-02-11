@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import { GridBackground } from "@/components/ui/GridBackground";
 import { ServicesPreview } from "@/components/layout/ServicesPreview";
@@ -7,11 +6,7 @@ import { SmartDropzone } from "@/components/layout/SmartDropzone";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/layout/Hero";
 import { ServiceFAQ } from "@/components/layout/ServiceFAQ";
-
-const ProjectsMap = dynamic(() => import("@/components/layout/ProjectsMap"), {
-  ssr: false,
-  loading: () => <div className="h-[500px] w-full bg-white/5 animate-pulse rounded-2xl" />
-});
+import InteractiveMap from "@/components/layout/InteractiveMap";
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -22,7 +17,7 @@ export default async function Home() {
       <GridBackground />
       <Hero region={region} />
       <ServicesPreview />
-      <ProjectsMap />
+      <InteractiveMap />
       <MachineryPreview />
       <SmartDropzone />
       <ServiceFAQ />

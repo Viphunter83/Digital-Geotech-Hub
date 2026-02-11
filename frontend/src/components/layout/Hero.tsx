@@ -25,10 +25,19 @@ export function Hero({ region }: HeroProps) {
 
     return (
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4">
-            {/* Background Animation */}
-            <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#F97316_0,rgba(249,115,22,0)_50%)] blur-[120px]" />
-                <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-[conic-gradient(from_0deg_at_50%_50%,#0F172A_0,#F97316_50%,#0F172A_100%)] blur-[100px]" />
+            {/* Background Image & Overlays */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <img
+                    src="/hero-main.png"
+                    alt="Geotech Digital Hub"
+                    className="w-full h-full object-cover scale-105 animate-slow-zoom opacity-70"
+                />
+                {/* Overlays for depth and readability */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/90 via-[#0F172A]/40 to-[#0F172A]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/80 via-transparent to-[#0F172A]/80" />
+
+                {/* Animated Light Spots */}
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#F97316_0,rgba(249,115,22,0)_60%)] opacity-30 blur-[120px]" />
             </div>
 
             <div className="container relative z-10 mx-auto text-center">
@@ -96,8 +105,8 @@ function TechnicalBadge({ icon, className, label }: { icon: React.ReactNode, cla
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 0.4, scale: 1 }}
-            whileHover={{ opacity: 1, scale: 1.1 }}
+            animate={{ opacity: 0.8, scale: 1 }}
+            whileHover={{ opacity: 1, scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
             className={`absolute hidden lg:flex flex-col items-center gap-2 text-primary ${className}`}
         >
             <div className="p-3 bg-white/40 ring-1 ring-primary/10 rounded-xl backdrop-blur-xl shadow-2xl">

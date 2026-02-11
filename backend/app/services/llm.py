@@ -8,30 +8,70 @@ client = AsyncOpenAI(
     base_url=settings.PROXY_API_BASE_URL
 )
 
+from typing import Tuple
+from app.schemas.copilot import ParsedSpecSchema
+
 SYSTEM_PROMPT = """
-Ты — ведущий инженер-сметчик компании "Digital Geotech Hub". 
-Твоя задача: проанализировать сырой текст спецификации или технического задания и извлечь данные для расчета стоимости работ.
+Ты — старший инженер-геотехник компании "Digital Geotech Hub". 
+Твоя задача: провести профессиональный технический аудит документа (спецификация или ТЗ).
 
-Извлеки следующие данные строго в формате JSON:
-1. work_type: тип работ (например: вдавливание шпунта, погружение шпунта вибропогружателем, бурение).
-2. volume: объем работ (только число, в погонных метрах или тоннах).
-3. soil_type: тип или категория грунта, если указаны.
-4. required_profile: марка/тип шпунта (например: Л5-УМ, Л4, VL606).
+Верни JSON со следующими полями:
+- work_type (str): Тип работ.
+- volume (float): Объем работ в тоннах/метрах.
+- soil_type (str): Тип грунтов.
+- required_profile (str): Требуемый профиль шпунта (если указан).
+- depth (float): Глубина погружения шпунта.
+- groundwater_level (float): Уровень грунтовых вод.
+- special_conditions (list[str]): Особые условия (стесненность, наличие зданий рядом и т.д.).
+- technical_summary (str): Профессиональное резюме объекта в формате Markdown. В резюме укажи: анализ задачи, оценку сложности (геология, стесненность), рекомендации по методу работ и критические риски.
 
-Если данные отсутствуют, используй null. 
-Отвечай ТОЛЬКО чистым JSON, без пояснений и Markdown разметки.
+Будь точен в извлечении данных. Техническое резюме должно быть экспертным и лаконичным.
 """
 
-async def parse_text_with_ai(text: str) -> ParsedSpecSchema:
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
+import re
+
+def clean_numeric(val):
+    if isinstance(val, (int, float)): return val
+    if isinstance(val, str):
+        # Extract digits, signs and dots
+        clean = "".join(re.findall(r"[-+]?\d*\.?\d+", val))
+        try: return float(clean)
+        except: return None
+    return None
+
+async def parse_text_with_ai(text: str) -> Tuple[ParsedSpecSchema, str, float]:
+    """
+    Parses text and returns (StructuredData, MarkdownSummary, ConfidenceScore)
+    """
+    # 1. Structured Data
+    data_response = await client.chat.completions.create(
+        model="gpt-4o",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"Текст спецификации:\n\n{text}"}
+            {"role": "system", "content": "Извлеки технические данные в JSON. ВАЖНО: поля volume, depth, groundwater_level должны быть ЧИСЛАМИ (float) БЕЗ ЕДИНИЦ ИЗМЕРЕНИЯ (только цифры). Поля: work_type, volume, soil_type, required_profile, depth, groundwater_level, special_conditions (list)."},
+            {"role": "user", "content": text}
         ],
         response_format={"type": "json_object"}
     )
+    data = json.loads(data_response.choices[0].message.content)
     
-    content = response.choices[0].message.content
-    data = json.loads(content)
-    return ParsedSpecSchema(**data)
+    # Clean numeric fields just in case
+    for field in ["volume", "depth", "groundwater_level"]:
+        if field in data:
+            data[field] = clean_numeric(data[field])
+
+    parsed_data = ParsedSpecSchema(**data)
+
+    # 2. Expert Summary
+    summary_response = await client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Ты — старший инженер-геотехник. Напиши профессиональный экспертный аудит объекта на основе ТЗ в формате Markdown. Укажи: Анализ задачи, Сложность геологии, Рекомендации по шпунту и методу погружения, Критические риски."},
+            {"role": "user", "content": text}
+        ]
+    )
+    summary = summary_response.choices[0].message.content
+
+    # 3. Confidence
+    confidence = 0.98 if parsed_data.required_profile and parsed_data.volume else 0.85
+
+    return parsed_data, summary, confidence

@@ -3,9 +3,12 @@ from typing import List, Optional
 
 class ParsedSpecSchema(BaseModel):
     work_type: str = Field(..., description="Тип работ (например, вдавливание, погружение, бурение)")
-    volume: float = Field(..., description="Объем работ в погонных метрах или тоннах")
-    soil_type: Optional[str] = Field(None, description="Тип грунта, если указан")
+    volume: Optional[float] = Field(None, description="Объем работ (если указан)")
+    soil_type: Optional[str] = Field(None, description="Тип грунта/геология")
     required_profile: Optional[str] = Field(None, description="Марка шпунта (например, Л5-УМ, Л4)")
+    depth: Optional[float] = Field(None, description="Глубина погружения (метры)")
+    groundwater_level: Optional[float] = Field(None, description="Уровень грунтовых вод (если указан)")
+    special_conditions: List[str] = Field(default_factory=list, description="Особые условия (стесненность, близость зданий и т.д.)")
 
 class ShpuntInfo(BaseModel):
     name: str
@@ -20,6 +23,8 @@ class MachineryInfo(BaseModel):
 
 class DraftProposalResponse(BaseModel):
     parsed_data: ParsedSpecSchema
+    technical_summary: str = Field(..., description="Профессиональное резюме от AI-инженера (Markdown)")
     matched_shpunts: List[ShpuntInfo] = []
     recommended_machinery: List[MachineryInfo] = []
-    estimated_total: Optional[float] = None
+    estimated_total: Optional[float] = Field(None, description="Ориентировочная стоимость (может отсутствовать)")
+    confidence_score: float = Field(..., description="Уровень уверенности AI в извлеченных данных (0-1)")

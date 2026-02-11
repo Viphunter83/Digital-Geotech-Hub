@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     PROXY_API_BASE_URL: str = "https://api.proxyapi.ru/openai/v1"
 
     class Config:
-        env_file = ".env"
+        env_file = ["../.env", ".env"]
         case_sensitive = True
+        extra = "ignore"
 
 settings = Settings()
