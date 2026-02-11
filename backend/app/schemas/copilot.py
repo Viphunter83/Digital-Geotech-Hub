@@ -10,6 +10,10 @@ class ParsedSpecSchema(BaseModel):
     groundwater_level: Optional[float] = Field(None, description="Уровень грунтовых вод (если указан)")
     special_conditions: List[str] = Field(default_factory=list, description="Особые условия (стесненность, близость зданий и т.д.)")
 
+class RiskItem(BaseModel):
+    risk: str
+    impact: str
+
 class ShpuntInfo(BaseModel):
     name: str
     price: float
@@ -24,6 +28,7 @@ class MachineryInfo(BaseModel):
 class DraftProposalResponse(BaseModel):
     parsed_data: ParsedSpecSchema
     technical_summary: str = Field(..., description="Профессиональное резюме от AI-инженера (Markdown)")
+    risks: List[RiskItem] = Field(default_factory=list, description="Список выявленных инженерных рисков")
     matched_shpunts: List[ShpuntInfo] = []
     recommended_machinery: List[MachineryInfo] = []
     estimated_total: Optional[float] = Field(None, description="Ориентировочная стоимость (может отсутствовать)")

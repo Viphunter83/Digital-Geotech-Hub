@@ -12,6 +12,11 @@ interface ChatMessage {
     content: string;
 }
 
+interface RiskItem {
+    risk: string;
+    impact: string;
+}
+
 interface DraftProposal {
     parsed_data: {
         work_type: string;
@@ -23,6 +28,7 @@ interface DraftProposal {
         special_conditions: string[];
     };
     technical_summary: string;
+    risks: RiskItem[];
     matched_shpunts: Array<{
         name: string;
         price: number;
@@ -40,6 +46,7 @@ interface DraftProposal {
 
 export function SmartDropzone() {
     const [isUploading, setIsUploading] = useState(false);
+    const [auditStep, setAuditStep] = useState<number>(0);
     const [proposal, setProposal] = useState<DraftProposal | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -47,6 +54,24 @@ export function SmartDropzone() {
     const [isThinking, setIsThinking] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const auditSteps = [
+        "Извлечение текста и таблиц",
+        "Инженерно-геологический анализ",
+        "Оценка технических рисков",
+        "Генерация экспертного отчета"
+    ];
+
+    useEffect(() => {
+        if (isUploading) {
+            const interval = setInterval(() => {
+                setAuditStep(prev => (prev < 3 ? prev + 1 : prev));
+            }, 1200);
+            return () => clearInterval(interval);
+        } else {
+            setAuditStep(0);
+        }
+    }, [isUploading]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -76,7 +101,7 @@ export function SmartDropzone() {
             const data = await response.json();
             setProposal(data);
         } catch (err: any) {
-            setError(err.message);
+            setError(err.message || "Неизвестная ошибка");
         } finally {
             setIsUploading(false);
         }
@@ -128,92 +153,115 @@ export function SmartDropzone() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-orange-500 text-xs font-bold uppercase tracking-widest mb-6">
-                            <Sparkles className="w-3 h-3" /> AI Copilot v1.0
+                            <Sparkles className="w-3 h-3" /> AI Copilot v2.0
                         </div>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-8 leading-tight">
                             AI Technical <span className="text-orange-500">Audit</span><br />Assistant
                         </h2>
                         <p className="text-lg text-white/70 mb-10 max-w-xl">
-                            Загрузите спецификацию проекта. Наш AI-инженер проведет технический аудит, выделит ключевые параметры и подготовит структурированное резюме для ваших специалистов.
+                            Загрузите спецификацию проекта. Наш AI-инженер проведет многоуровневый аудит, выявит критические риски и подготовит инженерное резюме.
                         </p>
 
                         <ul className="space-y-4 mb-10">
-                            <FeatureItem text="Технический аудит PDF/Excel" />
-                            <FeatureItem text="Извлечение геологических параметров" />
-                            <FeatureItem text="Оценка инженерных рисков" />
+                            <FeatureItem text="Глубокий аудит PDF/Excel (Layout Aware)" />
+                            <FeatureItem text="RAG-анализ по ГОСТ 25100 и СП 45.13330" />
+                            <FeatureItem text="Многофакторная оценка рисков среды" />
                         </ul>
 
                         {proposal && (
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl"
                             >
-                                <div className="flex justify-between items-start mb-6">
-                                    <h3 className="text-xl font-bold text-orange-500 uppercase tracking-tight">Результаты аудита</h3>
+                                <div className="flex justify-between items-start mb-8">
+                                    <div className="p-4 bg-orange-500 rounded-2xl flex items-center justify-center">
+                                        <FileText className="w-6 h-6 text-[#0F172A]" />
+                                    </div>
                                     <div className="flex flex-col items-end">
-                                        <span className="text-[10px] bg-orange-500/20 text-orange-500 px-2 py-1 rounded mb-1">AI Senior Engineer</span>
-                                        <span className="text-[9px] text-white/40">Confidence: {(proposal.confidence_score * 100).toFixed(0)}%</span>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-orange-500/20 text-orange-500 px-3 py-1.5 rounded-full mb-2">Technical Audit Report</span>
+                                        <span className="text-[11px] font-mono text-white/40 uppercase">ENGINEERING TRUST: {(proposal.confidence_score * 100).toFixed(0)}%</span>
                                     </div>
                                 </div>
 
-                                {/* Markdown Summary Component Section */}
-                                <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/5">
-                                    <p className="text-[10px] font-bold text-white/40 uppercase mb-3 flex items-center gap-2">
-                                        <FileText className="w-3 h-3" /> Техническое резюме
-                                    </p>
-                                    <div className="text-sm text-white/80 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed">
-                                        {/* Simple manual render for common markdown since we don't have a library installed yet, 
-                                            or just render as text with white-space-pre-wrap */}
-                                        <div className="whitespace-pre-wrap font-sans">
-                                            {proposal.technical_summary}
+                                {/* Engineering Dashboard Stats */}
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-10">
+                                    <div className="space-y-2">
+                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Тип работ</p>
+                                        <p className="text-sm font-bold uppercase">{proposal.parsed_data.work_type}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Объем</p>
+                                        <p className="text-sm font-bold text-orange-500">
+                                            {proposal.parsed_data.volume ? `${proposal.parsed_data.volume.toLocaleString()}` : "—"}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Глубина (m)</p>
+                                        <p className="text-sm font-bold">{proposal.parsed_data.depth || "—"}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Грунт</p>
+                                        <p className="text-[10px] font-bold leading-tight">{proposal.parsed_data.soil_type || "—"}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Шпунт / Профиль</p>
+                                        <p className="text-sm font-bold text-orange-400">{proposal.parsed_data.required_profile || "Standard"}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Budget Est.</p>
+                                        <p className="text-sm font-bold text-green-400">
+                                            {proposal.estimated_total ? `${proposal.estimated_total.toLocaleString()} ₽` : "Requires calculation"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Risk Matrix Section */}
+                                {proposal.risks && proposal.risks.length > 0 && (
+                                    <div className="mb-10 bg-red-500/5 rounded-2xl border border-red-500/10 p-6 overflow-hidden relative">
+                                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                                            <Info className="w-12 h-12 text-red-500" />
+                                        </div>
+                                        <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <Sparkles className="w-3 h-3" /> Матрица рисков
+                                        </p>
+                                        <div className="space-y-3">
+                                            {proposal.risks.map((r, i) => (
+                                                <div key={i} className="flex items-start gap-4 group">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                                                    <div>
+                                                        <p className="text-xs font-black uppercase text-white/90 group-hover:text-red-400 transition-colors uppercase tracking-tight">{r.risk}</p>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">{r.impact}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-                                </div>
+                                )}
 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8 text-sm">
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Тип работ</p>
-                                        <p className="font-medium">{proposal.parsed_data.work_type}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Объем</p>
-                                        <p className="font-medium text-orange-400">
-                                            {proposal.parsed_data.volume ? `${proposal.parsed_data.volume} ед.` : "Не указан"}
-                                        </p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Марка шпунта</p>
-                                        <p className="font-medium text-orange-400">{proposal.parsed_data.required_profile || "Не указан"}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Глубина</p>
-                                        <p className="font-medium">{proposal.parsed_data.depth ? `${proposal.parsed_data.depth} м` : "—"}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">УГВ</p>
-                                        <p className="font-medium">{proposal.parsed_data.groundwater_level ? `${proposal.parsed_data.groundwater_level} м` : "—"}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 uppercase text-[10px] font-bold">Ориент. бюджет</p>
-                                        <p className="font-bold text-green-400">
-                                            {proposal.estimated_total ? `${proposal.estimated_total.toLocaleString()} ₽` : "Требует расчета"}
-                                        </p>
-                                    </div>
-                                </div>
-
+                                {/* Special Conditions if any */}
                                 {proposal.parsed_data.special_conditions.length > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-white/10">
-                                        <p className="text-[10px] font-bold text-white/40 uppercase mb-3">Особые условия</p>
+                                    <div className="mb-8 p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10">
+                                        <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-3">Особые условия</p>
                                         <div className="flex flex-wrap gap-2">
                                             {proposal.parsed_data.special_conditions.map((cond, idx) => (
-                                                <div key={idx} className="text-[11px] bg-orange-500/10 text-orange-300 border border-orange-500/20 px-2 py-1 rounded">
+                                                <div key={idx} className="text-[10px] bg-white/10 px-2 py-1 rounded">
                                                     {cond}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Markdown Summary Section */}
+                                <div className="p-6 bg-white/[0.03] rounded-2xl border border-white/5">
+                                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <FileText className="w-3 h-3 text-orange-500" /> Итоговое экспертное резюме
+                                    </p>
+                                    <div className="text-[11px] text-white/70 font-mono leading-relaxed whitespace-pre-wrap">
+                                        {proposal.technical_summary}
+                                    </div>
+                                </div>
                             </motion.div>
                         )}
                     </div>
@@ -230,21 +278,41 @@ export function SmartDropzone() {
                             className={`aspect-video md:aspect-[4/3] rounded-3xl border-2 border-dashed border-white/20 bg-white/5 backdrop-blur-xl flex flex-col p-8 transition-all hover:border-orange-500/50 group ${isUploading ? 'pointer-events-none' : ''}`}
                         >
                             {isUploading ? (
-                                <div className="flex-1 flex flex-col items-center justify-center text-center">
-                                    <Loader2 className="w-16 h-16 text-orange-500 animate-spin mb-4" />
-                                    <p className="text-xl font-bold animate-pulse text-white/90">Анализируем спецификацию...</p>
-                                    <p className="text-sm text-white/40 mt-2">Senior Geotechnical AI на связи</p>
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
+                                    <motion.div
+                                        animate={{ rotate: 360 }}
+                                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                                        className="relative w-32 h-32 mb-12"
+                                    >
+                                        <div className="absolute inset-0 border-t-2 border-orange-500 rounded-full" />
+                                        <div className="absolute inset-4 border-l-2 border-white/20 rounded-full" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Sparkles className="w-8 h-8 text-orange-500 animate-pulse" />
+                                        </div>
+                                    </motion.div>
+                                    <div className="space-y-6 w-full max-w-xs">
+                                        {auditSteps.map((step, i) => (
+                                            <div key={i} className="flex items-center gap-4 transition-all duration-500">
+                                                <div className={`w-2 h-2 rounded-full ${i <= auditStep ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]' : 'bg-white/10'}`} />
+                                                <p className={`text-[10px] font-black uppercase tracking-widest ${i <= auditStep ? 'text-white' : 'text-white/20'}`}>
+                                                    {i < auditStep ? <span className="text-green-500 mr-2">✓</span> : null}
+                                                    {step}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-[9px] text-white/30 mt-12 font-mono animate-pulse uppercase">Система проводит глубокий расчет параметров...</p>
                                 </div>
                             ) : proposal ? (
                                 <div className="flex flex-col h-full">
                                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
-                                                <Sparkles className="w-4 h-4 text-[#0F172A]" />
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                                                <Sparkles className="w-5 h-5 text-[#0F172A]" />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold leading-none">AI Чат-ассистент</p>
-                                                <p className="text-[10px] text-white/40 uppercase tracking-tighter">В режиме уточнения ТЗ</p>
+                                                <p className="text-xs font-black uppercase tracking-tighter">AI Expert Support</p>
+                                                <p className="text-[9px] text-green-500 font-bold uppercase tracking-widest opacity-80">Online | Audit Session</p>
                                             </div>
                                         </div>
                                         <button
@@ -253,50 +321,54 @@ export function SmartDropzone() {
                                                 setProposal(null);
                                                 setChatMessages([]);
                                             }}
-                                            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/40 hover:text-white"
+                                            className="p-2 hover:bg-white/10 rounded-xl transition-all text-white/30 hover:text-white"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
                                     </div>
 
-                                    <ScrollArea className="flex-1 pr-4 -mr-4 mb-4">
-                                        <div className="space-y-4 pb-4">
-                                            <div className="bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-none text-xs leading-relaxed text-white/80">
-                                                Я завершил технический аудит документа. Вы можете задать любые вопросы по расчетам, рискам или рекомендуемому оборудованию.
+                                    <ScrollArea className="flex-1 pr-4 -mr-4 mb-6">
+                                        <div className="space-y-6 pb-4">
+                                            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none text-[11px] leading-relaxed text-white/70 font-mono">
+                                                <span className="text-orange-500 font-black">AI:</span> Приветствую. Я завершил аудит документации. <br /><br />
+                                                Обнаружено <span className="text-red-400">{proposal.risks?.length || 0} критических фактора</span>. Вы можете уточнить любые детали по расчету шпунта или геологии.
                                             </div>
 
                                             {chatMessages.map((msg, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className={`p-3 rounded-2xl text-xs leading-relaxed ${msg.role === 'user'
-                                                            ? 'bg-orange-500 text-[#0F172A] ml-8 rounded-tr-none font-medium'
-                                                            : 'bg-white/5 border border-white/10 text-white/80 mr-8 rounded-tl-none'
+                                                    className={`p-4 rounded-2xl text-[11px] leading-relaxed font-mono ${msg.role === 'user'
+                                                        ? 'bg-orange-500 text-[#0F172A] ml-8 rounded-tr-none font-black shadow-lg shadow-orange-500/10'
+                                                        : 'bg-white/5 border border-white/10 text-white/70 mr-8 rounded-tl-none'
                                                         }`}
                                                 >
+                                                    <span className={msg.role === 'user' ? 'text-black/50' : 'text-orange-500'}>
+                                                        {msg.role === 'user' ? '> USER: ' : 'AI: '}
+                                                    </span>
                                                     {msg.content}
                                                 </div>
                                             ))}
 
                                             {isThinking && (
-                                                <div className="flex items-center gap-2 text-white/40 text-[10px] animate-pulse">
-                                                    <Loader2 className="w-3 h-3 animate-spin" /> Инженер думает...
+                                                <div className="flex items-center gap-2 text-white/20 text-[9px] font-black uppercase tracking-widest animate-pulse ml-4">
+                                                    <Loader2 className="w-3 h-3 animate-spin text-orange-500" /> Инженер формирует ответ...
                                                 </div>
                                             )}
                                             <div ref={scrollRef} />
                                         </div>
                                     </ScrollArea>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 p-1 bg-white/5 rounded-2xl border border-white/10 focus-within:border-orange-500/50 transition-all">
                                         <Input
-                                            placeholder="Задайте вопрос инженеру..."
-                                            className="bg-white/5 border-white/10 text-white text-sm"
+                                            placeholder="Уточнить стоимость или риск..."
+                                            className="bg-transparent border-none text-white text-[11px] font-mono shadow-none focus-visible:ring-0 h-10"
                                             value={chatInput}
                                             onChange={(e) => setChatInput(e.target.value)}
                                             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                                         />
                                         <Button
                                             variant="secondary"
-                                            className="bg-orange-500 hover:bg-orange-600 text-[#0F172A]"
+                                            className="bg-orange-500 hover:bg-orange-600 text-[#0F172A] h-10 w-10 p-0 rounded-xl shrink-0 shadow-lg shadow-orange-500/20"
                                             onClick={handleSendMessage}
                                             disabled={isThinking}
                                         >
@@ -306,18 +378,33 @@ export function SmartDropzone() {
                                 </div>
                             ) : (
                                 <div
-                                    className="flex-1 flex flex-col items-center justify-center text-center cursor-pointer"
+                                    className="flex-1 flex flex-col items-center justify-center text-center cursor-pointer p-8 relative overflow-hidden"
                                     onClick={() => fileInputRef.current?.click()}
                                 >
-                                    <div className="mb-6 p-6 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
-                                        <Upload className="w-12 h-12 text-orange-500" />
+                                    <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+                                    <motion.div
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="mb-8 p-8 bg-white/5 rounded-full group-hover:bg-orange-500/10 border border-white/10 transition-all shadow-2xl relative z-10"
+                                    >
+                                        <Upload className="w-16 h-16 text-orange-500" />
+                                    </motion.div>
+                                    <h4 className="text-2xl font-black mb-2 uppercase tracking-tight relative z-10">Начать аудит</h4>
+                                    <p className="text-[10px] text-white/30 mb-8 font-black uppercase tracking-[0.4em] relative z-10">PDF Spec / Geotech XLSX</p>
+
+                                    <div className="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors relative z-10">
+                                        Выберите файл или перетащите его сюда
                                     </div>
-                                    <h4 className="text-xl font-bold mb-2 uppercase">Загрузить файл</h4>
-                                    <p className="text-sm text-white/50 mb-6 font-mono">PDF, XLSX (до 10 МБ)</p>
+
                                     {error && (
-                                        <div className="mt-4 p-3 bg-red-500/20 text-red-400 text-xs rounded-lg flex items-center gap-2">
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="mt-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest rounded-xl flex items-center gap-3 relative z-10"
+                                        >
                                             <Info className="w-4 h-4" /> {error}
-                                        </div>
+                                        </motion.div>
                                     )}
                                 </div>
                             )}

@@ -1,46 +1,49 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.schemas.copilot import DraftProposalResponse, ChatRequest, ChatResponse
-from app.services.extractor import extract_text_from_file
-from app.services.llm import parse_text_with_ai
-from app.services.directus import fetch_matching_data
+from app.services.ai.document_processor import doc_processor
+from app.services.ai.geotech_analyzer import geotech_analyzer
 
 router = APIRouter()
 
 @router.post("/parse-document", response_model=DraftProposalResponse)
 async def parse_document(file: UploadFile = File(...)):
     """
-    Endpoint for professional technical audit of uploaded documents.
+    Professional technical audit of uploaded documents using multi-pass AI analysis.
     """
-    # 1. Extract text from PDF/Excel
+    # 1. High-fidelity Processing
     try:
-        raw_text = await extract_text_from_file(file)
+        processed_doc = await doc_processor.process_file(file)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error extracting text: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error processing document: {str(e)}")
     
-    # 2. AI Parsing & Technical Audit
+    # 2. Expert Engineering Analysis
     try:
-        parsed_data, technical_summary, confidence_score = await parse_text_with_ai(raw_text)
+        analysis_result = await geotech_analyzer.analyze_project(processed_doc)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI technical audit failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Professional audit failed: {str(e)}")
     
-    # 3. Directus Lookup
+    parsed_data = analysis_result["parsed_data"]
+    
+    # 3. Directus Lookup for recommendations
     shpunts, machinery = await fetch_matching_data(
         work_type=parsed_data.work_type,
         required_profile=parsed_data.required_profile
     )
     
-    # 4. Calculate Estimate (simplistic logic)
+    # 4. Professional Estimate Calculation
     estimated_total = 0
     if shpunts and parsed_data.volume:
+        # Simplistic but matches current business logic
         estimated_total = shpunts[0].price * parsed_data.volume
     
     return DraftProposalResponse(
         parsed_data=parsed_data,
-        technical_summary=technical_summary,
+        technical_summary=analysis_result["technical_summary"],
+        risks=analysis_result["risks"],
         matched_shpunts=shpunts,
         recommended_machinery=machinery,
         estimated_total=estimated_total if estimated_total > 0 else None,
-        confidence_score=confidence_score
+        confidence_score=analysis_result["confidence_score"]
     )
 
 @router.post("/chat", response_model=ChatResponse)

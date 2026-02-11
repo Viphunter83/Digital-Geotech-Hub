@@ -59,10 +59,17 @@ const GEO_REGIONS = [
     { id: 'msk-zone', name: 'Московская синеклиза', soil: 'Карстовые опасности', color: '#0EA5E9', lat: 55.75, lng: 37.61, r: 60000 }
 ];
 
-export default function ProjectsMap() {
+interface ProjectMapProps {
+    region: 'msk' | 'spb';
+}
+
+export default function ProjectsMap({ region }: ProjectMapProps) {
     const [projects, setProjects] = useState<MapProject[]>(REFERENCE_PROJECTS);
     const [loading, setLoading] = useState(true);
     const [activeLayer, setActiveLayer] = useState<'projects' | 'geology'>('projects');
+
+    const defaultCenter: [number, number] = region === 'msk' ? [55.75, 37.6] : [59.93, 30.3];
+    const defaultZoom = 11;
 
     useEffect(() => {
         async function fetchPoints() {
@@ -154,9 +161,11 @@ export default function ProjectsMap() {
                     {/* Main Map Area */}
                     <div className="lg:col-span-3 h-[600px] w-full rounded-[40px] overflow-hidden border border-white/10 relative z-0 shadow-2xl">
                         <MapContainer
-                            center={[58, 38]}
-                            zoom={5}
+                            key={region}
+                            center={defaultCenter}
+                            zoom={defaultZoom}
                             scrollWheelZoom={false}
+                            attributionControl={false}
                             className="h-full w-full"
                         >
                             <TileLayer

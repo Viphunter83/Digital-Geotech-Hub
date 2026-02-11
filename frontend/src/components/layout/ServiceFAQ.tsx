@@ -72,25 +72,51 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
     if (faqs.length === 0) return null;
 
     return (
-        <section className="py-20 px-6 bg-white" id="faq">
-            <div className="container mx-auto max-w-4xl">
-                <div className="mb-12">
-                    <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-accent mb-4">FAQ</h2>
-                    <h3 className="text-4xl font-black uppercase text-primary">База знаний и вопросы</h3>
+        <section className="py-32 px-6 bg-[#09090b] relative overflow-hidden" id="faq">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #F97316 1px, transparent 0)', backgroundSize: '48px 48px' }} />
+
+            <div className="container mx-auto max-w-4xl relative z-10">
+                <div className="mb-20 text-center lg:text-left">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="flex items-center justify-center lg:justify-start gap-4 mb-6"
+                    >
+                        <div className="h-px w-10 bg-accent" />
+                        <h2 className="text-sm font-bold uppercase tracking-[0.5em] text-accent">Knowledge Base</h2>
+                    </motion.div>
+                    <h3 className="text-5xl md:text-6xl font-black uppercase text-white tracking-widest font-outfit">
+                        FAQ <span className="text-accent">/</span> Вопросы
+                    </h3>
                 </div>
 
-                <Accordion type="single" collapsible className="w-full border-t border-primary/10">
-                    {faqs.map((item) => (
-                        <AccordionItem key={item.id} value={item.id} className="border-b border-primary/10">
-                            <AccordionTrigger className="text-left font-bold uppercase tracking-tight py-6 hover:text-accent transition-colors">
-                                {item.question}
-                            </AccordionTrigger>
-                            <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
-                                <div dangerouslySetInnerHTML={{ __html: item.answer }} />
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
+                <div className="bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[40px] p-8 md:p-12 shadow-2xl">
+                    <Accordion type="single" collapsible className="w-full space-y-4">
+                        {faqs.map((item, index) => (
+                            <AccordionItem
+                                key={item.id}
+                                value={item.id}
+                                className="border-b border-white/5 last:border-0 px-4 transition-all hover:bg-white/[0.02] rounded-2xl"
+                            >
+                                <AccordionTrigger className="text-left font-black uppercase text-sm md:text-base tracking-widest py-8 text-white/80 hover:text-accent hover:no-underline transition-all">
+                                    <span className="flex items-center gap-6">
+                                        <span className="text-accent font-mono text-xs opacity-50">0{index + 1}</span>
+                                        {item.question}
+                                    </span>
+                                </AccordionTrigger>
+                                <AccordionContent className="text-white/60 leading-relaxed pb-8 pl-12 font-medium">
+                                    <div
+                                        className="prose prose-invert max-w-none text-sm md:text-base"
+                                        dangerouslySetInnerHTML={{ __html: item.answer }}
+                                    />
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
+                </div>
             </div>
         </section>
     );
