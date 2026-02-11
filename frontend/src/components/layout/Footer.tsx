@@ -15,7 +15,7 @@ export function Footer() {
                             <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase">Geotech Hub</span>
                         </Link>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                            Лидер в области шпунтовых работ и фундаментостроения на Северо-Западе. Инновационный подход к тяжелой технике.
+                            15+ лет лидерства в области шпунтовых работ и фундаментостроения. Свой парк современной техники для проектов любой сложности по всей России.
                         </p>
                     </div>
 
@@ -24,7 +24,7 @@ export function Footer() {
                         <ul className="space-y-4">
                             <FooterLink href="/services">Услуги</FooterLink>
                             <FooterLink href="/machinery">Каталог техники</FooterLink>
-                            <FooterLink href="/cases">Портфолио</FooterLink>
+                            <FooterLink href="/portfolio">Портфолио</FooterLink>
                         </ul>
                     </div>
 
@@ -40,9 +40,9 @@ export function Footer() {
                     <div>
                         <h5 className="font-black uppercase text-xs tracking-widest mb-6">Контакты</h5>
                         <div className="text-sm text-muted-foreground space-y-2">
-                            <p>Санкт-Петербург, ул. Строителей, 10</p>
-                            <p className="font-bold text-primary">+7 (812) 555-01-26</p>
-                            <p>info@geotech-hub.ru</p>
+                            <p>Санкт-Петербург, тер. промзона Парнас</p>
+                            <p className="font-bold text-primary">+7 (921) 884-44-03</p>
+                            <p>drilling.rigs.info@yandex.ru</p>
                         </div>
                     </div>
                 </div>

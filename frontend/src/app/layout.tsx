@@ -13,8 +13,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Digital Geotech Hub | ГеоТехнологии",
-  description: "B2B-платформа для строительной компании ГеоТехнологии. Нулевой цикл, аренда спецтехники, шпунтовые работы.",
+  title: "Digital Geotech Hub | B2B Инженерные решения",
+  description: "B2B-платформа для строительной компании ГеоТехнологии. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
 };
 
 import { Navbar } from "@/components/layout/Navbar";

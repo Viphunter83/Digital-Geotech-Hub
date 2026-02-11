@@ -25,7 +25,7 @@ export function Navbar() {
                 <div className="hidden md:flex items-center gap-10">
                     <NavLink href="/services">Услуги</NavLink>
                     <NavLink href="/machinery">Техника</NavLink>
-                    <NavLink href="/cases">Проекты</NavLink>
+                    <NavLink href="/portfolio">Проекты</NavLink>
                     <NavLink href="/contacts">Контакты</NavLink>
                     <button className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all">
                         Личный кабинет
@@ -47,7 +47,7 @@ export function Navbar() {
                 >
                     <Link href="/services" className="font-bold py-2">Услуги</Link>
                     <Link href="/machinery" className="font-bold py-2">Техника</Link>
-                    <Link href="/cases" className="font-bold py-2">Проекты</Link>
+                    <Link href="/portfolio" className="font-bold py-2">Проекты</Link>
                     <Link href="/contacts" className="font-bold py-2">Контакты</Link>
                 </motion.div>
             )}
