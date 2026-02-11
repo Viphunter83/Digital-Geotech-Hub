@@ -75,3 +75,28 @@ async def parse_text_with_ai(text: str) -> Tuple[ParsedSpecSchema, str, float]:
     confidence = 0.98 if parsed_data.required_profile and parsed_data.volume else 0.85
 
     return parsed_data, summary, confidence
+
+async def chat_with_ai(message: str, history: list, context: str = None) -> str:
+    """
+    Continues the conversation with AI based on technical context.
+    """
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT}
+    ]
+    
+    if context:
+        messages.append({"role": "system", "content": f"КОНТЕКСТ ОБЪЕКТА (ТЗ):\n{context}"})
+    
+    # Add history
+    for msg in history:
+        messages.append({"role": msg.role, "content": msg.content})
+    
+    # Add new message
+    messages.append({"role": "user", "content": message})
+    
+    response = await client.chat.completions.create(
+        model="gpt-4o",
+        messages=messages
+    )
+    
+    return response.choices[0].message.content

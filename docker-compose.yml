@@ -38,8 +38,10 @@ services:
       CACHE_STORE: "redis"
       CACHE_REDIS: "redis://redis:6379"
       REDIS: "redis://redis:6379"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "http://localhost:3000"
       ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@geotech.hub}"
-      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin-password}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-geotech-hub-2026}"
     depends_on:
       - postgres
       - redis

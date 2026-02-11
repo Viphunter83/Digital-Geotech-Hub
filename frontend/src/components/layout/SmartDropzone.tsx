@@ -1,8 +1,16 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, CheckCircle2, Loader2, Sparkles, X, Info } from "lucide-react";
-import { useState, useRef } from "react";
+import { Upload, FileText, CheckCircle2, Loader2, Sparkles, X, Info, Send } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+}
 
 interface DraftProposal {
     parsed_data: {
@@ -34,7 +42,17 @@ export function SmartDropzone() {
     const [isUploading, setIsUploading] = useState(false);
     const [proposal, setProposal] = useState<DraftProposal | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const [chatInput, setChatInput] = useState("");
+    const [isThinking, setIsThinking] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [chatMessages]);
 
     const handleFileUpload = async (file: File) => {
         setIsUploading(true);
@@ -67,6 +85,36 @@ export function SmartDropzone() {
     const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             handleFileUpload(e.target.files[0]);
+        }
+    };
+
+    const handleSendMessage = async () => {
+        if (!chatInput.trim() || isThinking || !proposal) return;
+
+        const userMsg = chatInput;
+        setChatInput("");
+        setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+        setIsThinking(true);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ai/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: userMsg,
+                    history: chatMessages,
+                    context: proposal.technical_summary
+                }),
+            });
+
+            if (!response.ok) throw new Error("Ошибка связи с AI");
+
+            const data = await response.json();
+            setChatMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
+        } catch (err: any) {
+            setChatMessages(prev => [...prev, { role: 'assistant', content: "Извините, произошла ошибка: " + err.message }]);
+        } finally {
+            setIsThinking(false);
         }
     };
 
@@ -179,30 +227,88 @@ export function SmartDropzone() {
                             accept=".pdf,.xlsx,.xls"
                         />
                         <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className={`aspect-video rounded-3xl border-2 border-dashed border-white/20 bg-white/5 backdrop-blur-xl flex flex-col items-center justify-center p-10 cursor-pointer transition-all hover:bg-white/10 hover:border-orange-500 group ${isUploading ? 'pointer-events-none' : ''}`}
+                            className={`aspect-video md:aspect-[4/3] rounded-3xl border-2 border-dashed border-white/20 bg-white/5 backdrop-blur-xl flex flex-col p-8 transition-all hover:border-orange-500/50 group ${isUploading ? 'pointer-events-none' : ''}`}
                         >
                             {isUploading ? (
-                                <div className="text-center">
-                                    <Loader2 className="w-16 h-16 text-orange-500 animate-spin mb-4 mx-auto" />
-                                    <p className="text-xl font-bold animate-pulse">Анализируем спецификацию...</p>
+                                <div className="flex-1 flex flex-col items-center justify-center text-center">
+                                    <Loader2 className="w-16 h-16 text-orange-500 animate-spin mb-4" />
+                                    <p className="text-xl font-bold animate-pulse text-white/90">Анализируем спецификацию...</p>
+                                    <p className="text-sm text-white/40 mt-2">Senior Geotechnical AI на связи</p>
                                 </div>
                             ) : proposal ? (
-                                <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-center">
-                                    <CheckCircle2 className="w-16 h-16 text-green-400 mb-4 mx-auto" />
-                                    <p className="text-xl font-bold mb-2">Готово!</p>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setProposal(null);
-                                        }}
-                                        className="text-white/40 text-xs hover:text-white mt-4 flex items-center gap-1 mx-auto"
-                                    >
-                                        <X className="w-3 h-3" /> Сбросить и загрузить заново
-                                    </button>
-                                </motion.div>
+                                <div className="flex flex-col h-full">
+                                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                                                <Sparkles className="w-4 h-4 text-[#0F172A]" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold leading-none">AI Чат-ассистент</p>
+                                                <p className="text-[10px] text-white/40 uppercase tracking-tighter">В режиме уточнения ТЗ</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setProposal(null);
+                                                setChatMessages([]);
+                                            }}
+                                            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/40 hover:text-white"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    <ScrollArea className="flex-1 pr-4 -mr-4 mb-4">
+                                        <div className="space-y-4 pb-4">
+                                            <div className="bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-none text-xs leading-relaxed text-white/80">
+                                                Я завершил технический аудит документа. Вы можете задать любые вопросы по расчетам, рискам или рекомендуемому оборудованию.
+                                            </div>
+
+                                            {chatMessages.map((msg, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`p-3 rounded-2xl text-xs leading-relaxed ${msg.role === 'user'
+                                                            ? 'bg-orange-500 text-[#0F172A] ml-8 rounded-tr-none font-medium'
+                                                            : 'bg-white/5 border border-white/10 text-white/80 mr-8 rounded-tl-none'
+                                                        }`}
+                                                >
+                                                    {msg.content}
+                                                </div>
+                                            ))}
+
+                                            {isThinking && (
+                                                <div className="flex items-center gap-2 text-white/40 text-[10px] animate-pulse">
+                                                    <Loader2 className="w-3 h-3 animate-spin" /> Инженер думает...
+                                                </div>
+                                            )}
+                                            <div ref={scrollRef} />
+                                        </div>
+                                    </ScrollArea>
+
+                                    <div className="flex gap-2">
+                                        <Input
+                                            placeholder="Задайте вопрос инженеру..."
+                                            className="bg-white/5 border-white/10 text-white text-sm"
+                                            value={chatInput}
+                                            onChange={(e) => setChatInput(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                        />
+                                        <Button
+                                            variant="secondary"
+                                            className="bg-orange-500 hover:bg-orange-600 text-[#0F172A]"
+                                            onClick={handleSendMessage}
+                                            disabled={isThinking}
+                                        >
+                                            <Send className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </div>
                             ) : (
-                                <>
+                                <div
+                                    className="flex-1 flex flex-col items-center justify-center text-center cursor-pointer"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
                                     <div className="mb-6 p-6 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
                                         <Upload className="w-12 h-12 text-orange-500" />
                                     </div>
@@ -213,7 +319,7 @@ export function SmartDropzone() {
                                             <Info className="w-4 h-4" /> {error}
                                         </div>
                                     )}
-                                </>
+                                </div>
                             )}
                         </div>
 

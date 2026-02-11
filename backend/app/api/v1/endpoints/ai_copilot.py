@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.schemas.copilot import DraftProposalResponse
+from app.schemas.copilot import DraftProposalResponse, ChatRequest, ChatResponse
 from app.services.extractor import extract_text_from_file
 from app.services.llm import parse_text_with_ai
 from app.services.directus import fetch_matching_data
@@ -42,3 +42,19 @@ async def parse_document(file: UploadFile = File(...)):
         estimated_total=estimated_total if estimated_total > 0 else None,
         confidence_score=confidence_score
     )
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_endpoint(request: ChatRequest):
+    """
+    Interactive chat with the AI Senior Geotechnical Engineer.
+    """
+    try:
+        from app.services.llm import chat_with_ai
+        answer = await chat_with_ai(
+            message=request.message,
+            history=request.history,
+            context=request.context
+        )
+        return ChatResponse(answer=answer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
