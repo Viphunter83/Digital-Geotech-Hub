@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { MapPin, Drill, Calendar, Info, Tractor } from "lucide-react";
 import Image from "next/image";
+import { SubPageHero } from "@/components/layout/SubPageHero";
 
 // Типизация данных из Directus
 interface ProjectCase {
@@ -38,17 +39,12 @@ export default async function PortfolioPage() {
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6">
             <div className="container mx-auto">
-                <header className="mb-20">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-orange-500 text-xs font-bold uppercase tracking-widest mb-6">
-                        <Info className="w-3 h-3" /> Proof of Work
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-black uppercase mb-8 leading-tight">
-                        Реализованные <span className="text-orange-500">кейсы</span>
-                    </h1>
-                    <p className="text-xl text-white/60 max-w-2xl font-medium border-l-4 border-orange-500 pl-6">
-                        Проекты нулевого цикла любой сложности: от центра Москвы до удаленных регионов РФ. Технический брутализм в действии.
-                    </p>
-                </header>
+                <SubPageHero
+                    title="Реализованные"
+                    accentTitle="кейсы"
+                    description="Проекты нулевого цикла любой сложности: от центра Москвы до удаленных регионов РФ. Технический брутализм в действии."
+                    badgeText="Proof of Work"
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {cases.length > 0 ? (
