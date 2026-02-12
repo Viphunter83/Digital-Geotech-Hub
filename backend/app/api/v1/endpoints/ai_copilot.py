@@ -20,20 +20,24 @@ router = APIRouter()
 async def _save_audit_to_directus(
     filename: str, result_data: dict, client_access_code: Optional[str] = None
 ):
-    """Background task: persist audit results to Directus audit_history."""
+    """Background task: persist audit results to Directus audit_history + send email."""
     try:
         client_id = None
+        client_email = None
+        company_name = "Клиент"
         if client_access_code:
             async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
                 res = await client.get("/items/clients", params={
                     "filter[access_code][_eq]": client_access_code,
-                    "fields": "id",
+                    "fields": "id,email,company_name",
                     "limit": 1,
                 })
                 if res.status_code == 200:
                     data = res.json().get("data", [])
                     if data:
                         client_id = data[0]["id"]
+                        client_email = data[0].get("email")
+                        company_name = data[0].get("company_name", "Клиент")
 
         parsed = result_data.get("parsed_data", {})
         record = {
@@ -54,6 +58,19 @@ async def _save_audit_to_directus(
         async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
             await client.post("/items/audit_history", json=record)
         logger.info(f"Audit saved to Directus: {filename}")
+
+        # Email notification
+        if client_email:
+            from app.services.email_service import email_service
+            email_service.send_audit_completed(
+                to_email=client_email,
+                company_name=company_name,
+                filename=filename,
+                work_type=parsed.get("work_type"),
+                risks_count=len(result_data.get("risks", [])),
+                confidence=result_data.get("confidence_score"),
+                estimated_total=result_data.get("estimated_total"),
+            )
     except Exception as e:
         logger.error(f"Failed to save audit to Directus: {e}")
 

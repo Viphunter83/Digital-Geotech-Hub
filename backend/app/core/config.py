@@ -25,6 +25,15 @@ class Settings(BaseSettings):
     AUDIT_RATE_LIMIT: int = 5  # requests per hour
     MAX_FILE_SIZE_MB: int = 5
 
+    # Email (SMTP)
+    SMTP_HOST: str = "smtp.yandex.ru"
+    SMTP_PORT: int = 465
+    SMTP_USER: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    SMTP_FROM_NAME: str = "Digital Geotech Hub"
+    SMTP_FROM_EMAIL: str = "noreply@geotech-hub.ru"
+    EMAIL_ENABLED: bool = False  # Enable when SMTP credentials are set
+
     class Config:
         env_file = ["../.env", ".env"]
         case_sensitive = True
