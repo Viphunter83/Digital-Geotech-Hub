@@ -23,6 +23,13 @@ class GeotechAnalyzer:
                 self.standards = json.load(f)
         except Exception:
             self.standards = {}
+            
+        # Heuristic keywords for quick validation
+        self.geotech_keywords = [
+            "шпунт", "сваи", "грунт", "геология", "котлован", "фундамент",
+            "бурение", "вдавливание", "статическое", "динамическое",
+            "уровень вод", "скважина", "разрез", "профиль"
+        ]
 
     async def analyze_project(self, processed_doc: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -30,6 +37,11 @@ class GeotechAnalyzer:
         """
         full_text = processed_doc.get("full_text", "")
         sections = processed_doc.get("sections", {})
+        
+        # 0. Pre-validation (Cheap check)
+        is_valid, reason = await self._pre_validate_document(full_text)
+        if not is_valid:
+            raise ValueError(f"Not a geotechnical document: {reason}")
         
         # 1. High-fidelity Extraction pass
         technical_data = await self._extract_technical_parameters(full_text)
@@ -78,6 +90,29 @@ class GeotechAnalyzer:
         )
         result = json.loads(response.choices[0].message.content)
         return result.get("risks", [])
+
+    async def _pre_validate_document(self, text: str) -> (bool, str):
+        # 0. Quick Heuristic
+        text_lower = text.lower()
+        keyword_hits = sum(1 for kw in self.geotech_keywords if kw in text_lower)
+        if keyword_hits >= 3:
+            return True, "Heuristic match"
+            
+        # 1. Cheap AI Validation (using gpt-4o-mini)
+        try:
+            response = await self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "Ты фильтр документов. Твоя задача — определить, является ли текст техническим заданием, спецификацией или отчетом в области ГЕОТЕХНИКИ, СТРОИТЕЛЬСТВА ФУНДАМЕНТОВ или ШПУНТОВЫХ ОГРАЖДЕНИЙ. Ответь только JSON: {'is_geotech': bool, 'reason': str}."},
+                    {"role": "user", "content": f"Текст документа (начало): {text[:2000]}"}
+                ],
+                response_format={"type": "json_object"}
+            )
+            result = json.loads(response.choices[0].message.content)
+            return result.get("is_geotech", False), result.get("reason", "No reason provided")
+        except Exception as e:
+            # If AI check fails, fallback to allowing if there's at least one keyword
+            return keyword_hits >= 1, "Fallback heuristic"
 
     async def _generate_professional_summary(self, data: Any, risks: List[Any], sections: Dict[str, str]) -> str:
         response = await self.client.chat.completions.create(

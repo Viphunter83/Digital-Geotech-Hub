@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 class ParsedSpecSchema(BaseModel):
     work_type: str = Field(..., description="Тип работ (например, вдавливание, погружение, бурение)")
@@ -45,3 +45,18 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
+
+class LeadInput(BaseModel):
+    name: str = Field(..., min_length=2)
+    phone: str = Field(..., pattern=r"^\+?[\d\s\-()]{10,}$")
+    email: Optional[str] = None
+    company: Optional[str] = None
+    audit_data: Optional[Dict] = None # To store technical data from the audit
+
+class LeadResponse(BaseModel):
+    success: bool
+    message: str
+    lead_id: Optional[str] = None
+
+class ProposalSchema(DraftProposalResponse):
+    pass

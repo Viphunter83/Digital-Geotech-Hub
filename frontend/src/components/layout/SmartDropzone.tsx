@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, CheckCircle2, Loader2, Sparkles, X, Info, Send } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2, Sparkles, X, Info, Send, Download, Phone, User, Building2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,10 @@ export function SmartDropzone() {
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const [chatInput, setChatInput] = useState("");
     const [isThinking, setIsThinking] = useState(false);
+    const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
+    const [leadSubmitted, setLeadSubmitted] = useState(false);
+    const [showLeadForm, setShowLeadForm] = useState(false);
+    const [leadForm, setLeadForm] = useState({ name: "", phone: "", company: "" });
     const fileInputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +84,20 @@ export function SmartDropzone() {
     }, [chatMessages]);
 
     const handleFileUpload = async (file: File) => {
+        // Client-side protection: File Size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setError("Файл слишком большой. Максимальный размер 5МБ.");
+            return;
+        }
+
+        // Client-side protection: File Type
+        const allowedTypes = ['.pdf', '.xlsx', '.xls'];
+        const fileName = file.name.toLowerCase();
+        if (!allowedTypes.some(type => fileName.endsWith(type))) {
+            setError("Недопустимый формат файла. Используйте PDF или Excel.");
+            return;
+        }
+
         setIsUploading(true);
         setError(null);
         setProposal(null);
@@ -95,6 +113,15 @@ export function SmartDropzone() {
 
             if (!response.ok) {
                 const errData = await response.json();
+
+                // Specific messaging for protection layers
+                if (response.status === 429) {
+                    throw new Error("Лимит запросов исчерпан. Пожалуйста, попробуйте через час.");
+                }
+                if (response.status === 422) {
+                    throw new Error("Документ не прошел проверку: система ожидает ТЗ или спецификацию по геотехнике.");
+                }
+
                 throw new Error(errData.detail || "Ошибка при обработке документа");
             }
 
@@ -137,9 +164,66 @@ export function SmartDropzone() {
             const data = await response.json();
             setChatMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
         } catch (err: any) {
-            setChatMessages(prev => [...prev, { role: 'assistant', content: "Извините, произошла ошибка: " + err.message }]);
+            setChatMessages(prev => [...prev, { role: 'assistant', content: "Извините, произошла ошибка. Попробуйте позже." }]);
         } finally {
             setIsThinking(false);
+        }
+    };
+
+    const handleDownloadReport = async () => {
+        if (!proposal) return;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ai/download-report`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(proposal),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Ошибка генерации PDF");
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Technical_Audit_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err: any) {
+            console.error("Ошибка при скачивании отчета:", err.message);
+            setError("Ошибка при скачивании отчета: " + err.message);
+        }
+    };
+
+    const handleLeadSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLeadSubmitting(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/leads/submit`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...leadForm,
+                    audit_data: proposal?.parsed_data
+                }),
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || "Ошибка при отправке данных");
+            }
+
+            setLeadSubmitted(true);
+            setShowLeadForm(false);
+            setLeadForm({ name: "", phone: "", company: "" }); // Reset form
+        } catch (err: any) {
+            setError(err.message || "Неизвестная ошибка при отправке данных");
+        } finally {
+            setIsLeadSubmitting(false);
         }
     };
 
@@ -307,73 +391,175 @@ export function SmartDropzone() {
                                 <div className="flex flex-col h-full">
                                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                                                <Sparkles className="w-5 h-5 text-[#0F172A]" />
+                                            <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                                                <Sparkles className="w-4 h-4 text-orange-500" />
                                             </div>
                                             <div>
-                                                <p className="text-xs font-black uppercase tracking-tighter">AI Expert Support</p>
-                                                <p className="text-[9px] text-green-500 font-bold uppercase tracking-widest opacity-80">Online | Audit Session</p>
+                                                <p className="text-[10px] font-black uppercase tracking-tighter">AI Engineering Session</p>
+                                                <p className="text-[9px] text-green-500 font-bold uppercase tracking-widest opacity-80">Online</p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setProposal(null);
-                                                setChatMessages([]);
-                                            }}
-                                            className="p-2 hover:bg-white/10 rounded-xl transition-all text-white/30 hover:text-white"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            {!leadSubmitted && (
+                                                <button
+                                                    onClick={() => setShowLeadForm(true)}
+                                                    className="px-3 py-1.5 bg-orange-500 text-[#0F172A] rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-orange-400 transition-all shadow-lg shadow-orange-500/20"
+                                                >
+                                                    Сохранить расчет
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={handleDownloadReport}
+                                                className="p-1.5 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-orange-500"
+                                                title="Скачать PDF отчет"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setProposal(null);
+                                                    setChatMessages([]);
+                                                    setLeadSubmitted(false);
+                                                    setShowLeadForm(false);
+                                                }}
+                                                className="p-1.5 hover:bg-white/10 rounded-lg transition-all text-white/30 hover:text-white"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <ScrollArea className="flex-1 pr-4 -mr-4 mb-6">
-                                        <div className="space-y-6 pb-4">
-                                            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none text-[11px] leading-relaxed text-white/70 font-mono">
-                                                <span className="text-orange-500 font-black">AI:</span> Приветствую. Я завершил аудит документации. <br /><br />
-                                                Обнаружено <span className="text-red-400">{proposal.risks?.length || 0} критических фактора</span>. Вы можете уточнить любые детали по расчету шпунта или геологии.
-                                            </div>
-
-                                            {chatMessages.map((msg, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className={`p-4 rounded-2xl text-[11px] leading-relaxed font-mono ${msg.role === 'user'
-                                                        ? 'bg-orange-500 text-[#0F172A] ml-8 rounded-tr-none font-black shadow-lg shadow-orange-500/10'
-                                                        : 'bg-white/5 border border-white/10 text-white/70 mr-8 rounded-tl-none'
-                                                        }`}
+                                    <div className="flex-1 relative overflow-hidden flex flex-col">
+                                        <AnimatePresence mode="wait">
+                                            {showLeadForm ? (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, scale: 0.95 }}
+                                                    className="absolute inset-0 z-20 bg-[#0F172A] flex flex-col items-center justify-center p-6 text-center"
                                                 >
-                                                    <span className={msg.role === 'user' ? 'text-black/50' : 'text-orange-500'}>
-                                                        {msg.role === 'user' ? '> USER: ' : 'AI: '}
-                                                    </span>
-                                                    {msg.content}
-                                                </div>
-                                            ))}
+                                                    <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mb-6">
+                                                        <Phone className="w-6 h-6 text-orange-500" />
+                                                    </div>
+                                                    <h5 className="text-lg font-black uppercase mb-2">Сохранить расчет</h5>
+                                                    <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest mb-8">Введите данные, чтобы наш инженер провел точный расчет сметы</p>
 
-                                            {isThinking && (
-                                                <div className="flex items-center gap-2 text-white/20 text-[9px] font-black uppercase tracking-widest animate-pulse ml-4">
-                                                    <Loader2 className="w-3 h-3 animate-spin text-orange-500" /> Инженер формирует ответ...
+                                                    <form onSubmit={handleLeadSubmit} className="w-full space-y-4 max-w-xs">
+                                                        <div className="relative">
+                                                            <User className="absolute left-3 top-3 w-4 h-4 text-white/20" />
+                                                            <Input
+                                                                placeholder="Ваше имя"
+                                                                required
+                                                                className="bg-white/5 border-white/10 pl-10 text-xs font-mono h-10 focus:border-orange-500/50"
+                                                                value={leadForm.name}
+                                                                onChange={e => setLeadForm({ ...leadForm, name: e.target.value })}
+                                                            />
+                                                        </div>
+                                                        <div className="relative">
+                                                            <Phone className="absolute left-3 top-3 w-4 h-4 text-white/20" />
+                                                            <Input
+                                                                placeholder="+7 (___) ___-__-__"
+                                                                type="tel"
+                                                                required
+                                                                className="bg-white/5 border-white/10 pl-10 text-xs font-mono h-10 focus:border-orange-500/50"
+                                                                value={leadForm.phone}
+                                                                onChange={e => setLeadForm({ ...leadForm, phone: e.target.value })}
+                                                            />
+                                                        </div>
+                                                        <div className="relative">
+                                                            <Building2 className="absolute left-3 top-3 w-4 h-4 text-white/20" />
+                                                            <Input
+                                                                placeholder="Компания (необязательно)"
+                                                                className="bg-white/5 border-white/10 pl-10 text-xs font-mono h-10 focus:border-orange-500/50"
+                                                                value={leadForm.company}
+                                                                onChange={e => setLeadForm({ ...leadForm, company: e.target.value })}
+                                                            />
+                                                        </div>
+                                                        <Button
+                                                            disabled={isLeadSubmitting}
+                                                            className="w-full bg-orange-500 hover:bg-orange-600 text-[#0F172A] font-black uppercase tracking-widest py-6 shadow-xl shadow-orange-500/20 transition-all"
+                                                        >
+                                                            {isLeadSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Отправить инженеру"}
+                                                        </Button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowLeadForm(false)}
+                                                            className="text-[9px] text-white/20 uppercase font-black hover:text-white transition-colors pt-2"
+                                                        >
+                                                            Вернуться к чату
+                                                        </button>
+                                                    </form>
+                                                </motion.div>
+                                            ) : leadSubmitted ? (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    className="absolute inset-0 z-20 bg-[#0F172A] flex flex-col items-center justify-center p-8 text-center"
+                                                >
+                                                    <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+                                                        <CheckCircle2 className="w-10 h-10 text-green-500" />
+                                                    </div>
+                                                    <h5 className="text-xl font-black uppercase mb-4">Заявка принята!</h5>
+                                                    <p className="text-[11px] text-white/50 leading-relaxed max-w-xs mb-8">Инженер ООО "Диджитал Геотех Хаб" свяжется с вами в течение 30 минут для уточнения деталей.</p>
+                                                    <Button
+                                                        variant="secondary"
+                                                        onClick={() => setLeadSubmitted(false)}
+                                                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black uppercase tracking-widest px-8"
+                                                    >
+                                                        К чату
+                                                    </Button>
+                                                </motion.div>
+                                            ) : null}
+                                        </AnimatePresence>
+
+                                        <ScrollArea className="flex-1 pr-4 -mr-4 mb-6">
+                                            <div className="space-y-6 pb-4">
+                                                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none text-[11px] leading-relaxed text-white/70 font-mono">
+                                                    <span className="text-orange-500 font-black">AI:</span> Приветствую. Я завершил аудит документации. <br /><br />
+                                                    Обнаружено <span className="text-red-400">{proposal.risks?.length || 0} критических факторов</span>. Вы можете уточнить любые детали по расчету шпунта или геологии в чате ниже.
                                                 </div>
-                                            )}
-                                            <div ref={scrollRef} />
+
+                                                {chatMessages.map((msg, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className={`p-4 rounded-2xl text-[11px] leading-relaxed font-mono ${msg.role === 'user'
+                                                            ? 'bg-orange-500 text-[#0F172A] ml-8 rounded-tr-none font-black shadow-lg shadow-orange-500/10'
+                                                            : 'bg-white/5 border border-white/10 text-white/70 mr-8 rounded-tl-none'
+                                                            }`}
+                                                    >
+                                                        <span className={msg.role === 'user' ? 'text-black/50' : 'text-orange-500'}>
+                                                            {msg.role === 'user' ? '> USER: ' : 'AI: '}
+                                                        </span>
+                                                        {msg.content}
+                                                    </div>
+                                                ))}
+
+                                                {isThinking && (
+                                                    <div className="flex items-center gap-2 text-white/20 text-[9px] font-black uppercase tracking-widest animate-pulse ml-4">
+                                                        <Loader2 className="w-3 h-3 animate-spin text-orange-500" /> Инженер формирует ответ...
+                                                    </div>
+                                                )}
+                                                <div ref={scrollRef} />
+                                            </div>
+                                        </ScrollArea>
+
+                                        <div className="flex gap-2 p-1 bg-white/5 rounded-2xl border border-white/10 focus-within:border-orange-500/50 transition-all">
+                                            <Input
+                                                placeholder="Уточнить стоимость или риск..."
+                                                className="bg-transparent border-none text-white text-[11px] font-mono shadow-none focus-visible:ring-0 h-10"
+                                                value={chatInput}
+                                                onChange={(e) => setChatInput(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                            />
+                                            <Button
+                                                variant="secondary"
+                                                className="bg-orange-500 hover:bg-orange-600 text-[#0F172A] h-10 w-10 p-0 rounded-xl shrink-0 shadow-lg shadow-orange-500/20"
+                                                onClick={handleSendMessage}
+                                                disabled={isThinking}
+                                            >
+                                                <Send className="w-4 h-4" />
+                                            </Button>
                                         </div>
-                                    </ScrollArea>
-
-                                    <div className="flex gap-2 p-1 bg-white/5 rounded-2xl border border-white/10 focus-within:border-orange-500/50 transition-all">
-                                        <Input
-                                            placeholder="Уточнить стоимость или риск..."
-                                            className="bg-transparent border-none text-white text-[11px] font-mono shadow-none focus-visible:ring-0 h-10"
-                                            value={chatInput}
-                                            onChange={(e) => setChatInput(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                                        />
-                                        <Button
-                                            variant="secondary"
-                                            className="bg-orange-500 hover:bg-orange-600 text-[#0F172A] h-10 w-10 p-0 rounded-xl shrink-0 shadow-lg shadow-orange-500/20"
-                                            onClick={handleSendMessage}
-                                            disabled={isThinking}
-                                        >
-                                            <Send className="w-4 h-4" />
-                                        </Button>
                                     </div>
                                 </div>
                             ) : (
@@ -406,6 +592,14 @@ export function SmartDropzone() {
                                             <Info className="w-4 h-4" /> {error}
                                         </motion.div>
                                     )}
+
+                                    <div className="mt-8 pt-4 border-t border-white/5 w-full flex items-center justify-center gap-4 text-[9px] text-white/20 font-bold uppercase tracking-widest">
+                                        <span>Max 5MB</span>
+                                        <div className="w-1 h-1 rounded-full bg-white/10" />
+                                        <span>PDF / XLSX</span>
+                                        <div className="w-1 h-1 rounded-full bg-white/10" />
+                                        <span>5 requests / hr</span>
+                                    </div>
                                 </div>
                             )}
                         </div>

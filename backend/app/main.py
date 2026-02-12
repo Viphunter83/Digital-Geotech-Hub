@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import ai_copilot
+from app.api.v1.endpoints import ai_copilot, leads
 from app.core.config import settings
 
 app = FastAPI(
@@ -19,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(ai_copilot.router, prefix=f"{settings.API_V1_STR}/ai", tags=["AI Copilot"])
+app.include_router(leads.router, prefix=f"{settings.API_V1_STR}/leads", tags=["Leads"])
 
 @app.get("/health")
 async def health_check():

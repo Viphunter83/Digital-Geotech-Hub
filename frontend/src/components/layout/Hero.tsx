@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePresence } from "framer-motion";
+import { ArrowRight, Box, Shield, Zap, Globe, Cpu, Database, Cloud, FileText } from "lucide-react";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { LeadMagnetModal } from "./LeadMagnetModal";
 
 interface HeroProps {
     region: 'msk' | 'spb';
@@ -25,6 +26,9 @@ export function Hero({ region }: HeroProps) {
     const config = geoConfigs[region] || geoConfigs.spb;
 
     // Mouse Tracking for Parallax
+    const [activeBadge, setActiveBadge] = useState<number | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const containerRef = useRef(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
@@ -117,11 +121,14 @@ export function Hero({ region }: HeroProps) {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="flex flex-col items-center justify-center gap-4 sm:flex-row"
                 >
-                    <button className="group relative overflow-hidden rounded-md bg-primary px-8 py-4 font-bold text-white transition-all hover:scale-105 active:scale-95">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="group relative overflow-hidden rounded-md bg-primary px-8 py-4 font-bold text-white transition-all hover:scale-105 active:scale-95"
+                    >
                         <span className="relative z-10 flex items-center gap-2">
                             Смотреть каталог <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </span>
-                        <div className="absolute inset-0 z-0 bg-gradient-to-r from-accent to-orange-400 opacity-0 transition-opacity group-hover:opacity-100" />
+                        <div className="absolute inset-0 z-0 bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity group-hover:opacity-100" />
                     </button>
                     <button
                         onClick={() => document.getElementById('copilot')?.scrollIntoView({ behavior: 'smooth' })}
@@ -159,6 +166,14 @@ export function Hero({ region }: HeroProps) {
                 mouseX={smoothX}
                 mouseY={smoothY}
                 factor={0.08}
+            />
+            {/* Modal for Catalog/Price List */}
+            <LeadMagnetModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Скачать каталог и прайс-лист"
+                subtitle="Мы вышлем актуальный каталог шпунта, спецтехники и примеры реализованных объектов"
+                magnetName="Catalog_Request"
             />
         </section>
     );
