@@ -12,11 +12,11 @@ interface SubPageHeroProps {
 
 export function SubPageHero({ title, accentTitle, description, badgeText = "Official Documentation" }: SubPageHeroProps) {
     return (
-        <header className="mb-20 pt-10">
+        <header className="mb-20 pt-10 relative">
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-orange-500 text-xs font-bold uppercase tracking-widest mb-6"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-orange-500 text-xs font-bold uppercase tracking-widest mb-6 shadow-2xl shadow-orange-500/10"
             >
                 <Info className="w-3 h-3" /> {badgeText}
             </motion.div>

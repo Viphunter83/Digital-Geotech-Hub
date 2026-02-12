@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
+import { WhyUs } from "@/components/layout/WhyUs";
 import { ServicesPreview } from "@/components/layout/ServicesPreview";
 import { MachineryPreview } from "@/components/layout/MachineryPreview";
 import { JournalPreview } from "@/components/layout/JournalPreview";
@@ -18,6 +19,7 @@ export default async function Home() {
       <EngineeringBackground />
       <div className="relative z-10">
         <Hero region={region} />
+        <WhyUs />
         <ServicesPreview region={region} />
         <SmartDropzone />
         <InteractiveMap region={region} />

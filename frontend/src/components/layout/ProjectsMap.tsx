@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { PROJECTS } from '@/lib/projects-data';
 
 // Fix for default marker icons in React Leaflet
 const icon = L.divIcon({
@@ -40,24 +41,62 @@ interface GeologyPoint {
     longitude: number;
 }
 
-const REFERENCE_PROJECTS: MapProject[] = [
-    { id: 'ref-1', title: 'МФК «Лахта Центр 2»', location: 'Санкт-Петербург', description: 'Статическое вдавливание шпунта 24м. Оборудование Giken.', latitude: 59.98, longitude: 30.17 },
-    { id: 'ref-2', title: 'ЖК в Москва-Сити', location: 'Москва', description: 'Буросекущие сваи 28м. Установки Bauer BG.', latitude: 55.75, longitude: 37.54 },
-    { id: 'ref-3', title: 'Терминал ЛПГ', location: 'Усть-Луга', description: 'Трубчатый шпунт с вибропогружением.', latitude: 59.68, longitude: 28.42 },
-    { id: 'ref-4', title: 'Эко-Технопарк', location: 'Казань', description: 'Лидерное бурение и погружение ЖБ свай.', latitude: 55.79, longitude: 49.12 },
-    { id: 'ref-5', title: 'Порт Тамань', location: 'Краснодарский край', description: 'Ограждение причала из шпунта Ларсена.', latitude: 45.13, longitude: 36.68 }
-];
 
 const GEOLOGY_POINTS: GeologyPoint[] = [
-    { id: 'geo-1', title: 'Скважина №42 (СПб)', depth: '45.0 м', soil_layers: ['0-8м: Техногенный грунт', '8-22м: Ленточные глины', '22-45м: Моренные суглинки'], water_level: '-1.5 м', latitude: 59.94, longitude: 30.32 },
-    { id: 'geo-2', title: 'Скважина №108 (МСК)', depth: '32.0 м', soil_layers: ['0-4м: Насыпь', '4-15м: Пески мелкие', '15-32м: Тяжелые глины'], water_level: '-8.0 м', latitude: 55.74, longitude: 37.59 },
-    { id: 'geo-3', title: 'Скважина №15 (Усть-Луга)', depth: '28.0 м', soil_layers: ['0-6м: Пески пылеватые', '6-28м: Глины плотные'], water_level: '-0.5 м', latitude: 59.70, longitude: 28.40 }
+    {
+        id: 'g1',
+        title: 'Скважина №14-2',
+        depth: '24.5м',
+        soil_layers: ['Насыпной грунт (2.1м)', 'Суглинок тугоплавкий (4.5м)', 'Песок средней крупности (8.2м)', 'Известняк (9.7м)'],
+        water_level: '-3.2м',
+        latitude: 59.94,
+        longitude: 30.32
+    },
+    {
+        id: 'g2',
+        title: 'Скважина №18-1',
+        depth: '18.0м',
+        soil_layers: ['Торф (1.5м)', 'Супесь пластичная (3.2м)', 'Глина кембрийская (13.3м)'],
+        water_level: '-1.8м',
+        latitude: 59.92,
+        longitude: 30.29
+    },
+    {
+        id: 'g3',
+        title: 'Скважина №11-5',
+        depth: '32.0м',
+        soil_layers: ['Насыпной слой (3.0м)', 'Песок пылеватый (5.0м)', 'Суглинок мягкоплавкий (12.0м)', 'Глина твердая (12.0м)'],
+        water_level: '-4.5м',
+        latitude: 55.76,
+        longitude: 37.62
+    },
+    {
+        id: 'g4',
+        title: 'Скважина №22-3',
+        depth: '28.5м',
+        soil_layers: ['Техногенный грунт (2.8м)', 'Песок мелкий (6.2м)', 'Суглинок полутвердый (19.5м)'],
+        water_level: '-5.1м',
+        latitude: 55.74,
+        longitude: 37.59
+    }
 ];
 
 const GEO_REGIONS = [
-    { id: 'spb-zone', name: 'Балтийский щит (край)', soil: 'Водонасыщенные глины', color: '#F97316', lat: 59.93, lng: 30.33, r: 50000 },
-    { id: 'msk-zone', name: 'Московская синеклиза', soil: 'Карстовые опасности', color: '#0EA5E9', lat: 55.75, lng: 37.61, r: 60000 }
+    { id: 'r1', lat: 59.93, lng: 30.3, r: 5000, color: '#0EA5E9' },
+    { id: 'r2', lat: 55.75, lng: 37.6, r: 8000, color: '#F97316' }
 ];
+
+
+
+const REFERENCE_PROJECTS: MapProject[] = PROJECTS.map(p => ({
+    id: p.id,
+    title: p.title,
+    location: p.location,
+    description: p.description,
+    latitude: p.latitude,
+    longitude: p.longitude
+}));
+
 
 interface ProjectMapProps {
     region: 'msk' | 'spb';
@@ -169,8 +208,11 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                             className="h-full w-full"
                         >
                             <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                                attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                            />
+                            <TileLayer
+                                url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
                             />
                             {activeLayer === 'projects' ? (
                                 projects.map((project) => (

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Hammer, Truck, Ruler, ShieldCheck, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 const services = (region: 'msk' | 'spb') => [
     {
@@ -70,55 +71,64 @@ export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {currentServices.map((service, index) => (
-                        <motion.div
+                        <Link
+                            href={
+                                service.id === "03" ? "/machinery" :
+                                    service.id === "02" ? "/services#catalog" :
+                                        "/services"
+                            }
                             key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
-                            whileHover={{ y: -12 }}
-                            className="group relative flex flex-col h-full bg-white/[0.02] backdrop-blur-sm border border-white/10 p-10 rounded-3xl overflow-hidden transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04]"
+                            className="block h-full"
                         >
-                            {/* Background Number */}
-                            <span className="absolute top-4 right-8 text-8xl font-black text-white/[0.08] select-none transition-all group-hover:text-accent/30 group-hover:scale-110 duration-500">
-                                {service.id}
-                            </span>
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                                whileHover={{ y: -12 }}
+                                className="group relative flex flex-col h-full bg-white/[0.02] backdrop-blur-sm border border-white/10 p-10 rounded-3xl overflow-hidden transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04]"
+                            >
+                                {/* Background Number */}
+                                <span className="absolute top-4 right-8 text-8xl font-black text-white/[0.08] select-none transition-all group-hover:text-accent/30 group-hover:scale-110 duration-500">
+                                    {service.id}
+                                </span>
 
-                            {/* Icon Wrapper */}
-                            <div className="relative z-10 mb-8 p-5 bg-white/[0.05] rounded-2xl w-fit text-white group-hover:bg-accent group-hover:text-white group-hover:rotate-12 transition-all duration-500">
-                                {service.icon}
-                            </div>
-
-                            <div className="relative z-10 flex-grow">
-                                {service.tag && (
-                                    <span className="inline-block px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[9px] font-black uppercase tracking-widest text-accent mb-4">
-                                        {service.tag}
-                                    </span>
-                                )}
-                                <h4 className="text-2xl font-black mb-4 uppercase tracking-tighter text-white transition-colors group-hover:text-accent">
-                                    {service.title}
-                                </h4>
-                                <p className="text-zinc-400 text-sm leading-relaxed mb-10">
-                                    {service.description}
-                                </p>
-                            </div>
-
-                            <div className="relative z-10 flex items-center justify-between pt-6 border-t border-white/5">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-bold text-accent uppercase tracking-widest">{service.stats}</span>
-                                    <div className="h-0.5 w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+                                {/* Icon Wrapper */}
+                                <div className="relative z-10 mb-8 p-5 bg-white/[0.05] rounded-2xl w-fit text-white group-hover:bg-accent group-hover:text-white group-hover:rotate-12 transition-all duration-500">
+                                    {service.icon}
                                 </div>
 
-                                <motion.div
-                                    className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-white/50 group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-500"
-                                >
-                                    <ArrowUpRight className="w-5 h-5" />
-                                </motion.div>
-                            </div>
+                                <div className="relative z-10 flex-grow">
+                                    {service.tag && (
+                                        <span className="inline-block px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[9px] font-black uppercase tracking-widest text-accent mb-4">
+                                            {service.tag}
+                                        </span>
+                                    )}
+                                    <h4 className="text-2xl font-black mb-4 uppercase tracking-tighter text-white transition-colors group-hover:text-accent">
+                                        {service.title}
+                                    </h4>
+                                    <p className="text-zinc-400 text-sm leading-relaxed mb-10">
+                                        {service.description}
+                                    </p>
+                                </div>
 
-                            {/* Hover Glow Effect */}
-                            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                        </motion.div>
+                                <div className="relative z-10 flex items-center justify-between pt-6 border-t border-white/5">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[10px] font-bold text-accent uppercase tracking-widest">{service.stats}</span>
+                                        <div className="h-0.5 w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+                                    </div>
+
+                                    <div
+                                        className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-white/50 group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-500"
+                                    >
+                                        <ArrowUpRight className="w-5 h-5" />
+                                    </div>
+                                </div>
+
+                                {/* Hover Glow Effect */}
+                                <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                            </motion.div>
+                        </Link>
                     ))}
                 </div>
             </div>

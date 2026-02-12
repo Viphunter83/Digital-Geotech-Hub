@@ -4,6 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePres
 import { ArrowRight, Box, Shield, Zap, Globe, Cpu, Database, Cloud, FileText } from "lucide-react";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { LeadMagnetModal } from "./LeadMagnetModal";
+import Link from "next/link";
 
 interface HeroProps {
     region: 'msk' | 'spb';
@@ -55,7 +56,7 @@ export function Hero({ region }: HeroProps) {
     }, [mouseX, mouseY]);
 
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4">
+        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4 selection:bg-orange-500/30">
             {/* Background Image & Overlays - Parallax Layer */}
             <motion.div
                 style={{ x: bgX, y: bgY, scale: 1.15 }}
@@ -64,11 +65,23 @@ export function Hero({ region }: HeroProps) {
                 <img
                     src="/hero-main.png"
                     alt="Geotech Digital Hub"
-                    className="w-full h-full object-cover opacity-70 scale-110"
+                    className="w-full h-full object-cover opacity-60 scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/95 via-[#0F172A]/40 to-[#0F172A]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/95 via-[#0F172A]/60 to-[#0F172A]" />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/90 via-transparent to-[#0F172A]/90" />
+
+                {/* Technical Grid Pattern */}
+                <div
+                    className="absolute inset-0 opacity-20 mix-blend-overlay"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+                        backgroundSize: '50px 50px'
+                    }}
+                />
+
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#F97316_0,rgba(249,115,22,0)_60%)] opacity-20 blur-[120px]" />
+                {/* Noise Texture */}
+                <div className="absolute inset-0 opacity-[0.05] bg-[url('/noise.png')] mix-blend-overlay" />
             </motion.div>
 
             <motion.div
@@ -121,15 +134,15 @@ export function Hero({ region }: HeroProps) {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="flex flex-col items-center justify-center gap-4 sm:flex-row"
                 >
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="group relative overflow-hidden rounded-md bg-primary px-8 py-4 font-bold text-white transition-all hover:scale-105 active:scale-95"
+                    <Link
+                        href="/machinery"
+                        className="group relative overflow-hidden rounded-md bg-primary px-8 py-4 font-bold text-white transition-all hover:scale-105 active:scale-95 inline-flex items-center justify-center"
                     >
                         <span className="relative z-10 flex items-center gap-2">
-                            Смотреть каталог <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            Смотреть каталог техники <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </span>
                         <div className="absolute inset-0 z-0 bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </button>
+                    </Link>
                     <button
                         onClick={() => document.getElementById('copilot')?.scrollIntoView({ behavior: 'smooth' })}
                         className="rounded-md border border-white/20 bg-white/10 px-8 py-4 font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 hover:border-white/40 active:scale-95 shadow-xl"
@@ -148,6 +161,7 @@ export function Hero({ region }: HeroProps) {
                 mouseX={smoothX}
                 mouseY={smoothY}
                 factor={0.1}
+                href="/services#drilling"
             />
             <TechnicalBadge
                 image="/assets/hero/sheet-pile.png"
@@ -157,6 +171,7 @@ export function Hero({ region }: HeroProps) {
                 mouseX={smoothX}
                 mouseY={smoothY}
                 factor={-0.12}
+                href="/services#catalog"
             />
             <TechnicalBadge
                 image="/assets/hero/truck.png"
@@ -166,6 +181,7 @@ export function Hero({ region }: HeroProps) {
                 mouseX={smoothX}
                 mouseY={smoothY}
                 factor={0.08}
+                href="/machinery"
             />
             {/* Modal for Catalog/Price List */}
             <LeadMagnetModal
@@ -179,7 +195,7 @@ export function Hero({ region }: HeroProps) {
     );
 }
 
-function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor }: { image: string, className?: string, label: string, delay: number, mouseX: any, mouseY: any, factor: number }) {
+function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor, href }: { image: string, className?: string, label: string, delay: number, mouseX: any, mouseY: any, factor: number, href: string }) {
     const x = useTransform(mouseX, [-500, 500], [-500 * factor, 500 * factor]);
     const y = useTransform(mouseY, [-500, 500], [-500 * factor, 500 * factor]);
 
@@ -195,26 +211,28 @@ function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor
                 delay: delay
             }}
             whileHover={{ opacity: 1, scale: 1.05 }}
-            className={`absolute hidden lg:flex flex-col items-center gap-4 pointer-events-auto ${className}`}
+            className={`absolute hidden lg:flex flex-col items-center gap-4 pointer-events-auto z-30 ${className}`}
         >
-            <div className="relative group/badge">
-                {/* Glow Effect */}
-                <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full opacity-0 group-hover/badge:opacity-100 transition-opacity duration-500" />
+            <Link href={href} className="group/badge flex flex-col items-center gap-4 w-full h-full">
+                <div className="relative">
+                    {/* Glow Effect */}
+                    <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full opacity-0 group-hover/badge:opacity-100 transition-opacity duration-500" />
 
-                <div className="relative w-32 h-32 p-1 bg-white/10 ring-1 ring-white/20 rounded-2xl backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10">
-                    <img
-                        src={image}
-                        alt={label}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover/badge:scale-110"
-                    />
+                    <div className="relative w-32 h-32 p-1 bg-white/10 ring-1 ring-white/20 rounded-2xl backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10">
+                        <img
+                            src={image}
+                            alt={label}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/badge:scale-110"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div className="flex flex-col items-center">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent drop-shadow-lg">
-                    {label}
-                </span>
-                <div className="h-[2px] w-8 bg-accent/50 mt-1 rounded-full scale-x-0 group-hover/badge:scale-x-100 transition-transform duration-500" />
-            </div>
+                <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent drop-shadow-lg">
+                        {label}
+                    </span>
+                    <div className="h-[2px] w-8 bg-accent/50 mt-1 rounded-full scale-x-0 group-hover/badge:scale-x-100 transition-transform duration-500" />
+                </div>
+            </Link>
         </motion.div>
     );
 }
