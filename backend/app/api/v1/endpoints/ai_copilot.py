@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Response
+from fastapi import APIRouter, UploadFile, File, HTTPException, Response, BackgroundTasks
 from app.schemas.copilot import DraftProposalResponse, ChatRequest, ChatResponse, ProposalSchema
 from app.services.ai.document_processor import doc_processor
 from app.services.ai.geotech_analyzer import geotech_analyzer
@@ -8,14 +8,64 @@ from app.core.redis import get_redis
 from app.services.pdf_generator import pdf_generator
 import hashlib
 import json
+import logging
 from fastapi import Request
+from typing import Optional
+import httpx
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
+
+async def _save_audit_to_directus(
+    filename: str, result_data: dict, client_access_code: Optional[str] = None
+):
+    """Background task: persist audit results to Directus audit_history."""
+    try:
+        client_id = None
+        if client_access_code:
+            async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
+                res = await client.get("/items/clients", params={
+                    "filter[access_code][_eq]": client_access_code,
+                    "fields": "id",
+                    "limit": 1,
+                })
+                if res.status_code == 200:
+                    data = res.json().get("data", [])
+                    if data:
+                        client_id = data[0]["id"]
+
+        parsed = result_data.get("parsed_data", {})
+        record = {
+            "filename": filename,
+            "work_type": parsed.get("work_type"),
+            "soil_type": parsed.get("soil_type"),
+            "volume": parsed.get("volume"),
+            "depth": parsed.get("depth"),
+            "confidence_score": result_data.get("confidence_score"),
+            "risks_count": len(result_data.get("risks", [])),
+            "estimated_total": result_data.get("estimated_total"),
+            "technical_summary": result_data.get("technical_summary"),
+            "full_result": result_data,
+        }
+        if client_id:
+            record["client_id"] = client_id
+
+        async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
+            await client.post("/items/audit_history", json=record)
+        logger.info(f"Audit saved to Directus: {filename}")
+    except Exception as e:
+        logger.error(f"Failed to save audit to Directus: {e}")
+
 @router.post("/parse-document", response_model=DraftProposalResponse)
-async def parse_document(request: Request, file: UploadFile = File(...)):
+async def parse_document(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+):
     """
     Professional technical audit of uploaded documents with abuse protection.
+    Results are automatically saved to Directus audit_history.
     """
     client_ip = request.client.host
     redis = get_redis()
@@ -88,6 +138,20 @@ async def parse_document(request: Request, file: UploadFile = File(...)):
 
     # Store in cache
     redis.setex(cache_key, 86400, response_data.model_dump_json()) # 24 hour cache
+
+    # 6. Background: save to Directus audit_history
+    client_code = None
+    auth_header = request.headers.get("authorization", "")
+    if auth_header.startswith("Bearer "):
+        try:
+            from app.core.security import decode_access_token
+            payload = decode_access_token(auth_header[7:])
+            client_code = payload.get("sub")
+        except Exception:
+            pass
+    background_tasks.add_task(
+        _save_audit_to_directus, file.filename or "unknown", json.loads(response_data.model_dump_json()), client_code
+    )
 
     return response_data
 

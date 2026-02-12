@@ -2,11 +2,15 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+
+    if (pathname?.startsWith('/dashboard') || pathname === '/login') return null;
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5">
@@ -28,9 +32,9 @@ export function Navbar() {
                     <NavLink href="/portfolio">Проекты</NavLink>
                     <NavLink href="/#faq">FAQ</NavLink>
                     <NavLink href="/contacts">Контакты</NavLink>
-                    <button className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all">
+                    <Link href="/login" className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all">
                         Личный кабинет
-                    </button>
+                    </Link>
                 </div>
 
                 {/* Mobile Toggle */}

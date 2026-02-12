@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     # Infrastructure
     REDIS_URL: str = "redis://localhost:6379/0"
     
+    # Auth
+    JWT_SECRET: str = "change-me-in-production-geotech-hub-2026"
+    
+    # Frontend (for CORS)
+    FRONTEND_URL: str = "http://localhost:3000"
+
     # Security/Optimization
     AUDIT_RATE_LIMIT: int = 5  # requests per hour
     MAX_FILE_SIZE_MB: int = 5
