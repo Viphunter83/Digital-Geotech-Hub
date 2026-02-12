@@ -10,7 +10,7 @@ export function JournalPreview() {
     const previewArticles = ARTICLES.slice(0, 3);
 
     return (
-        <section className="py-32 px-6 bg-[#09090b] relative overflow-hidden">
+        <section className="py-32 px-6 bg-transparent relative overflow-hidden">
             <div className="container mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-8">
                     <div className="max-w-2xl">
@@ -53,13 +53,13 @@ export function JournalPreview() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1, duration: 0.6 }}
-                            className="group flex flex-col h-full bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden hover:border-accent/40 transition-all duration-500"
+                            className="group flex flex-col h-full bg-black/40 backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden hover:border-accent/40 transition-all duration-500 shadow-2xl"
                         >
                             <Link href={`/journal/${article.slug}`} className="block relative aspect-[16/9] overflow-hidden">
                                 <img
                                     src={article.image}
                                     alt={article.title}
-                                    className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute top-6 left-6 px-4 py-1.5 bg-accent/20 border border-accent/40 backdrop-blur-md rounded-full">
                                     <span className="text-[9px] font-black uppercase tracking-widest text-accent">

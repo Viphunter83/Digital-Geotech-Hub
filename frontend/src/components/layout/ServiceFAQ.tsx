@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
     Accordion,
     AccordionContent,
@@ -26,6 +27,24 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const demoData: FAQItem[] = [
+            {
+                id: "1",
+                question: "В каких регионах вы работаете?",
+                answer: "Мы работаем по всей территории РФ, включая труднодоступные районы Крайнего Севера и Дальнего Востока."
+            },
+            {
+                id: "2",
+                question: "Какое оборудование используется для вдавливания шпунта?",
+                answer: "Для статического вдавливания мы используем установки Giken Silent Piler F3 и F201, которые позволяют работать вплотную к существующим зданиям без вибрации."
+            },
+            {
+                id: "3",
+                question: "Как AI-Copilot рассчитывает смету?",
+                answer: "Наш алгоритм анализирует загруженное техзадание (чертежи, ведомости), сопоставляет его с актуальными ценами на шпунт из нашего каталога и подбирает оптимальный комплект техники."
+            }
+        ];
+
         async function fetchFAQ() {
             try {
                 // Query FAQ from Directus. If serviceSlug provided, filter by it.
@@ -38,28 +57,13 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
                 const res = await fetch(url);
                 if (!res.ok) throw new Error("Failed to fetch FAQ");
                 const { data } = await res.json();
-                setFaqs(data);
+                if (data && data.length > 0) {
+                    setFaqs(data);
+                } else {
+                    setFaqs(demoData);
+                }
             } catch (err) {
                 console.error("FAQ fetch error:", err);
-                // Fallback for demo
-                const demoData: FAQItem[] = [
-                    {
-                        id: "1",
-                        question: "В каких регионах вы работаете?",
-                        answer: "Мы работаем по всей территории РФ, включая труднодоступные районы Крайнего Севера и Дальнего Востока."
-                    },
-                    {
-                        id: "2",
-                        question: "Какое оборудование используется для вдавливания шпунта?",
-                        answer: "Для статического вдавливания мы используем установки Giken Silent Piler F3 и F201, которые позволяют работать вплотную к существующим зданиям без вибрации."
-                    },
-                    {
-                        id: "3",
-                        question: "Как AI-Copilot рассчитывает смету?",
-                        answer: "Наш алгоритм анализирует загруженное техзадание (чертежи, ведомости), сопоставляет его с актуальными ценами на шпунт из нашего каталога и подбирает оптимальный комплект техники."
-                    }
-                ];
-                // If filtering by service, only show relevant or all if none matched
                 setFaqs(demoData);
             } finally {
                 setLoading(false);
@@ -68,11 +72,14 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
         fetchFAQ();
     }, [serviceSlug]);
 
-    if (loading) return <div className="h-40 w-full bg-white/5 animate-pulse rounded-xl" />;
-    if (faqs.length === 0) return null;
+    if (loading) return (
+        <div className="container mx-auto py-20 px-6">
+            <div className="h-64 w-full bg-white/5 animate-pulse rounded-[40px]" />
+        </div>
+    );
 
     return (
-        <section className="py-32 px-6 bg-[#09090b] relative overflow-hidden" id="faq">
+        <section className="py-32 px-6 bg-transparent relative z-20" id="faq">
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
                 style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #F97316 1px, transparent 0)', backgroundSize: '48px 48px' }} />
@@ -93,7 +100,8 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
                     </h3>
                 </div>
 
-                <div className="bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[40px] p-8 md:p-12 shadow-2xl">
+                <div className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[40px] p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent pointer-events-none" />
                     <Accordion type="single" collapsible className="w-full space-y-4">
                         {faqs.map((item, index) => (
                             <AccordionItem

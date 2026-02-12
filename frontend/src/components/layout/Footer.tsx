@@ -4,23 +4,23 @@ import Link from "next/link";
 
 export function Footer() {
     return (
-        <footer className="bg-white border-t border-primary/5 py-20 px-6">
+        <footer className="bg-transparent border-t border-white/5 py-32 px-6 relative z-10">
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
                     <div className="col-span-1 lg:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 bg-primary flex items-center justify-center rounded-lg">
+                            <div className="w-8 h-8 bg-accent flex items-center justify-center rounded-lg">
                                 <span className="text-white font-black text-lg">G</span>
                             </div>
-                            <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase">Geotech Hub</span>
+                            <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Geotech Hub</span>
                         </Link>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
+                        <p className="text-sm text-white/40 leading-relaxed">
                             15+ лет лидерства в области шпунтовых работ и фундаментостроения. Свой парк современной техники для проектов любой сложности по всей России.
                         </p>
                     </div>
 
                     <div>
-                        <h5 className="font-black uppercase text-xs tracking-widest mb-6">Навигация</h5>
+                        <h5 className="font-black uppercase text-xs tracking-widest mb-6 text-white">Навигация</h5>
                         <ul className="space-y-4">
                             <FooterLink href="/services">Услуги</FooterLink>
                             <FooterLink href="/machinery">Каталог техники</FooterLink>
@@ -29,7 +29,7 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h5 className="font-black uppercase text-xs tracking-widest mb-6">Компания</h5>
+                        <h5 className="font-black uppercase text-xs tracking-widest mb-6 text-white">Компания</h5>
                         <ul className="space-y-4">
                             <FooterLink href="/about">О компании</FooterLink>
                             <FooterLink href="/contacts">Контакты</FooterLink>
@@ -38,22 +38,22 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h5 className="font-black uppercase text-xs tracking-widest mb-6">Контакты</h5>
-                        <div className="text-sm text-muted-foreground space-y-2">
+                        <h5 className="font-black uppercase text-xs tracking-widest mb-6 text-white">Контакты</h5>
+                        <div className="text-sm text-white/40 space-y-2">
                             <p>Санкт-Петербург, тер. промзона Парнас</p>
-                            <p className="font-bold text-primary">+7 (921) 884-44-03</p>
+                            <p className="font-bold text-accent">+7 (921) 884-44-03</p>
                             <p>drilling.rigs.info@yandex.ru</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-primary/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-[10px] text-white/20 uppercase tracking-widest">
                         © 2026 Digital Geotech Hub. Все права защищены.
                     </p>
                     <div className="flex gap-6 text-[10px] uppercase font-bold tracking-widest">
-                        <Link href="/privacy" className="hover:text-accent">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-accent">Terms of Service</Link>
+                        <Link href="/privacy" className="text-white/40 hover:text-accent">Privacy Policy</Link>
+                        <Link href="/terms" className="text-white/40 hover:text-accent">Terms of Service</Link>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@ export function Footer() {
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
     return (
         <li>
-            <Link href={href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Link href={href} className="text-sm text-white/40 hover:text-accent transition-colors">
                 {children}
             </Link>
         </li>

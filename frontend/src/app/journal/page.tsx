@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { GridBackground } from "@/components/ui/GridBackground";
+import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
 
 import { ARTICLES } from "@/lib/journal-data";
 
@@ -25,7 +25,7 @@ export default function JournalPage() {
 
     return (
         <main className="min-h-screen bg-[#09090b] flex flex-col">
-            <GridBackground />
+            <EngineeringBackground />
             <Navbar />
 
             <section className="pt-40 pb-20 px-6 relative z-10">

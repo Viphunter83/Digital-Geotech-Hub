@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { GridBackground } from "@/components/ui/GridBackground";
+import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
 import { ServicesPreview } from "@/components/layout/ServicesPreview";
 import { MachineryPreview } from "@/components/layout/MachineryPreview";
 import { JournalPreview } from "@/components/layout/JournalPreview";
@@ -14,16 +14,18 @@ export default async function Home() {
   const region = (cookieStore.get("x-geo-region")?.value as 'msk' | 'spb') || 'spb';
 
   return (
-    <main className="flex-1">
-      <GridBackground />
-      <Hero region={region} />
-      <ServicesPreview region={region} />
-      <SmartDropzone />
-      <InteractiveMap region={region} />
-      <MachineryPreview />
-      <JournalPreview />
-      <ServiceFAQ />
-      <Footer />
+    <main className="flex-1 relative">
+      <EngineeringBackground />
+      <div className="relative z-10">
+        <Hero region={region} />
+        <ServicesPreview region={region} />
+        <SmartDropzone />
+        <InteractiveMap region={region} />
+        <MachineryPreview />
+        <JournalPreview />
+        <ServiceFAQ />
+        <Footer />
+      </div>
     </main>
   );
 }

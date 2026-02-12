@@ -55,7 +55,7 @@ export function Hero({ region }: HeroProps) {
             {/* Background Image & Overlays - Parallax Layer */}
             <motion.div
                 style={{ x: bgX, y: bgY, scale: 1.15 }}
-                className="absolute inset-0 z-0 overflow-hidden bg-[#0B1120]"
+                className="absolute inset-0 z-0 overflow-hidden bg-transparent"
             >
                 <img
                     src="/hero-main.png"
@@ -104,7 +104,11 @@ export function Hero({ region }: HeroProps) {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     className="mx-auto mb-12 max-w-4xl text-lg font-medium text-white/90 sm:text-2xl leading-relaxed drop-shadow-[0_10px_20px_rgba(0,0,0,1)]"
                 >
-                    {config.usp}
+                    {config.usp.split('. ').map((sentence, i, arr) => (
+                        <span key={i} className="block">
+                            {sentence}{i < arr.length - 1 ? '.' : ''}
+                        </span>
+                    ))}
                 </motion.p>
 
                 <motion.div

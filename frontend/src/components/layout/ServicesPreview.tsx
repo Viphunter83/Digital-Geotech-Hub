@@ -41,7 +41,7 @@ const services = (region: 'msk' | 'spb') => [
 export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) {
     const currentServices = services(region);
     return (
-        <section className="py-32 px-6 bg-[#09090b] relative overflow-hidden">
+        <section className="py-32 px-6 bg-transparent relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none"
                 style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '48px 48px' }} />

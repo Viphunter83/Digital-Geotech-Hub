@@ -156,16 +156,16 @@ export function SmartDropzone() {
                             <Sparkles className="w-3 h-3" /> AI Copilot v2.0
                         </div>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-8 leading-tight">
-                            AI Technical <span className="text-orange-500">Audit</span><br />Assistant
+                            AI Estimator & <span className="text-orange-500">Technical</span><br />Auditor
                         </h2>
                         <p className="text-lg text-white/70 mb-10 max-w-xl">
-                            Загрузите спецификацию проекта. Наш AI-инженер проведет многоуровневый аудит, выявит критические риски и подготовит инженерное резюме.
+                            Загрузите спецификацию или ТЗ. Наш AI-инженер рассчитает предварительную смету, подберет технику и проведет полный аудит технических рисков проекта.
                         </p>
 
                         <ul className="space-y-4 mb-10">
-                            <FeatureItem text="Глубокий аудит PDF/Excel (Layout Aware)" />
+                            <FeatureItem text="Автоматический расчет сметы (Budget Estimation)" />
                             <FeatureItem text="RAG-анализ по ГОСТ 25100 и СП 45.13330" />
-                            <FeatureItem text="Многофакторная оценка рисков среды" />
+                            <FeatureItem text="Выявление скрытых инженерных рисков" />
                         </ul>
 
                         {proposal && (
@@ -208,10 +208,10 @@ export function SmartDropzone() {
                                         <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Шпунт / Профиль</p>
                                         <p className="text-sm font-bold text-orange-400">{proposal.parsed_data.required_profile || "Standard"}</p>
                                     </div>
-                                    <div className="space-y-2">
-                                        <p className="text-white/30 uppercase text-[9px] font-black tracking-widest">Budget Est.</p>
-                                        <p className="text-sm font-bold text-green-400">
-                                            {proposal.estimated_total ? `${proposal.estimated_total.toLocaleString()} ₽` : "Requires calculation"}
+                                    <div className="space-y-2 col-span-2 md:col-span-1 p-3 bg-green-500/10 border border-green-500/20 rounded-xl">
+                                        <p className="text-green-500/60 uppercase text-[9px] font-black tracking-widest">Estimated Budget</p>
+                                        <p className="text-lg font-black text-green-400">
+                                            {proposal.estimated_total ? `${proposal.estimated_total.toLocaleString()} ₽` : "В расчете..."}
                                         </p>
                                     </div>
                                 </div>
@@ -390,8 +390,8 @@ export function SmartDropzone() {
                                     >
                                         <Upload className="w-16 h-16 text-orange-500" />
                                     </motion.div>
-                                    <h4 className="text-2xl font-black mb-2 uppercase tracking-tight relative z-10">Начать аудит</h4>
-                                    <p className="text-[10px] text-white/30 mb-8 font-black uppercase tracking-[0.4em] relative z-10">PDF Spec / Geotech XLSX</p>
+                                    <h4 className="text-2xl font-black mb-2 uppercase tracking-tight relative z-10">Рассчитать смету</h4>
+                                    <p className="text-[10px] text-white/30 mb-8 font-black uppercase tracking-[0.4em] relative z-10">Загрузить ТЗ / Спецификацию / XLSX</p>
 
                                     <div className="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors relative z-10">
                                         Выберите файл или перетащите его сюда

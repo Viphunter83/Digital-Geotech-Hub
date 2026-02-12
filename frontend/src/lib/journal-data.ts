@@ -25,7 +25,7 @@ export const ARTICLES = [
         date: "12 Фев 2026",
         readTime: "8 мин",
         author: "Алексей Иванов",
-        image: "/assets/journal-1.png",
+        image: "/assets/static_piling_expert.png",
         slug: "static-pressing-foundation",
         seo: {
             title: "Статическое вдавливание шпунта в СПб | Технология Silent Piler",
@@ -54,7 +54,7 @@ export const ARTICLES = [
         date: "10 Фев 2026",
         readTime: "12 мин",
         author: "Smart Geotech AI",
-        image: "/assets/journal-2.png",
+        image: "/assets/journal-ai.png",
         slug: "ai-geotech-audit",
         seo: {
             title: "Искусственный интеллект в геотехническом строительстве 2026",
@@ -83,7 +83,7 @@ export const ARTICLES = [
         date: "08 Фев 2026",
         readTime: "10 мин",
         author: "Дмитрий Петров",
-        image: "/assets/journal-3.png",
+        image: "/assets/journal-geology.png",
         slug: "moscow-soil-analysis",
         seo: {
             title: "Особенности грунтов Москвы для фундаментостроения | Геологический анализ",

@@ -44,7 +44,7 @@ const items = [
 
 export function MachineryPreview() {
     return (
-        <section className="py-32 px-6 bg-[#09090b] relative overflow-hidden">
+        <section className="py-32 px-6 bg-transparent relative overflow-hidden">
             {/* Background Mesh */}
             <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
                 style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #F97316 1px, transparent 0)', backgroundSize: '64px 64px' }} />
@@ -92,14 +92,14 @@ export function MachineryPreview() {
                             className="group relative bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[40px] overflow-hidden hover:border-accent/30 transition-all duration-700"
                         >
                             {/* Card Header Illustration */}
-                            <div className="aspect-[16/10] relative flex items-center justify-center p-12 bg-white/[0.02] border-b border-white/5 overflow-hidden">
+                            <div className="aspect-[16/12] relative flex items-center justify-center p-0 bg-white/[0.01] border-b border-white/5 overflow-hidden">
                                 <span className="absolute top-6 left-10 text-6xl font-black text-white/[0.02] select-none tracking-tighter">
                                     {item.id}
                                 </span>
                                 <img
                                     src={item.image}
                                     alt={item.name}
-                                    className="w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+                                    className="w-full h-full object-contain scale-125 drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] transition-transform duration-700 group-hover:scale-150 group-hover:rotate-2"
                                 />
                                 <div className="absolute top-8 right-8 px-4 py-1.5 bg-accent/20 border border-accent/30 rounded-full">
                                     <span className="text-[9px] font-black uppercase tracking-widest text-accent">

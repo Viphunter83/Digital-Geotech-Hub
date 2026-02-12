@@ -101,7 +101,7 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
     if (loading) return <div className="h-[600px] w-full bg-[#0F172A] animate-pulse rounded-2xl flex items-center justify-center text-white/20 font-black uppercase tracking-widest text-xl">Loading Digital Soil...</div>;
 
     return (
-        <section className="py-24 px-6 bg-[#0F172A]" id="map">
+        <section className="py-24 px-6 bg-transparent" id="map">
             <div className="container mx-auto">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 mb-16">
                     <div className="max-w-2xl">
@@ -261,7 +261,7 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
           background: #0F172A !important;
         }
         .leaflet-container {
-          background: #0F172A !important;
+          background: transparent !important;
           outline: none;
         }
       `}</style>

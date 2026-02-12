@@ -7,7 +7,7 @@ import { useParams, notFound } from "next/navigation";
 import { ARTICLES } from "@/lib/journal-data";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { GridBackground } from "@/components/ui/GridBackground";
+import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
 
 export default function ArticleDetailPage() {
     const params = useParams();
@@ -22,7 +22,7 @@ export default function ArticleDetailPage() {
 
     return (
         <main className="min-h-screen bg-[#09090b] flex flex-col">
-            <GridBackground />
+            <EngineeringBackground />
             <Navbar />
 
             <article className="pt-40 pb-32 px-6 relative z-10">
@@ -74,11 +74,13 @@ export default function ArticleDetailPage() {
 
                                 <div
                                     className="prose prose-invert prose-orange max-w-none 
-                                    prose-h2:text-4xl prose-h2:font-black prose-h2:uppercase prose-h2:tracking-tighter prose-h2:mt-12 prose-h2:mb-8
-                                    prose-h3:text-2xl prose-h3:font-black prose-h3:uppercase prose-h3:tracking-tight prose-h3:mt-8 prose-h3:mb-6
-                                    prose-p:text-lg prose-p:text-white/60 prose-p:leading-relaxed prose-p:mb-8
-                                    prose-li:text-white/60 prose-li:text-lg prose-li:mb-4
-                                    prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-accent/5 prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-white/80"
+                                    text-white/80
+                                    prose-h2:text-4xl prose-h2:font-black prose-h2:uppercase prose-h2:tracking-tighter prose-h2:mt-12 prose-h2:mb-8 prose-h2:text-white
+                                    prose-h3:text-2xl prose-h3:font-black prose-h3:uppercase prose-h3:tracking-tight prose-h3:mt-8 prose-h3:mb-6 prose-h3:text-white
+                                    prose-p:text-lg prose-p:text-white/70 prose-p:leading-relaxed prose-p:mb-8
+                                    prose-li:text-white/70 prose-li:text-lg prose-li:mb-4
+                                    prose-strong:text-white prose-strong:font-black
+                                    prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-accent/5 prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-white/90"
                                     dangerouslySetInnerHTML={{ __html: article.content || "" }}
                                 />
 
