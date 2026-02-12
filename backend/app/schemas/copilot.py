@@ -33,6 +33,7 @@ class DraftProposalResponse(BaseModel):
     recommended_machinery: List[MachineryInfo] = []
     estimated_total: Optional[float] = Field(None, description="Ориентировочная стоимость (может отсутствовать)")
     confidence_score: float = Field(..., description="Уровень уверенности AI в извлеченных данных (0-1)")
+    clarifying_questions: List[str] = Field(default_factory=list, description="Уточняющие вопросы от AI, если данных недостаточно")
 
 class ChatMessage(BaseModel):
     role: str = Field(..., pattern="^(user|assistant|system)$")

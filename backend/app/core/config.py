@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     
     # CMS
     DIRECTUS_URL: str = "http://localhost:8055"
+    ADMIN_EMAIL: str = "admin@example.com"
+    ADMIN_PASSWORD: str = "admin-password"
     
     # ProxyAPI
     PROXY_API_KEY: Optional[str] = None

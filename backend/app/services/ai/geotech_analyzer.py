@@ -81,11 +81,17 @@ class GeotechAnalyzer:
         # 5. Smart confidence
         confidence = self._compute_confidence(technical_data, full_text)
 
+        # 6. Generate Clarifying Questions if needed
+        questions = []
+        if confidence < 0.8:
+            questions = await self._generate_clarifying_questions(technical_data, risks)
+
         return {
             "parsed_data": technical_data,
             "risks": risks,
             "technical_summary": summary,
             "confidence_score": confidence,
+            "clarifying_questions": questions,
         }
 
     # ═══════════════════════════════════════════════
@@ -111,8 +117,10 @@ class GeotechAnalyzer:
                         "- depth (float|null): Глубина погружения в метрах (число)\n"
                         "- groundwater_level (float|null): УГВ в метрах (число)\n"
                         "- special_conditions (list[str]): Особые условия\n\n"
+                        "- special_conditions (list[str]): Особые условия\n\n"
                         "ВАЖНО: volume, depth, groundwater_level — ТОЛЬКО числа (float), "
-                        "без единиц измерения. Если данных нет — ставь null."
+                        "без единиц измерения. Если данных нет — ставь null. "
+                        "Если что-то критически неясно — не выдумывай."
                     ),
                 },
                 {"role": "user", "content": f"Извлеки параметры ТЗ:\n\n{text[:15000]}"},
@@ -339,6 +347,44 @@ class GeotechAnalyzer:
             return result.get("is_geotech", False), result.get("reason", "No reason provided")
         except Exception:
             return keyword_hits >= 1, "Fallback heuristic"
+
+    # ═══════════════════════════════════════════════
+    # Clarifying Questions
+    # ═══════════════════════════════════════════════
+
+    async def _generate_clarifying_questions(
+        self, data: ParsedSpecSchema, risks: List[Dict[str, str]]
+    ) -> List[str]:
+        """Generate 3 specific questions if data is missing or vague."""
+        try:
+            response = await self.client.chat.completions.create(
+                model=AI_MODEL,
+                temperature=0.3,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "Ты — опытный главный инженер. Твоя задача — задать 3 коротких, "
+                            "профессиональных вопроса заказчику, чтобы уточнить ТЗ.\n"
+                            "Спрашивай только о том, чего не хватает для точного расчета (грунт, глубина, нагрузки).\n"
+                            "Верни JSON: {\"questions\": [\"Вопрос 1?\", \"Вопрос 2?\", \"Вопрос 3?\"]}"
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            f"ТЕКУЩИЕ ДАННЫЕ:\n{data.model_dump_json()}\n"
+                            f"РИСКИ: {json.dumps(risks, ensure_ascii=False)}"
+                        ),
+                    },
+                ],
+                response_format={"type": "json_object"},
+            )
+            result = json.loads(response.choices[0].message.content)
+            return result.get("questions", [])[:3]
+        except Exception as e:
+            logger.warning(f"Failed to generate questions: {e}")
+            return []
 
 
 # Singleton

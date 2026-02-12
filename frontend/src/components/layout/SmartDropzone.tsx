@@ -42,6 +42,7 @@ interface DraftProposal {
     }>;
     estimated_total: number | null;
     confidence_score: number;
+    clarifying_questions?: string[];
 }
 
 export function SmartDropzone() {
@@ -541,6 +542,26 @@ export function SmartDropzone() {
                                                 )}
                                                 <div ref={scrollRef} />
                                             </div>
+
+                                            {/* Clarifying Questions Chips */}
+                                            {proposal.clarifying_questions && proposal.clarifying_questions.length > 0 && chatMessages.length === 0 && (
+                                                <div className="mb-4 flex flex-wrap gap-2 px-1">
+                                                    <p className="w-full text-[9px] text-white/40 font-black uppercase tracking-widest mb-1 pl-1">УЗНАТЬ ПОДРОБНЕЕ:</p>
+                                                    {proposal.clarifying_questions.map((q, i) => (
+                                                        <button
+                                                            key={i}
+                                                            onClick={() => {
+                                                                setChatInput(q);
+                                                                // Optional: auto-send
+                                                                // handleSendMessage(); 
+                                                            }}
+                                                            className="text-[10px] bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 rounded-lg px-3 py-1.5 transition-all text-left"
+                                                        >
+                                                            {q}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </ScrollArea>
 
                                         <div className="flex gap-2 p-1 bg-white/5 rounded-2xl border border-white/10 focus-within:border-orange-500/50 transition-all">

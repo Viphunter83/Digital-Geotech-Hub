@@ -144,7 +144,8 @@ async def parse_document(
         matched_shpunts=shpunts,
         recommended_machinery=machinery,
         estimated_total=estimated_total if estimated_total > 0 else None,
-        confidence_score=analysis_result["confidence_score"]
+        confidence_score=analysis_result["confidence_score"],
+        clarifying_questions=analysis_result.get("clarifying_questions", [])
     )
 
     # Increment rate limit counter
