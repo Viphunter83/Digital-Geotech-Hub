@@ -39,6 +39,7 @@ async def chat_with_ai(message: str, history: list, context: str = None) -> str:
 
     response = await client.chat.completions.create(
         model="gpt-4o",
+        temperature=0.3,
         messages=messages,
     )
 

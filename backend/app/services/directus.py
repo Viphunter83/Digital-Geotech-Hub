@@ -1,10 +1,13 @@
 import httpx
+import logging
 from typing import List
 from app.core.config import settings
 from app.schemas.copilot import ShpuntInfo, MachineryInfo
 
+logger = logging.getLogger(__name__)
+
 async def fetch_matching_data(work_type: str, required_profile: str = None):
-    # Initialize both variables at the very beginning to avoid UnboundLocalError
+    """Fetch matching equipment from Directus. Returns empty lists on failure (no fake data)."""
     shpunts = []
     machinery = []
     
@@ -19,15 +22,14 @@ async def fetch_matching_data(work_type: str, required_profile: str = None):
                     for item in items:
                         shpunts.append(ShpuntInfo(
                             name=item.get("name"),
-                            price=float(item.get("price") or 0), # Note: Check if price actually exists in schema
-                            stock=float(item.get("stock_quantity") or 0) # Fixed field name
+                            price=float(item.get("price") or 0),
+                            stock=float(item.get("stock_quantity") or 0)
                         ))
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Shpunt lookup failed: {e}")
 
         # 2. Search for Machinery
         try:
-            # Better search: check both name and category
             m_params = {"filter[_or]": [
                 {"name": {"_contains": work_type}},
                 {"category": {"_contains": work_type}}
@@ -39,24 +41,16 @@ async def fetch_matching_data(work_type: str, required_profile: str = None):
                     machinery.append(MachineryInfo(
                         id=str(m.get("id")),
                         name=m.get("name"),
-                        description=m.get("status"), # Using status as brief description if description field is missing
+                        description=m.get("status"),
                         category=m.get("category") or "Спецтехника"
                     ))
-        except Exception:
-            pass
-            
-    # Fallback for Demo if DB is empty or fails (Crucial for presentation as per HANDOVER.md)
+        except Exception as e:
+            logger.warning(f"Machinery lookup failed: {e}")
+
     if not shpunts:
-        shpunts = [
-            ShpuntInfo(name="Ларссен L5-UM", price=125000, stock=850),
-            ShpuntInfo(name="Ларссен L4", price=118000, stock=1200)
-        ]
-    
+        logger.info("No shpunts found in Directus for profile: %s", required_profile)
     if not machinery:
-        machinery = [
-            MachineryInfo(id="m1", name="Giken Silent Piler F201", description="Установка для бесшумного статического вдавливания", category="Вдавливание"),
-            MachineryInfo(id="m2", name="Bauer BG 28", description="Буровая установка для тяжелых грунтов", category="Бурение")
-        ]
+        logger.info("No machinery found in Directus for work_type: %s", work_type)
             
     return shpunts, machinery
 
