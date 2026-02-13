@@ -4,14 +4,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SubPageHero } from "@/components/layout/SubPageHero";
 import { ArrowRight, Settings, Tractor } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { LeadMagnetModal } from "@/components/layout/LeadMagnetModal";
 import { MachineryDetailsDialog } from "@/components/features/MachineryDetailsDialog";
 
 import { machinery, machineryCategories as categories } from "@/lib/machinery-data";
 import { services } from "@/lib/services-data";
 
+import { useSearchParams } from "next/navigation";
+
 export default function MachineryPage() {
+    const searchParams = useSearchParams();
+    const initialId = searchParams.get('id');
     const [activeCategory, setActiveCategory] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
@@ -28,6 +32,16 @@ export default function MachineryPage() {
 
     const [detailsMachine, setDetailsMachine] = useState<typeof machinery[0] | null>(null);
 
+    // Deep linking logic
+    useEffect(() => {
+        if (initialId) {
+            const machine = machinery.find(m => m.id === initialId);
+            if (machine) {
+                setDetailsMachine(machine);
+            }
+        }
+    }, [initialId]);
+
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6 overflow-hidden relative">
             {/* Background elements - Extreme Industrial Aesthetics */}
@@ -43,8 +57,10 @@ export default function MachineryPage() {
                 <SubPageHero
                     title="Технический"
                     accentTitle="арсенал"
-                    description="Мы владеем одним из самых современных парков тяжелой инженерной техники в России. Bauer, Junttan, Giken — это не просто бренды, это гарантия успеха вашего проекта."
-                    badgeText="Heavy Machinery Inventory"
+                    description="Собственный парк современной буровой и сваебойной техники. Аренда с экипажем, обслуживание и перебазировка."
+                    badgeText="Machinery Fleet v3.0"
+                    backLink="/"
+                    backLabel="На главную"
                 />
 
                 {/* Filtering System */}

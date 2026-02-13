@@ -84,6 +84,8 @@ export default async function PortfolioPage() {
                         accentTitle="проекты"
                         description="Портфолио GIP. От работы в условиях исторической застройки до реализации масштабных инфраструктурных объектов государственного значения."
                         badgeText="Portfolio & Cases"
+                        backLink="/"
+                        backLabel="На главную"
                     />
                 </div>
 

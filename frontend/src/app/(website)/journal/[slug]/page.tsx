@@ -8,6 +8,7 @@ import { ARTICLES } from "@/lib/journal-data";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function ArticleDetailPage() {
     const params = useParams();
@@ -27,18 +28,23 @@ export default function ArticleDetailPage() {
 
             <article className="pt-40 pb-32 px-6 relative z-10">
                 <div className="container mx-auto">
-                    {/* Breadcrumbs */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-4 mb-12"
-                    >
-                        <Link href="/" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Главная</Link>
-                        <ChevronRight className="w-3 h-3 text-white/20" />
-                        <Link href="/journal" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Journal</Link>
-                        <ChevronRight className="w-3 h-3 text-white/20" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-accent truncate max-w-[200px]">{article.title}</span>
-                    </motion.div>
+
+                    {/* Back Button & Breadcrumbs */}
+                    <div className="mb-12">
+                        <BackButton href="/journal" label="Все статьи" className="mb-8" />
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex items-center gap-4"
+                        >
+                            <Link href="/" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Главная</Link>
+                            <ChevronRight className="w-3 h-3 text-white/20" />
+                            <Link href="/journal" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Journal</Link>
+                            <ChevronRight className="w-3 h-3 text-white/20" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-accent truncate max-w-[200px]">{article.title}</span>
+                        </motion.div>
+                    </div>
 
                     <div className="flex flex-col lg:flex-row gap-16 item-start">
                         {/* Main Content */}

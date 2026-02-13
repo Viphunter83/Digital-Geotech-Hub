@@ -12,6 +12,8 @@ import { ARTICLES } from "@/lib/journal-data";
 
 const CATEGORIES = ["Все", "Технологии", "Инновации", "Геология", "Кейсы", "Оборудование"];
 
+import { BackButton } from "@/components/ui/BackButton";
+
 export default function JournalPage() {
     const [selectedCategory, setSelectedCategory] = useState("Все");
     const [searchQuery, setSearchQuery] = useState("");
@@ -32,15 +34,7 @@ export default function JournalPage() {
                 <div className="container mx-auto">
                     {/* Header */}
                     <div className="max-w-4xl mb-20">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex items-center gap-4 mb-8"
-                        >
-                            <Link href="/" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-accent transition-colors">Главная</Link>
-                            <ChevronRight className="w-3 h-3 text-white/20" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-accent">Journal</span>
-                        </motion.div>
+                        <BackButton href="/" label="На главную" />
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}

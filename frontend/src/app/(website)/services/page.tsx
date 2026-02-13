@@ -47,6 +47,8 @@ export default function ServicesPage() {
                     accentTitle="компетенции"
                     description="Проектирование и реализация полного цикла работ нулевого цикла. Собственный парк спецтехники и команда инженеров высшей квалификации."
                     badgeText="Service Catalog v2.0"
+                    backLink="/"
+                    backLabel="На главную"
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-32">

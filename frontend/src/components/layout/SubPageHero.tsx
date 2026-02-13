@@ -3,16 +3,23 @@
 import { motion } from "framer-motion";
 import { Info } from "lucide-react";
 
+import { BackButton } from "@/components/ui/BackButton";
+
 interface SubPageHeroProps {
     title: string;
     description: string;
     badgeText?: string;
     accentTitle: string;
+    backLink?: string;
+    backLabel?: string;
 }
 
-export function SubPageHero({ title, accentTitle, description, badgeText = "Official Documentation" }: SubPageHeroProps) {
+export function SubPageHero({ title, accentTitle, description, badgeText = "Official Documentation", backLink, backLabel }: SubPageHeroProps) {
     return (
         <header className="mb-20 pt-10 relative">
+            {backLink && (
+                <BackButton href={backLink} label={backLabel} className="mb-8" />
+            )}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

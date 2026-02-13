@@ -13,10 +13,20 @@ export interface Project {
     longitude: number;
     image: string;
     tags: string[];
+    technologies?: ProjectTechnology[];
     stats: {
         label: string;
         value: string;
     }[];
+}
+
+export interface ProjectTechnology {
+    id: string;
+    name: string;
+    type: 'Метод' | 'Оборудование' | 'Материал' | 'Инструмент';
+    description?: string;
+    image?: string;
+    specs?: { label: string; value: string }[];
 }
 
 export const PROJECTS: Project[] = [
@@ -34,6 +44,31 @@ export const PROJECTS: Project[] = [
         longitude: 30.17,
         image: '/assets/projects/lakhta.png',
         tags: ['Giken Silent Piler', 'Шпунт Ларсена', 'Нулевой цикл'],
+        technologies: [
+            {
+                id: 'giken-f201',
+                name: 'Giken Silent Piler F201',
+                type: 'Оборудование',
+                description: 'Установка статического вдавливания, позволяющая погружать шпунт в условиях плотной городской застройки без шума и вибрации. Идеально для работы вблизи исторических зданий.',
+                image: '/assets/static_piling_expert.png',
+                specs: [
+                    { label: 'Усилие', value: '150 тс' },
+                    { label: 'Шум', value: '< 65 дБ' }
+                ]
+            },
+            {
+                id: 'sheet-pile-larsen',
+                name: 'Шпунт Ларсена',
+                type: 'Материал',
+                description: 'Металлический профиль корытообразного сечения, используемый для создания герметичных ограждений котлованов. Обеспечивает высокую несущую способность и возможность многократного использования.'
+            },
+            {
+                id: 'zero-cycle',
+                name: 'Нулевой цикл',
+                type: 'Метод',
+                description: 'Комплекс работ по подготовке основания, включая земляные работы, устройство фундаментов и прокладку подземных коммуникаций до отметки пола первого этажа.'
+            }
+        ],
         stats: [
             { label: 'Глубина', value: '24 м' },
             { label: 'Шпунт', value: '1,200 т' },
@@ -54,6 +89,25 @@ export const PROJECTS: Project[] = [
         longitude: 37.54,
         image: '/assets/projects/moscow-city.png',
         tags: ['Bauer BG', 'Буросекущие сваи', 'Котлован'],
+        technologies: [
+            {
+                id: 'bauer-bg45',
+                name: 'Bauer BG 45',
+                type: 'Оборудование',
+                description: 'Роторная буровая установка премиум-класса для устройства буронабивных свай больших диаметров и глубин. Обладает высокой производительностью в сложных грунтах.',
+                image: '/assets/machinery-bauer.png',
+                specs: [
+                    { label: 'Момент', value: '461 кНм' },
+                    { label: 'Глубина', value: '100 м' }
+                ]
+            },
+            {
+                id: 'secant-piles',
+                name: 'Буросекущие сваи',
+                type: 'Метод',
+                description: 'Технология устройства герметичной стены в грунте путем перекрытия (сечения) соседних свай. Применяется для ограждения котлованов в водонасыщенных грунтах.'
+            }
+        ],
         stats: [
             { label: 'Сваи', value: '450 шт' },
             { label: 'Диаметр', value: '800 мм' },
@@ -74,6 +128,25 @@ export const PROJECTS: Project[] = [
         longitude: 28.42,
         image: '/assets/projects/ust-luga.png',
         tags: ['Трубчатый шпунт', 'Вибропогружение', 'Гидротехника'],
+        technologies: [
+            {
+                id: 'pve-52m',
+                name: 'PVE 52M',
+                type: 'Оборудование',
+                description: 'Мощный гидравлический вибропогружатель для погружения тяжелых шпунтовых свай и труб. Обеспечивает высокую скорость работы в песчаных и глинистых грунтах.',
+                image: '/assets/machinery-movax.png',
+                specs: [
+                    { label: 'Усилие', value: '2300 кН' },
+                    { label: 'Частота', value: '2300 об/мин' }
+                ]
+            },
+            {
+                id: 'tubular-pile',
+                name: 'Трубчатый шпунт',
+                type: 'Материал',
+                description: 'Шпунтовые сваи трубчатого сечения (ШТС), обладающие повышенным моментом сопротивления. Используются при строительстве причальных стенок и глубоководных сооружений.'
+            }
+        ],
         stats: [
             { label: 'Шпунт', value: '3,500 т' },
             { label: 'Длина', value: 'До 32 м' },
@@ -94,6 +167,20 @@ export const PROJECTS: Project[] = [
         longitude: 49.12,
         image: '/assets/projects/kazan.png',
         tags: ['Забивные сваи', 'Лидерное бурение', 'Фундамент'],
+        technologies: [
+            {
+                id: 'driven-piles',
+                name: 'Забивные сваи',
+                type: 'Метод',
+                description: 'Традиционный и надежный метод устройства свайных фундаментов. Сваи погружаются в грунт ударами молота, что обеспечивает уплотнение грунта вокруг ствола сваи.'
+            },
+            {
+                id: 'leader-drilling',
+                name: 'Лидерное бурение',
+                type: 'Метод',
+                description: 'Предварительное бурение скважин меньшего диаметра перед погружением свай. Применяется в плотных грунтах, мерзлоте или для снижения динамических воздействий.'
+            }
+        ],
         stats: [
             { label: 'Сваи', value: '1,100 шт' },
             { label: 'Сечение', value: '400 мм' },
@@ -113,7 +200,26 @@ export const PROJECTS: Project[] = [
         latitude: 45.13,
         longitude: 36.68,
         image: '/assets/projects/taman.png',
-        tags: ['Шпунт Ларсена', 'Плавкран', 'Порт'],
+        tags: ['Шпунт Ларсена', 'Вибропогружатель', 'Порт'],
+        technologies: [
+            {
+                id: 'vibro-hammer-pve',
+                name: 'Вибропогружатель PVE',
+                type: 'Оборудование',
+                description: 'Высокочастотный вибропогружатель для погружения и извлечения шпунтовых свай. Обеспечивает высокую скорость и точность работ.',
+                image: '/assets/machinery-movax.png',
+                specs: [
+                    { label: 'Усилие', value: '2300 кН' },
+                    { label: 'Частота', value: '2300 об/мин' }
+                ]
+            },
+            {
+                id: 'sheet-piles-marine',
+                name: 'Шпунт Ларсена',
+                type: 'Материал',
+                description: 'Применение специализированного профиля шпунта с антикоррозийным покрытием для защиты гидротехнических сооружений в агрессивной морской среде.'
+            }
+        ],
         stats: [
             { label: 'Шпунт', value: '800 т' },
             { label: 'Глубина', value: '18 м' },

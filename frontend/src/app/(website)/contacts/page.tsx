@@ -62,6 +62,8 @@ export default function ContactsPage() {
                     accentTitle="связь"
                     description="Мы всегда открыты для новых проектов и технического консультирования. Свяжитесь с нашими инженерами удобным для вас способом."
                     badgeText="HQ Communication Center"
+                    backLink="/"
+                    backLabel="На главную"
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
