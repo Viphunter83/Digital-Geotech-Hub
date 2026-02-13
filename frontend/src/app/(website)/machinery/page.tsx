@@ -6,6 +6,7 @@ import { ArrowRight, Settings, Tractor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { LeadMagnetModal } from "@/components/layout/LeadMagnetModal";
+import { MachineryDetailsDialog } from "@/components/features/MachineryDetailsDialog";
 
 import { machinery, machineryCategories as categories } from "@/lib/machinery-data";
 import { services } from "@/lib/services-data";
@@ -24,6 +25,8 @@ export default function MachineryPage() {
         setSelectedItem(name);
         setIsModalOpen(true);
     };
+
+    const [detailsMachine, setDetailsMachine] = useState<typeof machinery[0] | null>(null);
 
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6 overflow-hidden relative">
@@ -82,7 +85,10 @@ export default function MachineryPage() {
 
                                 <div className="flex flex-col h-full">
                                     {/* Image Section - Technical Blueprint Style */}
-                                    <div className="h-72 relative overflow-hidden bg-[#0F172A]">
+                                    <div
+                                        className="h-72 relative overflow-hidden bg-[#0F172A] cursor-pointer"
+                                        onClick={() => setDetailsMachine(item)}
+                                    >
                                         <div className="absolute inset-0 opacity-20 pointer-events-none z-10">
                                             <div className="absolute top-0 left-0 w-full h-px bg-orange-500/30" />
                                             <div className="absolute top-0 left-0 w-px h-full bg-orange-500/30" />
@@ -118,13 +124,24 @@ export default function MachineryPage() {
                                     {/* Content Section */}
                                     <div className="p-10 flex flex-col justify-between flex-1">
                                         <div>
-                                            <h3 className="text-4xl font-black uppercase leading-tight mb-4 group-hover:text-orange-500 transition-colors">
+                                            <h3
+                                                className="text-4xl font-black uppercase leading-tight mb-4 group-hover:text-orange-500 transition-colors cursor-pointer"
+                                                onClick={() => setDetailsMachine(item)}
+                                            >
                                                 {item.name}
                                             </h3>
 
-                                            <p className="text-sm text-white/50 leading-relaxed font-bold uppercase tracking-widest mb-6 border-l-2 border-orange-500/30 pl-6 line-clamp-2">
-                                                {item.description}
-                                            </p>
+                                            <div
+                                                className="group/desc cursor-pointer"
+                                                onClick={() => setDetailsMachine(item)}
+                                            >
+                                                <p className="text-sm text-white/50 leading-relaxed font-bold uppercase tracking-widest mb-6 border-l-2 border-orange-500/30 pl-6 line-clamp-2 group-hover/desc:text-white/80 transition-colors">
+                                                    {item.description}
+                                                </p>
+                                                <div className="mb-4 text-[10px] text-orange-500 font-bold uppercase tracking-widest opacity-0 -translate-y-2 group-hover/desc:opacity-100 group-hover/desc:translate-y-0 transition-all">
+                                                    Читать подробнее →
+                                                </div>
+                                            </div>
 
                                             {/* Related Services Chips */}
                                             {item.relatedServiceIds && item.relatedServiceIds.length > 0 && (
@@ -171,10 +188,7 @@ export default function MachineryPage() {
                                             </Button>
                                             <Button
                                                 variant="outline"
-                                                onClick={() => {
-                                                    setSelectedItem(`Technical Specs: ${item.name}`);
-                                                    setIsModalOpen(true);
-                                                }}
+                                                onClick={() => setDetailsMachine(item)}
                                                 className="sm:w-16 h-16 bg-white/5 border-white/10 hover:border-orange-500 hover:bg-white/10 text-white/40 hover:text-orange-500 rounded-2xl flex items-center justify-center transition-all group/btn"
                                             >
                                                 <Settings className="w-5 h-5 group-hover/btn:rotate-180 transition-transform duration-500" />
@@ -239,6 +253,16 @@ export default function MachineryPage() {
                     </div>
                 </motion.div>
             </div >
+
+            <MachineryDetailsDialog
+                isOpen={!!detailsMachine}
+                onClose={() => setDetailsMachine(null)}
+                machinery={detailsMachine}
+                onRentRequest={(name) => {
+                    setDetailsMachine(null);
+                    handleInquiry(name);
+                }}
+            />
 
             <LeadMagnetModal
                 isOpen={isModalOpen}

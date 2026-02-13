@@ -14,7 +14,7 @@ export function Navbar() {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5">
-            <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+            <div className="w-full max-w-[1920px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg group-hover:bg-accent transition-colors">
                         <span className="text-white font-black text-xl">G</span>
@@ -40,7 +40,7 @@ export function Navbar() {
                         </a>
                     </div>
 
-                    <Link href="/login" className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all">
+                    <Link href="/login" className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all whitespace-nowrap">
                         Личный кабинет
                     </Link>
                 </div>
