@@ -196,7 +196,7 @@ export default function MachineryPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     className="mt-32 p-1 relative overflow-hidden rounded-[50px] bg-gradient-to-br from-white/20 via-transparent to-white/20"
                 >
-                    <div className="bg-[#0F172A] rounded-[49px] p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-16 relative overflow-hidden group">
+                    <div className="bg-[#0F172A] rounded-[49px] p-8 md:p-12 lg:p-16 flex flex-col xl:flex-row items-center gap-10 xl:gap-16 relative overflow-hidden group">
                         {/* Blueprint decorative lines */}
                         <div className="absolute top-10 left-10 w-20 h-20 border-t border-l border-white/10" />
                         <div className="absolute bottom-10 right-10 w-20 h-20 border-b border-r border-white/10" />
@@ -206,23 +206,23 @@ export default function MachineryPage() {
                             <div className="absolute inset-0 border-2 border-dashed border-orange-500/30 rounded-full animate-spin-slow" />
                         </div>
 
-                        <div className="flex-1 relative z-10 text-center lg:text-left">
+                        <div className="flex-1 relative z-10 text-center xl:text-left">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-[9px] font-black uppercase tracking-widest mb-6">
                                 Quality Assurance
                             </div>
                             <h4 className="text-4xl lg:text-5xl font-black uppercase text-white mb-6 leading-tight">Собственный <br />инженерный центр</h4>
-                            <p className="text-white/50 text-base font-bold uppercase tracking-widest max-w-2xl leading-relaxed">
+                            <p className="text-white/50 text-base font-bold uppercase tracking-widest max-w-2xl leading-relaxed mx-auto xl:mx-0">
                                 Каждая единица техники проходит регламентный аудит перед каждой мобилизацией. <span className="text-orange-500">Гарантируем бесперебойную работу</span> 24/7 в любых климатических условиях.
                             </p>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-6 relative z-10 w-full lg:w-auto">
+                        <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 relative z-10 w-full xl:w-auto justify-center xl:justify-start">
                             <Button
                                 onClick={() => {
                                     setSelectedItem("Certificates & Compliance");
                                     setIsModalOpen(true);
                                 }}
-                                className="bg-white text-[#0F172A] hover:bg-orange-500 px-12 h-20 rounded-3xl font-black uppercase tracking-widest text-[11px] transition-all shadow-2xl"
+                                className="bg-white text-[#0F172A] hover:bg-orange-500 px-8 lg:px-12 h-20 rounded-3xl font-black uppercase tracking-widest text-[11px] transition-all shadow-2xl shrink-0"
                             >
                                 Сертификаты
                             </Button>
@@ -231,7 +231,7 @@ export default function MachineryPage() {
                                     setSelectedItem("Rent & Project Inquiry");
                                     setIsModalOpen(true);
                                 }}
-                                className="bg-transparent border border-white/20 text-white hover:text-[#0F172A] hover:bg-white hover:border-transparent h-20 rounded-3xl px-12 font-black uppercase tracking-widest text-[11px] transition-all"
+                                className="bg-transparent border border-white/20 text-white hover:text-[#0F172A] hover:bg-white hover:border-transparent h-20 rounded-3xl px-8 lg:px-12 font-black uppercase tracking-widest text-[11px] transition-all shrink-0"
                             >
                                 Аренда / Подряд
                             </Button>

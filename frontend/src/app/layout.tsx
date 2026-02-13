@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   description: "B2B-платформа для строительной компании ГеоТехнологии. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
 };
 
-import { Navbar } from "@/components/layout/Navbar";
 
 export default function RootLayout({
   children,
@@ -29,10 +28,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} antialiased font-sans bg-background text-foreground`}
       >
-        <div className="flex min-h-screen flex-col pt-20">
-          <Navbar />
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

@@ -32,6 +32,14 @@ export function Navbar() {
                     <NavLink href="/portfolio">Проекты</NavLink>
                     <NavLink href="/#faq">FAQ</NavLink>
                     <NavLink href="/contacts">Контакты</NavLink>
+
+                    <div className="flex items-center gap-4 border-l border-white/10 pl-6">
+                        <a href="tel:+79218844403" className="flex flex-col items-end group">
+                            <span className="text-xs font-bold text-white group-hover:text-orange-500 transition-colors">+7 (921) 884-44-03</span>
+                            <span className="text-[10px] text-white/40 uppercase tracking-wider">Отдел аренды</span>
+                        </a>
+                    </div>
+
                     <Link href="/login" className="bg-primary text-white px-6 py-2 rounded-md font-bold text-sm hover:bg-accent transition-all">
                         Личный кабинет
                     </Link>

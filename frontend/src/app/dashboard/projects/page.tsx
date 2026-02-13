@@ -15,6 +15,8 @@ interface Project {
     end_date: string | null;
     tags: string[] | null;
     date_created: string;
+    photos?: { directus_files_id: { id: string; filename_disk: string } }[];
+    documents?: { directus_files_id: { id: string; filename_download: string; title?: string } }[];
 }
 
 const statusStyles: Record<string, string> = {
@@ -142,19 +144,65 @@ export default function ProjectsPage() {
                                 <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                                     <div
                                         className={`h-full rounded-full transition-all ${project.progress >= 80
-                                                ? "bg-emerald-500"
-                                                : project.progress >= 50
-                                                    ? "bg-orange-500"
-                                                    : "bg-blue-500"
+                                            ? "bg-emerald-500"
+                                            : project.progress >= 50
+                                                ? "bg-orange-500"
+                                                : "bg-blue-500"
                                             }`}
                                         style={{ width: `${project.progress}%` }}
                                     />
                                 </div>
+
+                                {/* Photos & Docs (Evidence-Based) */}
+                                {(project.photos?.length || 0) > 0 && (
+                                    <div className="mt-6">
+                                        <p className="text-[10px] font-bold uppercase text-white/30 mb-2">Фотоотчет</p>
+                                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                            {project.photos?.map((p, k) => (
+                                                <div key={k} className="shrink-0 w-24 h-16 rounded-lg bg-white/5 border border-white/10 overflow-hidden relative group/img">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img
+                                                        src={`${process.env.NEXT_PUBLIC_CMS_URL}/assets/${p.directus_files_id.id}?key=system-medium-contain`}
+                                                        alt="Photo"
+                                                        className="w-full h-full object-cover opacity-80 group-hover/img:opacity-100 transition-opacity"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {(project.documents?.length || 0) > 0 && (
+                                    <div className="mt-4">
+                                        <p className="text-[10px] font-bold uppercase text-white/30 mb-2">Документы</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {project.documents?.map((d, k) => (
+                                                <a
+                                                    key={k}
+                                                    href={`${process.env.NEXT_PUBLIC_CMS_URL}/assets/${d.directus_files_id.id}?download`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group/doc"
+                                                >
+                                                    <div className="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span className="text-xs text-white/60 group-hover/doc:text-white transition-colors">
+                                                        {d.directus_files_id.title || d.directus_files_id.filename_download}
+                                                    </span>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

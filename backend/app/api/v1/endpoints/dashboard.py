@@ -98,7 +98,7 @@ async def get_projects(client: Dict = Depends(get_current_client)):
 
     projects = await _directus_get("/items/projects", {
         "filter[client_id][_eq]": client_id,
-        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created",
+        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title",
         "sort": "-date_created",
     })
 
