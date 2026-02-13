@@ -360,7 +360,7 @@ export function SmartDropzone() {
                             accept=".pdf,.xlsx,.xls"
                         />
                         <div
-                            className={`aspect-video md:aspect-[4/3] rounded-3xl border-2 border-dashed border-white/20 bg-white/5 backdrop-blur-xl flex flex-col p-8 transition-all hover:border-orange-500/50 group ${isUploading ? 'pointer-events-none' : ''}`}
+                            className={`aspect-video md:aspect-square rounded-3xl border-2 border-dashed border-white/20 bg-white/5 backdrop-blur-xl flex flex-col p-8 transition-all hover:border-orange-500/50 group ${isUploading ? 'pointer-events-none' : ''}`}
                         >
                             {isUploading ? (
                                 <div className="flex-1 flex flex-col items-center justify-center text-center p-12">

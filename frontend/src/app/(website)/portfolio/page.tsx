@@ -1,5 +1,6 @@
 import { SubPageHero } from "@/components/layout/SubPageHero";
 import { PROJECTS, Project } from "@/lib/projects-data";
+import { PortfolioHeroDecorations } from "@/components/portfolio/PortfolioHeroDecorations";
 import { PortfolioClient } from "@/components/portfolio/PortfolioClient";
 
 // Типизация данных из Directus
@@ -82,11 +83,13 @@ export default async function PortfolioPage() {
                     <SubPageHero
                         title="Знаковые"
                         accentTitle="проекты"
-                        description="Портфолио GIP. От работы в условиях исторической застройки до реализации масштабных инфраструктурных объектов государственного значения."
+                        description="Портфолио Digital Geotech Hub. От работы в условиях исторической застройки до реализации масштабных инфраструктурных объектов государственного значения."
                         badgeText="Portfolio & Cases"
                         backLink="/"
                         backLabel="На главную"
-                    />
+                    >
+                        <PortfolioHeroDecorations />
+                    </SubPageHero>
                 </div>
 
                 {/* Client Component for Interactive Grid */}

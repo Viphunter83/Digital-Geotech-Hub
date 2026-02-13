@@ -27,7 +27,7 @@ export function PortfolioClient({ initialProjects }: PortfolioClientProps) {
     }, [initialProjects, filterRegion, filterCategory]);
 
     return (
-        <section className="relative z-10 -mt-20">
+        <section className="relative z-10 mt-10">
             {/* Filter Bar */}
             <div className="sticky top-24 z-40 mb-12">
                 <div className="container mx-auto px-4">

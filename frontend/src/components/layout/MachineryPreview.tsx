@@ -94,10 +94,10 @@ export function MachineryPreview() {
                                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1, duration: 0.6 }}
-                                className="group relative bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[40px] overflow-hidden hover:border-accent/30 transition-all duration-700"
+                                className="group relative bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[40px] overflow-hidden hover:border-accent/30 transition-all duration-700 flex flex-col h-full"
                             >
                                 {/* Card Header Illustration */}
-                                <div className="aspect-[16/12] relative flex items-center justify-center p-0 bg-white/[0.01] border-b border-white/5 overflow-hidden">
+                                <div className="aspect-[16/12] relative flex items-center justify-center p-0 bg-white/[0.01] border-b border-white/5 overflow-hidden shrink-0">
                                     <span className="absolute top-6 left-10 text-6xl font-black text-white/[0.02] select-none tracking-tighter">
                                         {item.id}
                                     </span>
@@ -113,7 +113,7 @@ export function MachineryPreview() {
                                     </div>
                                 </div>
 
-                                <div className="p-12">
+                                <div className="p-12 flex flex-col flex-1">
                                     <h4 className="text-3xl font-black mb-10 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500">
                                         {item.name}
                                     </h4>
@@ -134,7 +134,7 @@ export function MachineryPreview() {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => setSelectedMachine({ id: item.id, name: item.name })}
-                                        className="w-full py-5 rounded-2xl bg-white/[0.03] border border-white/5 font-black text-[10px] uppercase tracking-[0.2em] text-white/40 hover:bg-white hover:text-black hover:border-white transition-all duration-500 cursor-pointer"
+                                        className="w-full py-5 rounded-2xl bg-white/[0.03] border border-white/5 font-black text-[10px] uppercase tracking-[0.2em] text-white/40 hover:bg-white hover:text-black hover:border-white transition-all duration-500 cursor-pointer mt-auto"
                                     >
                                         Запросить расчёт аренды
                                     </motion.button>

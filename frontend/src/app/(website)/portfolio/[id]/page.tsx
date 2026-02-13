@@ -109,16 +109,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/40 to-black/30" />
 
-                    <div className="container mx-auto px-4 relative">
-
-                        {/* Back Link - Positioned Absolute Top */}
-                        <div className="absolute -top-[60vh] left-4 md:left-0 z-20">
+                    {/* Back Link - Positioned Absolute Top */}
+                    <div className="absolute top-32 left-0 w-full z-20">
+                        <div className="container mx-auto px-4">
                             <BackButton
                                 href="/portfolio"
                                 label="Все Проекты"
                                 className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 hover:bg-black/40 mb-0"
                             />
                         </div>
+                    </div>
+
+                    <div className="container mx-auto px-4 relative">
 
                         <div className="max-w-4xl">
                             <div className="flex flex-wrap items-center gap-4 mb-6 animate-fade-in-up">

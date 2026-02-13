@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
 import { SubPageHero } from "@/components/layout/SubPageHero";
 import { Phone, Mail, MapPin, Clock, Globe, MessageSquare, Send, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -53,8 +54,8 @@ export default function ContactsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <main className="min-h-screen text-white pt-32 pb-20 px-6 overflow-hidden relative">
+            <EngineeringBackground />
 
             <div className="container mx-auto relative z-10">
                 <SubPageHero
@@ -68,7 +69,7 @@ export default function ContactsPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                     {/* Left Column - Info & Cards */}
-                    <div className="lg:col-span-4 space-y-6">
+                    <div className="lg:col-span-5 space-y-6">
                         {contactInfo.map((info, idx) => (
                             <motion.a
                                 key={idx}
@@ -77,7 +78,7 @@ export default function ContactsPage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="block p-8 bg-white/[0.03] border border-white/10 rounded-3xl hover:bg-white/[0.05] hover:border-orange-500/30 transition-all group"
+                                className="block p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl hover:bg-black/80 hover:border-orange-500/50 transition-all group"
                             >
                                 <div className="flex items-center gap-6">
                                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-white/5 border border-white/5 group-hover:scale-110 transition-transform`}>
@@ -102,12 +103,12 @@ export default function ContactsPage() {
                     </div>
 
                     {/* Right Column - Form */}
-                    <div className="lg:col-span-8">
+                    <div className="lg:col-span-7">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.98 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="bg-white/[0.02] border border-white/10 rounded-[40px] p-12 relative overflow-hidden"
+                            className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-[40px] p-12 relative overflow-hidden"
                         >
                             {submitted ? (
                                 <motion.div
@@ -198,11 +199,11 @@ export default function ContactsPage() {
                 </div>
 
                 {/* Map Section Placeholder */}
-                <div id="map" className="mt-32 rounded-[40px] overflow-hidden border border-white/10 aspect-[21/9] relative group">
+                <div id="map" className="mt-32 rounded-[40px] overflow-hidden border border-white/10 bg-black/60 backdrop-blur-xl aspect-[21/9] relative group">
                     <img
                         src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=2000"
                         alt="Location Map"
-                        className="w-full h-full object-cover grayscale opacity-20 group-hover:opacity-40 transition-all duration-1000 group-hover:scale-105"
+                        className="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-60 transition-all duration-1000 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-10">
@@ -211,8 +212,14 @@ export default function ContactsPage() {
                         </div>
                         <h4 className="text-3xl font-black uppercase mb-2">Наше производство</h4>
                         <p className="text-sm font-bold uppercase tracking-widest text-white/40">Санкт-Петербург, тер. промзона Парнас, 2-й Верхний переулок</p>
-                        <Button variant="outline" className="mt-8 bg-white/5 border-white/10 hover:bg-orange-500 hover:text-[#0F172A] rounded-xl px-10">
-                            Открыть в Навигаторе
+                        <Button asChild variant="outline" className="mt-8 bg-white/5 border-white/10 hover:bg-orange-500 hover:text-[#0F172A] rounded-xl px-10">
+                            <a
+                                href="https://yandex.ru/maps/?text=60.062108,30.375741"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Открыть в Навигаторе
+                            </a>
                         </Button>
                     </div>
                 </div>
