@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     
     # CMS
     DIRECTUS_URL: str = "http://localhost:8055"
+    DIRECTUS_ADMIN_TOKEN: Optional[str] = None
     ADMIN_EMAIL: str = "admin@example.com"
     ADMIN_PASSWORD: str = "admin-password"
     

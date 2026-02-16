@@ -16,8 +16,12 @@ router = APIRouter()
 
 async def _directus_get(path: str, params: dict = None) -> Any:
     """Helper: fetch data from Directus."""
+    headers = {}
+    if settings.DIRECTUS_ADMIN_TOKEN:
+        headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
+        
     async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
-        res = await client.get(path, params=params or {})
+        res = await client.get(path, params=params or {}, headers=headers)
         if res.status_code != 200:
             logger.warning(f"Directus GET {path} returned {res.status_code}: {res.text[:200]}")
             return None
@@ -98,7 +102,7 @@ async def get_projects(client: Dict = Depends(get_current_client)):
 
     projects = await _directus_get("/items/projects", {
         "filter[client_id][_eq]": client_id,
-        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title",
+        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title,machinery_used.machinery_id.*",
         "sort": "-date_created",
     })
 
@@ -172,9 +176,14 @@ async def update_profile(
         raise HTTPException(status_code=400, detail="Нет допустимых полей для обновления")
 
     async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as http_client:
+        headers = {}
+        if settings.DIRECTUS_ADMIN_TOKEN:
+            headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
+            
         res = await http_client.patch(
             f"/items/clients/{client_id}",
             json=safe_updates,
+            headers=headers
         )
         if res.status_code != 200:
             raise HTTPException(status_code=500, detail="Ошибка обновления профиля")

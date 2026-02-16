@@ -23,6 +23,10 @@ DEMO_CLIENTS = {
 async def _verify_via_directus(access_code: str) -> ClientInfo | None:
     """Try to verify the access code against the Directus `clients` collection."""
     try:
+        headers = {}
+        if settings.DIRECTUS_ADMIN_TOKEN:
+            headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
+            
         async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=5.0) as client:
             res = await client.get(
                 "/items/clients",
@@ -31,6 +35,7 @@ async def _verify_via_directus(access_code: str) -> ClientInfo | None:
                     "filter[active][_eq]": True,
                     "limit": 1,
                 },
+                headers=headers
             )
             if res.status_code == 200:
                 items = res.json().get("data", [])

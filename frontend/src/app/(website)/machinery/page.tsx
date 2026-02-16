@@ -2,13 +2,13 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { SubPageHero } from "@/components/layout/SubPageHero";
-import { ArrowRight, Settings } from "lucide-react";
+import { ArrowRight, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { LeadMagnetModal } from "@/components/layout/LeadMagnetModal";
 import { MachineryDetailsDialog } from "@/components/features/MachineryDetailsDialog";
 
-import { machinery, machineryCategories as categories } from "@/lib/machinery-data";
+import { fetchMachinery, fetchMachineryCategories, type Machinery, type MachineryCategory } from "@/lib/machinery-data";
 import { services } from "@/lib/services-data";
 
 import { useSearchParams } from "next/navigation";
@@ -19,28 +19,59 @@ function MachineryContent() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [machineryList, setMachineryList] = useState<Machinery[]>([]);
+    const [categoryList, setCategoryList] = useState<MachineryCategory[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const [m, c] = await Promise.all([fetchMachinery(), fetchMachineryCategories()]);
+                setMachineryList(m);
+                setCategoryList(c);
+            } catch (err) {
+                console.error("Failed to load machinery data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, []);
 
     const filteredMachinery = useMemo(() => {
-        if (activeCategory === 'all') return machinery;
-        return machinery.filter(item => item.category === activeCategory);
-    }, [activeCategory]);
+        if (activeCategory === 'all') return machineryList;
+        return machineryList.filter(item => item.category === activeCategory);
+    }, [activeCategory, machineryList]);
 
     const handleInquiry = (name: string) => {
         setSelectedItem(name);
         setIsModalOpen(true);
     };
 
-    const [detailsMachine, setDetailsMachine] = useState<typeof machinery[0] | null>(null);
+    const [detailsMachine, setDetailsMachine] = useState<Machinery | null>(null);
 
     // Deep linking logic
     useEffect(() => {
-        if (initialId) {
-            const machine = machinery.find(m => m.id === initialId);
+        if (initialId && machineryList.length > 0) {
+            const machine = machineryList.find(m => m.id === initialId);
             if (machine) {
                 setDetailsMachine(machine);
             }
         }
-    }, [initialId]);
+    }, [initialId, machineryList]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#0F172A] text-white pt-20">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20 animate-pulse">
+                        Инициализация парка техники...
+                    </span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6 overflow-hidden relative">
@@ -65,7 +96,7 @@ function MachineryContent() {
 
                 {/* Filtering System */}
                 <div className="flex flex-wrap items-center justify-center gap-4 mb-20">
-                    {categories.map((cat) => (
+                    {categoryList.map((cat) => (
                         <button
                             key={cat.id}
                             onClick={() => setActiveCategory(cat.id)}
