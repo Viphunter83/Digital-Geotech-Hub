@@ -15,7 +15,11 @@ async def fetch_matching_data(work_type: str, required_profile: str = None):
         # 1. Search for Shpunts
         if required_profile:
             try:
-                params = {"filter[name][_contains]": required_profile}
+                # Use a more flexible search for the mark
+                params = {
+                    "filter[name][_contains]": required_profile,
+                    "fields": "name,price,stock_quantity"
+                }
                 res = await client.get("/items/shpunts", params=params)
                 if res.status_code == 200:
                     items = res.json().get("data", [])

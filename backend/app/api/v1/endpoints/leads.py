@@ -5,6 +5,7 @@ from app.api.v1.endpoints.dashboard import _directus_get # Reuse helper if possi
 from app.core.config import settings
 from app.schemas.copilot import LeadInput, LeadResponse
 from app.services.amocrm import amocrm_service
+from app.services.mail import mail_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -47,6 +48,19 @@ async def submit_lead(lead_data: LeadInput):
             audit_data=lead_data.audit_data
         )
         
+        # 3. Notify Manager via Email
+        try:
+            await mail_service.send_lead_notification({
+                "name": lead_data.name,
+                "phone": lead_data.phone,
+                "email": lead_data.email,
+                "company": lead_data.company,
+                "audit_data": lead_data.audit_data
+            })
+        except Exception as mail_err:
+            logger.error(f"Failed to trigger mail notification: {mail_err}")
+            # We don't fail the whole request if email fails
+
         return LeadResponse(
             success=True,
             message="Заявка успешно отправлена. Наш инженер свяжется с вами в ближайшее время.",

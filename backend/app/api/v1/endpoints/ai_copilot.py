@@ -135,7 +135,10 @@ async def parse_document(
     # 4. Professional Estimate Calculation
     estimated_total = 0
     if shpunts and parsed_data.volume:
-        estimated_total = shpunts[0].price * parsed_data.volume
+        # Use simple ton-based pricing for sheet piling
+        price_per_unit = shpunts[0].price
+        estimated_total = price_per_unit * parsed_data.volume
+        logger.info(f"Calc: {price_per_unit} * {parsed_data.volume} = {estimated_total}")
     
     response_data = DraftProposalResponse(
         parsed_data=parsed_data,
