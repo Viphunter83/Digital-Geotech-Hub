@@ -1,9 +1,48 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Award, Wrench, Clock } from "lucide-react";
+import { ShieldCheck, Award, Wrench, Clock, type LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchFromDirectus } from "@/lib/directus-fetch";
+import { resolveIcon } from "@/lib/icon-map";
 
-const features = [
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+interface Feature {
+    icon: LucideIcon;
+    title: string;
+    description: string;
+    accent: string;
+    bg: string;
+}
+
+// ──────────────────────────────────────────────
+// Color mapping
+// ──────────────────────────────────────────────
+
+const colorMap: Record<string, { accent: string; bg: string }> = {
+    orange: { accent: "text-orange-500", bg: "bg-orange-500/10" },
+    blue: { accent: "text-blue-500", bg: "bg-blue-500/10" },
+    green: { accent: "text-green-500", bg: "bg-green-500/10" },
+    purple: { accent: "text-purple-500", bg: "bg-purple-500/10" },
+    red: { accent: "text-red-500", bg: "bg-red-500/10" },
+    cyan: { accent: "text-cyan-500", bg: "bg-cyan-500/10" },
+    teal: { accent: "text-teal-500", bg: "bg-teal-500/10" },
+    indigo: { accent: "text-indigo-500", bg: "bg-indigo-500/10" },
+};
+
+function resolveColor(name: string | null | undefined): { accent: string; bg: string } {
+    if (!name) return colorMap.orange;
+    return colorMap[name.toLowerCase()] ?? colorMap.orange;
+}
+
+// ──────────────────────────────────────────────
+// Fallback
+// ──────────────────────────────────────────────
+
+const FEATURES_FALLBACK: Feature[] = [
     {
         icon: Clock,
         title: "15+ Лет Опыта",
@@ -35,6 +74,33 @@ const features = [
 ];
 
 export function WhyUs() {
+    const [features, setFeatures] = useState<Feature[]>(FEATURES_FALLBACK);
+
+    useEffect(() => {
+        fetchFromDirectus<{
+            title: string;
+            description: string;
+            icon: string;
+            accent_color: string;
+        }>('advantages', {
+            fields: ['title', 'description', 'icon', 'accent_color'],
+            sort: ['sort'],
+        }).then(data => {
+            if (data.length > 0) {
+                setFeatures(data.map(d => {
+                    const colors = resolveColor(d.accent_color);
+                    return {
+                        icon: resolveIcon(d.icon),
+                        title: d.title,
+                        description: d.description,
+                        accent: colors.accent,
+                        bg: colors.bg,
+                    };
+                }));
+            }
+        });
+    }, []);
+
     return (
         <section className="py-20 relative z-10">
             <div className="container mx-auto px-6">

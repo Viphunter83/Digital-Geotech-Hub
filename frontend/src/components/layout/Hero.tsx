@@ -4,13 +4,20 @@ import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePres
 import { ArrowRight, Box, Shield, Zap, Globe, Cpu, Database, Cloud, FileText } from "lucide-react";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { LeadMagnetModal } from "./LeadMagnetModal";
+import { fetchFromDirectus } from "@/lib/directus-fetch";
 import Link from "next/link";
 
 interface HeroProps {
     region: 'msk' | 'spb';
 }
 
-const geoConfigs = {
+interface GeoConfig {
+    title: string;
+    usp: string;
+    cta: string;
+}
+
+const geoConfigsFallback: Record<string, GeoConfig> = {
     spb: {
         title: "Digital Geotech Hub — СПб",
         usp: "Нулевой цикл в условиях исторической застройки Санкт-Петербурга. 15+ лет опыта и деликатное погружение шпунта (Silent Piler).",
@@ -24,7 +31,23 @@ const geoConfigs = {
 };
 
 export function Hero({ region }: HeroProps) {
-    const config = geoConfigs[region] || geoConfigs.spb;
+    const [geoConfigs, setGeoConfigs] = useState(geoConfigsFallback);
+    const config = geoConfigs[region] || geoConfigs.spb || geoConfigsFallback.spb;
+
+    // Load hero configs from Directus
+    useEffect(() => {
+        fetchFromDirectus<{ region: string; title: string; usp: string; cta_text: string }>('hero_configs', {
+            fields: ['region', 'title', 'usp', 'cta_text'],
+        }).then(data => {
+            if (data.length > 0) {
+                const configs: Record<string, GeoConfig> = {};
+                data.forEach(d => {
+                    configs[d.region] = { title: d.title, usp: d.usp, cta: d.cta_text };
+                });
+                setGeoConfigs(prev => ({ ...prev, ...configs }));
+            }
+        });
+    }, []);
 
     // Mouse Tracking for Parallax
     const [activeBadge, setActiveBadge] = useState<number | null>(null);

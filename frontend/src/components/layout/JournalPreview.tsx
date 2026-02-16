@@ -3,11 +3,18 @@
 import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, Clock, User } from "lucide-react";
 import Link from "next/link";
-import { ARTICLES } from "@/lib/journal-data";
+import { useEffect, useState } from "react";
+import { fetchArticles, ARTICLES_FALLBACK, type Article } from "@/lib/journal-data";
 
 export function JournalPreview() {
-    // Only show latest 3 for preview
-    const previewArticles = ARTICLES.slice(0, 3);
+    const [articles, setArticles] = useState<Article[]>(ARTICLES_FALLBACK.slice(0, 3));
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchArticles({ limit: 3 })
+            .then(setArticles)
+            .finally(() => setLoading(false));
+    }, []);
 
     return (
         <section className="py-32 px-6 bg-transparent relative overflow-hidden">
@@ -45,52 +52,60 @@ export function JournalPreview() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    {previewArticles.map((article, index) => (
-                        <motion.article
-                            key={article.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.6 }}
-                            className="group flex flex-col h-full bg-black/40 backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden hover:border-accent/40 transition-all duration-500 shadow-2xl"
-                        >
-                            <Link href={`/journal/${article.slug}`} className="block relative aspect-[16/9] overflow-hidden">
-                                <img
-                                    src={article.image}
-                                    alt={article.title}
-                                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute top-6 left-6 px-4 py-1.5 bg-accent/20 border border-accent/40 backdrop-blur-md rounded-full">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-accent">
-                                        {article.category}
-                                    </span>
-                                </div>
-                            </Link>
-
-                            <div className="p-10 flex flex-col flex-grow">
-                                <div className="flex items-center gap-6 mb-6 text-white/30 text-[10px] font-bold uppercase tracking-widest">
-                                    <span className="flex items-center gap-2"><Clock className="w-3 h-3 text-accent" /> {article.readTime}</span>
-                                    <span className="flex items-center gap-2"><User className="w-3 h-3 text-accent" /> {article.author}</span>
-                                </div>
-                                <h4 className="text-2xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500 leading-tight">
-                                    <Link href={`/journal/${article.slug}`}>
-                                        {article.title}
-                                    </Link>
-                                </h4>
-                                <p className="text-white/40 text-sm leading-relaxed font-medium mb-10 flex-grow">
-                                    {article.excerpt}
-                                </p>
-                                <Link
-                                    href={`/journal/${article.slug}`}
-                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-accent group/link hover:text-white transition-colors"
-                                >
-                                    Читать полностью <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
+                {loading ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="h-96 bg-white/5 animate-pulse rounded-[32px]" />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                        {articles.map((article, index) => (
+                            <motion.article
+                                key={article.id}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1, duration: 0.6 }}
+                                className="group flex flex-col h-full bg-black/40 backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden hover:border-accent/40 transition-all duration-500 shadow-2xl"
+                            >
+                                <Link href={`/journal/${article.slug}`} className="block relative aspect-[16/9] overflow-hidden">
+                                    <img
+                                        src={article.image}
+                                        alt={article.title}
+                                        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute top-6 left-6 px-4 py-1.5 bg-accent/20 border border-accent/40 backdrop-blur-md rounded-full">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-accent">
+                                            {article.category}
+                                        </span>
+                                    </div>
                                 </Link>
-                            </div>
-                        </motion.article>
-                    ))}
-                </div>
+
+                                <div className="p-10 flex flex-col flex-grow">
+                                    <div className="flex items-center gap-6 mb-6 text-white/30 text-[10px] font-bold uppercase tracking-widest">
+                                        <span className="flex items-center gap-2"><Clock className="w-3 h-3 text-accent" /> {article.readTime}</span>
+                                        <span className="flex items-center gap-2"><User className="w-3 h-3 text-accent" /> {article.author}</span>
+                                    </div>
+                                    <h4 className="text-2xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500 leading-tight">
+                                        <Link href={`/journal/${article.slug}`}>
+                                            {article.title}
+                                        </Link>
+                                    </h4>
+                                    <p className="text-white/40 text-sm leading-relaxed font-medium mb-10 flex-grow">
+                                        {article.excerpt}
+                                    </p>
+                                    <Link
+                                        href={`/journal/${article.slug}`}
+                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-accent group/link hover:text-white transition-colors"
+                                    >
+                                        Читать полностью <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
+                                    </Link>
+                                </div>
+                            </motion.article>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );

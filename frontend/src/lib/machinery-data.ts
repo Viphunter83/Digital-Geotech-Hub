@@ -1,13 +1,25 @@
+import { fetchFromDirectus, getDirectusFileUrl } from './directus-fetch';
+import { resolveIcon } from './icon-map';
 import {
-    Tractor, Drill, Hammer, Settings, Zap, Weight, Ruler
+    Tractor, Drill, Hammer, Settings, Zap, Weight, Ruler,
+    type LucideIcon,
 } from "lucide-react";
 
-export const machineryCategories = [
-    { id: 'all', label: 'Вся техника', icon: Tractor },
-    { id: 'drilling', label: 'Буровые', icon: Drill },
-    { id: 'piling', label: 'Сваебойные', icon: Hammer },
-    { id: 'auxiliary', label: 'Вспомогательная', icon: Settings },
-];
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+export interface MachineryCategory {
+    id: string;
+    label: string;
+    icon: LucideIcon;
+}
+
+export interface MachinerySpec {
+    label: string;
+    value: string;
+    icon: LucideIcon;
+}
 
 export interface Machinery {
     id: string;
@@ -15,13 +27,147 @@ export interface Machinery {
     category: string;
     categoryLabel: string;
     description: string;
-    specs: { label: string; value: string; icon: any }[];
+    specs: MachinerySpec[];
     image: string;
     accent: string;
     relatedServiceIds?: string[];
 }
 
-export const machinery: Machinery[] = [
+/** Raw shape from Directus */
+interface DirectusMachinery {
+    id: string;
+    name: string;
+    category: { id: string } | string | null;
+    category_label: string;
+    description: string;
+    image: string | null;
+    accent_color: string | null;
+    specs?: { label: string; value: string; icon: string; sort: number }[];
+    related_services?: { services_id: string }[];
+}
+
+interface DirectusMachineryCategory {
+    id: string;
+    name: string;
+    icon: string | null;
+}
+
+// ──────────────────────────────────────────────
+// Color mapping
+// ──────────────────────────────────────────────
+
+const accentColorMap: Record<string, string> = {
+    orange: "bg-orange-500/10",
+    blue: "bg-blue-500/10",
+    red: "bg-red-500/10",
+    yellow: "bg-yellow-500/10",
+    green: "bg-green-500/10",
+    purple: "bg-purple-500/10",
+    teal: "bg-teal-500/10",
+    indigo: "bg-indigo-500/10",
+    cyan: "bg-cyan-500/10",
+    slate: "bg-slate-500/10",
+};
+
+function resolveAccent(color: string | null | undefined): string {
+    if (!color) return "bg-white/5";
+    return accentColorMap[color.toLowerCase()] ?? "bg-white/5";
+}
+
+// ──────────────────────────────────────────────
+// Spec icon mapping
+// ──────────────────────────────────────────────
+
+const specIconMap: Record<string, LucideIcon> = {
+    zap: Zap,
+    weight: Weight,
+    ruler: Ruler,
+};
+
+function resolveSpecIcon(name: string | null | undefined): LucideIcon {
+    if (!name) return Zap;
+    return specIconMap[name.toLowerCase()] ?? Zap;
+}
+
+// ──────────────────────────────────────────────
+// Transformers
+// ──────────────────────────────────────────────
+
+function transformMachinery(d: DirectusMachinery): Machinery {
+    const categoryId = typeof d.category === 'object' && d.category ? d.category.id : (d.category ?? 'auxiliary');
+    return {
+        id: d.id,
+        name: d.name,
+        category: categoryId,
+        categoryLabel: d.category_label ?? '',
+        description: d.description ?? '',
+        specs: (d.specs ?? [])
+            .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+            .map(s => ({
+                label: s.label,
+                value: s.value,
+                icon: resolveSpecIcon(s.icon),
+            })),
+        image: getDirectusFileUrl(d.image) ?? '/images/machinery/placeholder.png',
+        accent: resolveAccent(d.accent_color),
+        relatedServiceIds: d.related_services?.map(r => r.services_id) ?? [],
+    };
+}
+
+// ──────────────────────────────────────────────
+// Fetch from Directus
+// ──────────────────────────────────────────────
+
+export async function fetchMachineryCategories(): Promise<MachineryCategory[]> {
+    const data = await fetchFromDirectus<DirectusMachineryCategory>('machinery_categories', {
+        fields: ['id', 'name', 'icon'],
+        sort: ['sort'],
+    });
+
+    if (data.length > 0) {
+        return [
+            { id: 'all', label: 'Вся техника', icon: Tractor },
+            ...data.map(c => ({
+                id: c.id,
+                label: c.name,
+                icon: resolveIcon(c.icon),
+            })),
+        ];
+    }
+
+    return machineryCategories;
+}
+
+export async function fetchMachinery(): Promise<Machinery[]> {
+    const data = await fetchFromDirectus<DirectusMachinery>('machinery', {
+        fields: [
+            'id', 'name', 'category.id', 'category_label', 'description',
+            'image', 'accent_color',
+            'specs.label', 'specs.value', 'specs.icon', 'specs.sort',
+            'related_services.services_id',
+        ],
+        sort: ['sort'],
+    });
+
+    if (data.length > 0) {
+        return data.map(transformMachinery);
+    }
+
+    return MACHINERY_FALLBACK;
+}
+
+// ──────────────────────────────────────────────
+// Fallback Data
+// ──────────────────────────────────────────────
+
+export const machineryCategories: MachineryCategory[] = [
+    { id: 'all', label: 'Вся техника', icon: Tractor },
+    { id: 'drilling', label: 'Буровые', icon: Drill },
+    { id: 'piling', label: 'Сваебойные', icon: Hammer },
+    { id: 'auxiliary', label: 'Вспомогательная', icon: Settings },
+];
+
+export const MACHINERY_FALLBACK: Machinery[] = [
     {
         id: "bauer-bg28",
         name: "Bauer BG 28",
@@ -143,3 +289,8 @@ export const machinery: Machinery[] = [
         relatedServiceIds: ["micropiles", "leader-drilling"]
     }
 ];
+
+/**
+ * @deprecated Use fetchMachinery() instead. Kept for backward compatibility.
+ */
+export const machinery = MACHINERY_FALLBACK;

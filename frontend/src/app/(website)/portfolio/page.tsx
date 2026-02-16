@@ -31,10 +31,14 @@ function transformDirectusCase(item: ProjectCase): Project {
         challenge: 'Уточняется...',
         solution: item.description,
         year: item.duration,
-        latitude: 0,
-        longitude: 0,
+        coordinates: [0, 0] as [number, number],
         image: `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${item.image}`,
         tags: [item.soil_type],
+        technologies: item.machinery?.map(m => ({
+            name: m.machinery_id.name,
+            type: 'Оборудование',
+            description: '',
+        })) ?? [],
         stats: [
             { label: 'Грунт', value: item.soil_type },
             { label: 'Срок', value: item.duration }

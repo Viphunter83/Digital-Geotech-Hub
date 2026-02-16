@@ -1,42 +1,115 @@
+import { fetchFromDirectus } from './directus-fetch';
+
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+export interface SheetPileSeries {
+    id: string;
+    label: string;
+}
+
 export interface SheetPile {
     id: string;
     model: string;
     series: string;
-    width: number; // mm
-    height: number; // mm
-    thickness: number; // mm
-    weight: number; // kg/m
-    moment: number; // cm3/m
+    width: number;
+    height: number;
+    thickness: number;
+    weight: number;
+    moment: number;
 }
 
-export const sheetPiles: SheetPile[] = [
-    // L5-UM (Russian standard)
-    { id: "l5-um", model: "Л5-УМ", series: "RU", width: 500, height: 236, thickness: 11, weight: 113, moment: 2962 },
+interface DirectusSheetPile {
+    id: string;
+    model: string;
+    series: { id: string } | string | null;
+    width: number;
+    height: number;
+    thickness: number;
+    weight: number;
+    moment: number;
+}
 
-    // Larson AZ Series
+// ──────────────────────────────────────────────
+// Fetch from Directus
+// ──────────────────────────────────────────────
+
+/**
+ * Fetch sheet pile profiles from Directus.
+ */
+export async function fetchSheetPiles(): Promise<SheetPile[]> {
+    const data = await fetchFromDirectus<DirectusSheetPile>('sheet_piles', {
+        fields: ['id', 'model', 'series.id', 'width', 'height', 'thickness', 'weight', 'moment'],
+        sort: ['series.sort', 'model'],
+    });
+
+    if (data.length > 0) {
+        return data.map(d => ({
+            id: d.id,
+            model: d.model,
+            series: typeof d.series === 'object' && d.series ? d.series.id : (d.series ?? ''),
+            width: d.width,
+            height: d.height,
+            thickness: d.thickness,
+            weight: d.weight,
+            moment: d.moment,
+        }));
+    }
+
+    return SHEET_PILES_FALLBACK;
+}
+
+/**
+ * Fetch sheet pile series names from Directus.
+ */
+export async function fetchSheetPileSeries(): Promise<SheetPileSeries[]> {
+    const data = await fetchFromDirectus<{ id: string; name: string }>('sheet_pile_series', {
+        fields: ['id', 'name'],
+        sort: ['sort'],
+    });
+
+    if (data.length > 0) {
+        return [
+            { id: 'all', label: 'Все' },
+            ...data.map(s => ({ id: s.id, label: s.name ?? s.id }))
+        ];
+    }
+
+    return SHEET_PILE_SERIES_FALLBACK;
+}
+
+// ──────────────────────────────────────────────
+// Fallback Data
+// ──────────────────────────────────────────────
+
+export const SHEET_PILE_SERIES_FALLBACK: SheetPileSeries[] = [
+    { id: 'all', label: 'Все' },
+    { id: 'AZ', label: 'AZ' },
+    { id: 'AU', label: 'AU' },
+    { id: 'PU', label: 'PU' },
+];
+
+export const SHEET_PILES_FALLBACK: SheetPile[] = [
     { id: "az-13-770", model: "AZ 13-770", series: "AZ", width: 770, height: 344, thickness: 8.5, weight: 76.4, moment: 1300 },
-    { id: "az-18-700", model: "AZ 18-700", series: "AZ", width: 700, height: 420, thickness: 9.5, weight: 81.6, moment: 1800 },
-    { id: "az-26-700", model: "AZ 26-700", series: "AZ", width: 700, height: 460, thickness: 12.2, weight: 96.9, moment: 2600 },
-
-    // AU Series
-    { id: "au-14", model: "AU 14", series: "AU", width: 750, height: 408, thickness: 10, weight: 77.7, moment: 1405 },
-    { id: "au-18", model: "AU 18", series: "AU", width: 750, height: 441, thickness: 10.5, weight: 88.5, moment: 1800 },
-    { id: "au-25", model: "AU 25", series: "AU", width: 750, height: 485, thickness: 12, weight: 110.4, moment: 2500 },
-
-    // VL Series
-    { id: "vl-603", model: "VL 603", series: "VL", width: 600, height: 310, thickness: 9, weight: 73.6, moment: 1200 },
-    { id: "vl-606a", model: "VL 606A", series: "VL", width: 600, height: 435, thickness: 9, weight: 86.1, moment: 2250 },
-
-    // GU Series
-    { id: "gu-16n", model: "GU 16N", series: "GU", width: 600, height: 430, thickness: 10.2, weight: 84.8, moment: 1600 },
-    { id: "gu-22n", model: "GU 22N", series: "GU", width: 600, height: 450, thickness: 11.1, weight: 86.1, moment: 2200 },
+    { id: "az-18-800", model: "AZ 18-800", series: "AZ", width: 800, height: 380, thickness: 8.5, weight: 82.0, moment: 1800 },
+    { id: "az-26-700", model: "AZ 26-700", series: "AZ", width: 700, height: 427, thickness: 12.2, weight: 112.0, moment: 2600 },
+    { id: "az-36-700n", model: "AZ 36-700N", series: "AZ", width: 700, height: 479, thickness: 13.0, weight: 127.0, moment: 3600 },
+    { id: "az-46-700n", model: "AZ 46-700N", series: "AZ", width: 700, height: 580, thickness: 13.0, weight: 145.0, moment: 4620 },
+    { id: "au-14", model: "AU 14", series: "AU", width: 750, height: 408, thickness: 9.5, weight: 92.0, moment: 1400 },
+    { id: "au-18", model: "AU 18", series: "AU", width: 750, height: 440, thickness: 11.2, weight: 105.0, moment: 1810 },
+    { id: "au-21", model: "AU 21", series: "AU", width: 750, height: 450, thickness: 12.0, weight: 119.0, moment: 2100 },
+    { id: "au-25", model: "AU 25", series: "AU", width: 750, height: 460, thickness: 14.0, weight: 130.0, moment: 2500 },
+    { id: "pu-12", model: "PU 12", series: "PU", width: 600, height: 360, thickness: 9.8, weight: 70.0, moment: 1200 },
+    { id: "pu-22", model: "PU 22", series: "PU", width: 600, height: 450, thickness: 10.0, weight: 102.0, moment: 2210 },
 ];
 
-export const sheetPileSeries = [
-    { id: "all", label: "Все" },
-    { id: "RU", label: "Л5-УМ (РФ)" },
-    { id: "AZ", label: "Larssen AZ" },
-    { id: "AU", label: "Arcelor AU" },
-    { id: "VL", label: "VL Series" },
-    { id: "GU", label: "GU Series" },
-];
+/**
+ * @deprecated Use fetchSheetPiles() instead.
+ */
+export const sheetPiles = SHEET_PILES_FALLBACK;
+
+/**
+ * @deprecated Use fetchSheetPileSeries() instead.
+ */
+export const sheetPileSeries: SheetPileSeries[] = SHEET_PILE_SERIES_FALLBACK;

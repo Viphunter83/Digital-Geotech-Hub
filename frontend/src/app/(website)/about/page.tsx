@@ -2,16 +2,41 @@
 
 import { motion } from "framer-motion";
 import { SubPageHero } from "@/components/layout/SubPageHero";
-import { Shield, Target, Users, Award, Building, HardHat, TrendingUp, Cpu } from "lucide-react";
+import { Shield, Target, Users, Award, Building, HardHat, TrendingUp, Cpu, type LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchFromDirectus } from "@/lib/directus-fetch";
+import { resolveIcon } from "@/lib/icon-map";
 
-const stats = [
+interface Stat {
+    label: string;
+    value: string;
+    description: string;
+}
+
+interface Value {
+    title: string;
+    description: string;
+    icon: LucideIcon;
+    color: string;
+}
+
+const colorMap: Record<string, string> = {
+    orange: "text-orange-500",
+    blue: "text-blue-500",
+    green: "text-green-500",
+    purple: "text-purple-500",
+    red: "text-red-500",
+    cyan: "text-cyan-500",
+};
+
+const statsFallback: Stat[] = [
     { label: "Лет опыта", value: "15+", description: "Безупречной репутации на рынке" },
     { label: "Единиц техники", value: "40+", description: "Современного парка оборудования" },
     { label: "Проектов", value: "850+", description: "Успешно завершенных объектов" },
     { label: "Инженеров", value: "25+", description: "Высшей квалификационной категории" }
 ];
 
-const values = [
+const valuesFallback: Value[] = [
     {
         title: "Технологическое превосходство",
         description: "Мы постоянно инвестируем в обновление парка, выбирая лучшие мировые образцы техники от BAUER до JUNTTAN.",
@@ -39,6 +64,31 @@ const values = [
 ];
 
 export default function AboutPage() {
+    const [stats, setStats] = useState<Stat[]>(statsFallback);
+    const [values, setValues] = useState<Value[]>(valuesFallback);
+
+    useEffect(() => {
+        // Load stats
+        fetchFromDirectus<{ label: string; value: string; description: string }>('company_stats', {
+            fields: ['label', 'value', 'description'],
+            sort: ['sort'],
+        }).then(data => { if (data.length > 0) setStats(data); });
+
+        // Load values
+        fetchFromDirectus<{ title: string; description: string; icon: string; accent_color: string }>('company_values', {
+            fields: ['title', 'description', 'icon', 'accent_color'],
+            sort: ['sort'],
+        }).then(data => {
+            if (data.length > 0) {
+                setValues(data.map(d => ({
+                    title: d.title,
+                    description: d.description,
+                    icon: resolveIcon(d.icon),
+                    color: colorMap[d.accent_color] ?? "text-orange-500",
+                })));
+            }
+        });
+    }, []);
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6 overflow-hidden relative">
             {/* Background elements */}

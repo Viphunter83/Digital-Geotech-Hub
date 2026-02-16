@@ -1,229 +1,315 @@
+import { fetchFromDirectus, getDirectusFileUrl } from './directus-fetch';
+
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+export interface ProjectTech {
+    id?: string;
+    name: string;
+    type: string;
+    description: string;
+    image?: string;
+    specs?: { label: string; value: string }[];
+}
+
+export interface ProjectStat {
+    label: string;
+    value: string;
+}
 
 export interface Project {
     id: string;
     title: string;
     location: string;
-    region: 'spb' | 'msk' | 'regions';
-    category: 'industrial' | 'civil' | 'infrastructure' | 'marine';
+    region: string;
+    category: string;
+    description: string;
+    challenge: string;
+    solution: string;
+    year: string;
+    coordinates: [number, number];
+    image: string;
+    tags: string[];
+    technologies: ProjectTech[];
+    stats: ProjectStat[];
+}
+
+/** Raw shape from Directus */
+interface DirectusProject {
+    id: string;
+    title: string;
+    location: string;
+    region: string;
+    category: string;
     description: string;
     challenge: string;
     solution: string;
     year: string;
     latitude: number;
     longitude: number;
-    image: string;
-    tags: string[];
-    technologies?: ProjectTechnology[];
-    stats: {
-        label: string;
-        value: string;
+    image: string | null;
+    tags?: { tag: string }[];
+    technologies?: {
+        name: string;
+        type: string;
+        description: string;
+        image: string | null;
+        specs?: { text: string }[];
     }[];
+    stats?: { label: string; value: string; sort: number }[];
 }
 
-export interface ProjectTechnology {
-    id: string;
-    name: string;
-    type: 'Метод' | 'Оборудование' | 'Материал' | 'Инструмент';
-    description?: string;
-    image?: string;
-    specs?: { label: string; value: string }[];
+// ──────────────────────────────────────────────
+// Transformers
+// ──────────────────────────────────────────────
+
+function transformProject(d: DirectusProject): Project {
+    return {
+        id: d.id,
+        title: d.title,
+        location: d.location ?? '',
+        region: d.region ?? 'spb',
+        category: d.category ?? '',
+        description: d.description ?? '',
+        challenge: d.challenge ?? '',
+        solution: d.solution ?? '',
+        year: d.year ?? '',
+        coordinates: [d.latitude ?? 0, d.longitude ?? 0],
+        image: getDirectusFileUrl(d.image) ?? '/assets/project-placeholder.png',
+        tags: d.tags?.map(t => t.tag) ?? [],
+        technologies: (d.technologies ?? []).map(t => ({
+            name: t.name,
+            type: t.type ?? '',
+            description: t.description ?? '',
+            image: getDirectusFileUrl(t.image) ?? undefined,
+        })),
+        stats: (d.stats ?? [])
+            .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+            .map(s => ({ label: s.label, value: s.value })),
+    };
 }
 
-export const PROJECTS: Project[] = [
+// ──────────────────────────────────────────────
+// Fetch from Directus
+// ──────────────────────────────────────────────
+
+/**
+ * Fetch all published projects from Directus.
+ */
+export async function fetchProjects(): Promise<Project[]> {
+    const data = await fetchFromDirectus<DirectusProject>('projects', {
+        fields: [
+            'id', 'title', 'location', 'region', 'category',
+            'description', 'challenge', 'solution', 'year',
+            'latitude', 'longitude', 'image',
+            'tags.tag',
+            'technologies.name', 'technologies.type', 'technologies.description', 'technologies.image',
+            'stats.label', 'stats.value', 'stats.sort',
+        ],
+        filter: { status: { _eq: 'published' } },
+        sort: ['sort'],
+    });
+
+    if (data.length > 0) return data.map(transformProject);
+    return PROJECTS_FALLBACK;
+}
+
+/**
+ * Fetch a single project by ID from Directus.
+ */
+export async function fetchProjectById(id: string): Promise<Project | null> {
+    const data = await fetchFromDirectus<DirectusProject>('projects', {
+        fields: [
+            'id', 'title', 'location', 'region', 'category',
+            'description', 'challenge', 'solution', 'year',
+            'latitude', 'longitude', 'image',
+            'tags.tag',
+            'technologies.name', 'technologies.type', 'technologies.description', 'technologies.image',
+            'stats.label', 'stats.value', 'stats.sort',
+        ],
+        filter: {
+            id: { _eq: id },
+            status: { _eq: 'published' },
+        },
+        limit: 1,
+    });
+
+    if (data.length > 0) return transformProject(data[0]);
+    return PROJECTS_FALLBACK.find(p => p.id === id) ?? null;
+}
+
+// ──────────────────────────────────────────────
+// Fallback Data
+// ──────────────────────────────────────────────
+
+export const PROJECTS_FALLBACK: Project[] = [
     {
-        id: 'lakhta-2',
-        title: 'МФК «Лахта Центр 2»',
-        location: 'Санкт-Петербург',
-        region: 'spb',
-        category: 'civil',
-        description: 'Устройство шпунтового ограждения котлована для второго небоскреба в условиях плотной застройки и сложных грунтов.',
-        challenge: 'Нулевые допуски по вибрации из-за близости существующей башни и исторических зданий.',
-        solution: 'Использование технологии статического вдавливания Giken Silent Piler. Погружение шпунта длиной 24 метра без резонансных колебаний.',
-        year: '2024',
-        latitude: 59.98,
-        longitude: 30.17,
-        image: '/assets/projects/lakhta.png',
-        tags: ['Giken Silent Piler', 'Шпунт Ларсена', 'Нулевой цикл'],
+        id: "lakhta-2",
+        title: "МФК «Лахта Центр 2»",
+        location: "Санкт-Петербург, Приморский район",
+        region: "spb",
+        category: "civil",
+        description: "Устройство шпунтового ограждения котлована глубиной 24 м для строительства второй очереди МФК «Лахта Центр» — нового знакового проекта Приморского района.",
+        challenge: "Нулевые допуски по вибрации из-за близости к существующему комплексу «Лахта Центр». Слабые водонасыщенные грунты (мягкие глины и плывуны).",
+        solution: "Использование технологии статического вдавливания Giken Silent Piler, обеспечившей вибрационный фон на уровне менее 0.5 мм/с. Комбинация тяжёлого шпунта AZ 46-700N.",
+        year: "2024",
+        coordinates: [59.9871, 30.1776],
+        image: "/assets/lakhta2.png",
+        tags: ["Giken Silent Piler", "Шпунт Ларсена AZ 46", "Мониторинг осадок"],
         technologies: [
             {
-                id: 'giken-f201',
-                name: 'Giken Silent Piler F201',
-                type: 'Оборудование',
-                description: 'Установка статического вдавливания, позволяющая погружать шпунт в условиях плотной городской застройки без шума и вибрации. Идеально для работы вблизи исторических зданий.',
-                image: '/assets/static_piling_expert.png',
-                specs: [
-                    { label: 'Усилие', value: '150 тс' },
-                    { label: 'Шум', value: '< 65 дБ' }
-                ]
+                name: "Giken Silent Piler F201",
+                type: "Оборудование",
+                description: "Установка статического вдавливания с усилием до 200 тонн. Обеспечивает погружение шпунта без вибраций.",
+                image: "/images/machinery/giken_silent_piler.png",
             },
             {
-                id: 'sheet-pile-larsen',
-                name: 'Шпунт Ларсена',
-                type: 'Материал',
-                description: 'Металлический профиль корытообразного сечения, используемый для создания герметичных ограждений котлованов. Обеспечивает высокую несущую способность и возможность многократного использования.'
-            },
-            {
-                id: 'zero-cycle',
-                name: 'Нулевой цикл',
-                type: 'Метод',
-                description: 'Комплекс работ по подготовке основания, включая земляные работы, устройство фундаментов и прокладку подземных коммуникаций до отметки пола первого этажа.'
+                name: "Геомониторинг в реальном времени",
+                type: "Технология",
+                description: "Система датчиков инклинометров и марок на соседних зданиях с передачей данных в облако.",
             }
         ],
         stats: [
-            { label: 'Глубина', value: '24 м' },
-            { label: 'Шпунт', value: '1,200 т' },
-            { label: 'Срок', value: '3 мес' }
+            { label: "Глубина", value: "24 м" },
+            { label: "Периметр", value: "1250 м" },
+            { label: "Вибрация", value: "<0.5 мм/с" },
+            { label: "Срок", value: "6 мес." }
         ]
     },
     {
-        id: 'moscow-city',
-        title: 'ЖК «High Life» (Москва-Сити)',
-        location: 'Москва',
-        region: 'msk',
-        category: 'civil',
-        description: 'Комплекс работ по устройству «стены в грунте» и буросекущих свай для многоуровневого подземного паркинга.',
-        challenge: 'Стесненные условия мегаполиса, необходимость работы в режиме 24/7 для соблюдения жесткого графика.',
-        solution: 'Мобилизация двух установок Bauer BG. Устройство свайного поля диаметром 800мм в рекордные сроки.',
-        year: '2023',
-        latitude: 55.75,
-        longitude: 37.54,
-        image: '/assets/projects/moscow-city.png',
-        tags: ['Bauer BG', 'Буросекущие сваи', 'Котлован'],
+        id: "metro-spasskaya",
+        title: "Станция «Спасская» — Выход №2",
+        location: "Санкт-Петербург, Сенная площадь",
+        region: "spb",
+        category: "infrastructure",
+        description: "Устройство крепления глубокого котлована у вестибюля станции метро «Спасская» в условиях исторической застройки.",
+        challenge: "Зона охраны объектов культурного наследия. Водонасыщенные грунты. Действующие коммуникации.",
+        solution: "Применение буросекущих свай CFA диаметром 750 мм + многоуровневая распорная система с постоянным геомониторингом.",
+        year: "2025",
+        coordinates: [59.9275, 30.3162],
+        image: "/assets/metro-spasskaya.png",
+        tags: ["Буросекущие сваи", "CFA технология", "Историческая застройка"],
         technologies: [
             {
-                id: 'bauer-bg45',
-                name: 'Bauer BG 45',
-                type: 'Оборудование',
-                description: 'Роторная буровая установка премиум-класса для устройства буронабивных свай больших диаметров и глубин. Обладает высокой производительностью в сложных грунтах.',
-                image: '/assets/machinery-bauer.png',
-                specs: [
-                    { label: 'Момент', value: '461 кНм' },
-                    { label: 'Глубина', value: '100 м' }
-                ]
-            },
-            {
-                id: 'secant-piles',
-                name: 'Буросекущие сваи',
-                type: 'Метод',
-                description: 'Технология устройства герметичной стены в грунте путем перекрытия (сечения) соседних свай. Применяется для ограждения котлованов в водонасыщенных грунтах.'
+                name: "Bauer BG 28",
+                type: "Оборудование",
+                description: "Буровая установка для устройства свай большого диаметра в стесненных городских условиях.",
+                image: "/images/machinery/bauer_bg28.png"
             }
         ],
         stats: [
-            { label: 'Сваи', value: '450 шт' },
-            { label: 'Диаметр', value: '800 мм' },
-            { label: 'Бетон', value: '15,000 м³' }
+            { label: "Глубина", value: "32 м" },
+            { label: "Кол-во свай", value: "480 шт." },
+            { label: "Осадки", value: "<3 мм" },
+            { label: "Срок", value: "14 мес." }
         ]
     },
     {
-        id: 'ust-luga',
-        title: 'Терминал СПГ «Усть-Луга»',
-        location: 'Ленинградская обл.',
-        region: 'regions',
-        category: 'marine',
-        description: 'Берегоукрепление и устройство причальной стенки для нового терминала сжиженного газа.',
-        challenge: 'Работа в прибрежной зоне, сложные гидрогеологические условия, высокие ветровые нагрузки.',
-        solution: 'Вибропогружение трубчатого шпунта большого диаметра с использованием тяжелых вибропогружателей PVE.',
-        year: '2023',
-        latitude: 59.68,
-        longitude: 28.42,
-        image: '/assets/projects/ust-luga.png',
-        tags: ['Трубчатый шпунт', 'Вибропогружение', 'Гидротехника'],
+        id: "kamennoostrovskiy",
+        title: "ЖК «Каменноостровский»",
+        location: "Санкт-Петербург, Петроградская сторона",
+        region: "spb",
+        category: "residential",
+        description: "Комплексный нулевой цикл: шпунтовое ограждение + буронабивные сваи для элитного жилого комплекса на набережной.",
+        challenge: "Предельно стесненная площадка на Петроградской стороне. Высокий уровень грунтовых вод.",
+        solution: "Комбинированное решение: статическое вдавливание шпунта для ограждения + свайное поле из 320 буронабивных свай CFA ⌀600 мм.",
+        year: "2024",
+        coordinates: [59.9632, 30.3082],
+        image: "/assets/kamennoostrovsky.png",
+        tags: ["Статическое вдавливание", "CFA сваи", "Элитная застройка"],
         technologies: [
             {
-                id: 'pve-52m',
-                name: 'PVE 52M',
-                type: 'Оборудование',
-                description: 'Мощный гидравлический вибропогружатель для погружения тяжелых шпунтовых свай и труб. Обеспечивает высокую скорость работы в песчаных и глинистых грунтах.',
-                image: '/assets/machinery-movax.png',
-                specs: [
-                    { label: 'Усилие', value: '2300 кН' },
-                    { label: 'Частота', value: '2300 об/мин' }
-                ]
+                name: "Giken Silent Piler",
+                type: "Оборудование",
+                description: "Бесшумная установка для вдавливания шпунта в жилых кварталах.",
+                image: "/images/machinery/giken_silent_piler.png"
             },
             {
-                id: 'tubular-pile',
-                name: 'Трубчатый шпунт',
-                type: 'Материал',
-                description: 'Шпунтовые сваи трубчатого сечения (ШТС), обладающие повышенным моментом сопротивления. Используются при строительстве причальных стенок и глубоководных сооружений.'
+                name: "Enteco E400",
+                type: "Оборудование",
+                description: "Универсальная буровая для CFA свай ⌀600 мм с автоматическим контролем параметров.",
+                image: "/images/machinery/enteco_e400.png"
             }
         ],
         stats: [
-            { label: 'Шпунт', value: '3,500 т' },
-            { label: 'Длина', value: 'До 32 м' },
-            { label: 'Линия', value: '450 п.м.' }
+            { label: "Шпунт", value: "720 м" },
+            { label: "CFA сваи", value: "320 шт." },
+            { label: "Площадь", value: "4500 м²" },
+            { label: "Срок", value: "8 мес." }
         ]
     },
     {
-        id: 'kazan-eco',
-        title: 'Эко-Технопарк «Волга»',
-        location: 'Казань',
-        region: 'regions',
-        category: 'industrial',
-        description: 'Фундаментные работы для промышленного комплекса переработки отходов.',
-        challenge: 'Неоднородные грунты с включениями скальных пород. Требование высокой несущей способности.',
-        solution: 'Лидерное бурение с последующим погружением забивных ЖБ свай сечением 400х400мм.',
-        year: '2022',
-        latitude: 55.79,
-        longitude: 49.12,
-        image: '/assets/projects/kazan.png',
-        tags: ['Забивные сваи', 'Лидерное бурение', 'Фундамент'],
+        id: "moscow-ics",
+        title: "ICS Москва-Сити",
+        location: "Москва, Пресненская наб.",
+        region: "msk",
+        category: "civil",
+        description: "Устройство свайного основания для нового офисного комплекса в Москва-Сити. Буронабивные сваи большого диаметра.",
+        challenge: "Крайне сжатые сроки. Сложная логистика в условиях действующего делового центра.",
+        solution: "Параллельная работа 3-х буровых установок Bauer BG 28 по 24-часовому графику. Координация поставок бетона с 2-х заводов.",
+        year: "2023",
+        coordinates: [55.7494, 37.5375],
+        image: "/assets/moscow-ics.png",
+        tags: ["Буронабивные сваи", "Kelly бурение", "Москва-Сити"],
         technologies: [
             {
-                id: 'driven-piles',
-                name: 'Забивные сваи',
-                type: 'Метод',
-                description: 'Традиционный и надежный метод устройства свайных фундаментов. Сваи погружаются в грунт ударами молота, что обеспечивает уплотнение грунта вокруг ствола сваи.'
-            },
-            {
-                id: 'leader-drilling',
-                name: 'Лидерное бурение',
-                type: 'Метод',
-                description: 'Предварительное бурение скважин меньшего диаметра перед погружением свай. Применяется в плотных грунтах, мерзлоте или для снижения динамических воздействий.'
+                name: "Bauer BG 28 (3 единицы)",
+                type: "Оборудование",
+                description: "Развернуто 3 установки для параллельного бурения свай ⌀1500 мм.",
+                image: "/images/machinery/bauer_bg28.png"
             }
         ],
         stats: [
-            { label: 'Сваи', value: '1,100 шт' },
-            { label: 'Сечение', value: '400 мм' },
-            { label: 'Нагрузка', value: '80 т' }
+            { label: "⌀ свай", value: "1500 мм" },
+            { label: "Глубина", value: "45 м" },
+            { label: "Кол-во", value: "120 шт." },
+            { label: "Срок", value: "4 мес." }
         ]
     },
     {
-        id: 'taman-port',
-        title: 'Морской Порт «Тамань»',
-        location: 'Краснодарский край',
-        region: 'regions',
-        category: 'marine',
-        description: 'Реконструкция грузовых причалов. Погружение шпунта в условиях открытой акватории.',
-        challenge: 'Коррозионная агрессивность среды, работа с плавсредств (баржи).',
-        solution: 'Применение шпунта с антикоррозийным покрытием. Высокоточная забивка с использованием GPS-позиционирования.',
-        year: '2022',
-        latitude: 45.13,
-        longitude: 36.68,
-        image: '/assets/projects/taman.png',
-        tags: ['Шпунт Ларсена', 'Вибропогружатель', 'Порт'],
+        id: "baltic-pearl",
+        title: "ЖК «Балтийская Жемчужина» — III очередь",
+        location: "Санкт-Петербург, Юго-Запад",
+        region: "spb",
+        category: "residential",
+        description: "III очередь масштабного проекта: забивка 1200 ЖБ свай 350×350 для жилых корпусов на намывных территориях.",
+        challenge: "Намывные грунты. Необходимость забивки через плотные прослойки песка.",
+        solution: "Использование дизель-молотов Junttan PM 25 с предварительным лидерным бурением через плотные песчаные линзы.",
+        year: "2024",
+        coordinates: [59.8522, 30.1485],
+        image: "/assets/baltic-pearl.png",
+        tags: ["Забивка ЖБ свай", "Лидерное бурение", "Намывные территории"],
         technologies: [
             {
-                id: 'vibro-hammer-pve',
-                name: 'Вибропогружатель PVE',
-                type: 'Оборудование',
-                description: 'Высокочастотный вибропогружатель для погружения и извлечения шпунтовых свай. Обеспечивает высокую скорость и точность работ.',
-                image: '/assets/machinery-movax.png',
-                specs: [
-                    { label: 'Усилие', value: '2300 кН' },
-                    { label: 'Частота', value: '2300 об/мин' }
-                ]
+                name: "Junttan PM 25",
+                type: "Оборудование",
+                description: "Сваебойная установка с гидравлическим молотом для забивки свай 350×350 мм.",
+                image: "/images/machinery/junttan_pm25.png"
             },
             {
-                id: 'sheet-piles-marine',
-                name: 'Шпунт Ларсена',
-                type: 'Материал',
-                description: 'Применение специализированного профиля шпунта с антикоррозийным покрытием для защиты гидротехнических сооружений в агрессивной морской среде.'
+                name: "Inteco E6050",
+                type: "Оборудование",
+                description: "Компактная буровая для лидерного бурения скважин перед забивкой.",
+                image: "/images/machinery/inteco_e6050.png"
             }
         ],
         stats: [
-            { label: 'Шпунт', value: '800 т' },
-            { label: 'Глубина', value: '18 м' },
-            { label: 'Защита', value: 'Эпоксид' }
+            { label: "Свай забито", value: "1200 шт." },
+            { label: "Сечение", value: "350×350" },
+            { label: "Глубина", value: "18 м" },
+            { label: "Срок", value: "5 мес." }
         ]
     }
 ];
+
+/**
+ * @deprecated Use fetchProjects() instead.
+ */
+export const PROJECTS = PROJECTS_FALLBACK;
+
+/**
+ * @deprecated Use ProjectTech instead.
+ */
+export type ProjectTechnology = ProjectTech;
+

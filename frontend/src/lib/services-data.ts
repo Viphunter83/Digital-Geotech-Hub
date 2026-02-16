@@ -1,119 +1,235 @@
+import { fetchFromDirectus } from './directus-fetch';
+import { resolveIcon } from './icon-map';
 import {
     Drill, Layers, Anchor, Hammer, ArrowDownCircle,
-    Activity, Shield, Construction, MoveVertical, Zap,
-    Pickaxe, Component
+    Activity, Shield, Construction, MoveVertical, Pickaxe,
+    type LucideIcon,
 } from "lucide-react";
+
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+export interface ServiceFeature {
+    text: string;
+}
 
 export interface Service {
     id: string;
     title: string;
     subtitle: string;
     description: string;
-    icon: any;
+    icon: LucideIcon;
     features: string[];
     accent: string;
-    relatedMachineryIds?: string[]; // IDs from machinery-data.ts
+    relatedMachineryIds: string[];
 }
 
-export const services: Service[] = [
+/** Raw shape from Directus */
+interface DirectusService {
+    id: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    icon: string | null;
+    accent_color: string | null;
+    features?: { text: string; sort: number }[];
+    related_machinery?: { machinery_id: string }[];
+}
+
+// ──────────────────────────────────────────────
+// Fetch from Directus
+// ──────────────────────────────────────────────
+
+/**
+ * Fetch all services from Directus.
+ */
+export async function fetchServices(): Promise<Service[]> {
+    const data = await fetchFromDirectus<DirectusService>('services', {
+        fields: [
+            'id', 'title', 'subtitle', 'description', 'icon', 'accent_color',
+            'features.text', 'features.sort',
+            'related_machinery.machinery_id',
+        ],
+        sort: ['sort'],
+    });
+
+    if (data.length > 0) {
+        return data.map(d => ({
+            id: d.id,
+            title: d.title,
+            subtitle: d.subtitle ?? '',
+            description: d.description ?? '',
+            icon: resolveIcon(d.icon),
+            features: (d.features ?? [])
+                .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+                .map(f => f.text),
+            accent: d.accent_color ?? 'orange',
+            relatedMachineryIds: d.related_machinery?.map(r => r.machinery_id) ?? [],
+        }));
+    }
+
+    return SERVICES_FALLBACK;
+}
+
+// ──────────────────────────────────────────────
+// Fallback Data
+// ──────────────────────────────────────────────
+
+export const SERVICES_FALLBACK: Service[] = [
     {
         id: "bored-piles",
         title: "Буронабивные сваи",
         subtitle: "Bored Piles (CFA / Kelly)",
-        description: "Устройство свай по технологиям CFA (непрерывный полый шнек), Kelly и под защитой обсадной трубы. Оптимально для плотной застройки.",
+        description: "Устройство свай диаметром от 300 до 2500 мм глубиной до 70 метров методами CFA и Kelly-бурения.",
         icon: Drill,
-        features: ["Отсутствие опасных вибраций", "Глубина до 50 метров", "Диаметры 400-1500 мм"],
-        accent: "bg-orange-500/10",
-        relatedMachineryIds: ["bauer-bg28", "enteco-e400", "inteco-e6050"]
+        features: [
+            "Диаметр 300–2500 мм",
+            "Глубина погружения до 70 м",
+            "CFA и Kelly-технологии",
+            "Работа в стесненных условиях"
+        ],
+        accent: "orange",
+        relatedMachineryIds: ["bauer-bg28", "enteco-e400"]
     },
     {
         id: "sheet-piling",
         title: "Шпунтовое ограждение",
-        subtitle: "Sheet Piling Works",
-        description: "Полный комплекс работ: вибропогружение, статическое вдавливание и извлечение шпунта Ларсена. Монтаж распорных систем.",
+        subtitle: "Sheet Piling (Larssen, трубошпунт)",
+        description: "Погружение стального шпунта Ларсена и трубошпунта методами вибро- и статического вдавливания.",
         icon: Layers,
-        features: ["Вибропогружение (PVE)", "Статическое вдавливание", "Крепление котлованов"],
-        accent: "bg-blue-500/10",
-        relatedMachineryIds: ["giken-silent-piler", "pve-2316", "mkt-v35"]
-    },
-    {
-        id: "sheet-pile-supply",
-        title: "Поставка и Выкуп шпунта",
-        subtitle: "Supply & Buy-Back",
-        description: "Продажа и обратный выкуп шпунта Ларсена. Аренда шпунта. Оптимизация бюджета за счет системы Buy-Back (экономия до 80%).",
-        icon: Component,
-        features: ["Обратный выкуп (Buy-Back)", "Продажа нового и Б/У", "Аренда шпунта"],
-        accent: "bg-orange-500/10",
-        relatedMachineryIds: [] // No specific machinery for supply, maybe transport?
+        features: [
+            "Все типы шпунта Ларсена",
+            "Трубошпунт до ⌀1220 мм",
+            "Вибро- и статическое погружение",
+            "Идеально для котлованов в городе"
+        ],
+        accent: "blue",
+        relatedMachineryIds: ["giken-silent-piler", "pve-2316", "manitowoc-222"]
     },
     {
         id: "pile-driving",
-        title: "Забивка свай",
-        subtitle: "Driven Piling",
-        description: "Погружение железобетонных свай сечением 300x300, 350x350, 400x400 мм современными гидравлическими молотами Junttan.",
+        title: "Забивка ЖБ свай",
+        subtitle: "Driven Precast Piles (RC)",
+        description: "Забивка и вдавливание железобетонных свай сечением до 400×400 мм. Контроль по отказу.",
         icon: Hammer,
-        features: ["Сверхвысокая несущая способность", "Контроль отказа свай", "Производительность до 30 шт/смена"],
-        accent: "bg-red-500/10",
-        relatedMachineryIds: ["junttan-pm25"]
-    },
-    {
-        id: "leader-drilling",
-        title: "Лидерное бурение",
-        subtitle: "Leader Drilling",
-        description: "Предварительное бурение скважин для снижения вибрационного воздействия и облегчения погружения свай в плотные грунты.",
-        icon: Anchor,
-        features: ["Работа в мерзлых грунтах", "Снижение шума и вибрации", "Точное позиционирование"],
-        accent: "bg-green-500/10",
-        relatedMachineryIds: ["bauer-bg28", "enteco-e400"]
+        features: [
+            "Сечение до 400×400 мм",
+            "Длина до 24 метров",
+            "Гидравлические молоты",
+            "Мониторинг PDA в реальном времени"
+        ],
+        accent: "red",
+        relatedMachineryIds: ["junttan-pm25", "bsp-356"]
     },
     {
         id: "pile-pressing",
-        title: "Вдавливание свай",
-        subtitle: "Statically Pressed Piles",
-        description: "Бесшумное погружение свай под давлением статической нагрузки (СВУ). Идеально для работы вблизи ветхих и аварийных зданий.",
+        title: "Статическое вдавливание",
+        subtitle: "Static Pile Pressing (Silent)",
+        description: "Бесшумное погружение свай и шпунта методом статического вдавливания. Безопасно для исторической застройки.",
         icon: ArrowDownCircle,
-        features: ["Нулевая вибрация", "Работа 24/7 в городе", "Усилие до 300 тонн"],
-        accent: "bg-purple-500/10",
-        relatedMachineryIds: ["giken-silent-piler"] // Assuming Giken can also do some pile pressing or represents this category
+        features: [
+            "Отсутствие опасных вибраций",
+            "Работа в историческом центре",
+            "Усилие до 400 тонн",
+            "Ночные работы без ограничений"
+        ],
+        accent: "green",
+        relatedMachineryIds: ["giken-silent-piler"]
+    },
+    {
+        id: "anchors",
+        title: "Грунтовые анкеры",
+        subtitle: "Ground Anchors (Temporary & Permanent)",
+        description: "Устройство временных и постоянных грунтовых анкеров для крепления ограждающих конструкций котлованов.",
+        icon: Anchor,
+        features: [
+            "Временные и постоянные",
+            "Глубина до 30 м",
+            "Испытание каждого анкера",
+            "Инъекционная технология"
+        ],
+        accent: "purple",
+        relatedMachineryIds: ["enteco-e400", "inteco-e6050"]
     },
     {
         id: "jet-grouting",
-        title: "Jet Grouting",
-        subtitle: "Soil Stabilization",
-        description: "Закрепление грунтов методом струйной цементации. Создание грунтоцементных свай и массивов для усиления фундаментов.",
+        title: "Струйная цементация",
+        subtitle: "Jet Grouting (Mono / Bi / Triple)",
+        description: "Укрепление и гидроизоляция грунтов методом струйной цементации (jet grouting) с контролем параметров.",
         icon: Activity,
-        features: ["Усиление фундаментов", "Противофильтрационные завесы", "Работа в стесненных условиях"],
-        accent: "bg-cyan-500/10",
-        relatedMachineryIds: ["enteco-e400"] // Often used for Jet Grouting
+        features: [
+            "Моно-, би-, трёхкомпонентная",
+            "Диаметр столбов до 2000 мм",
+            "Укрепление и гидроизоляция",
+            "Работа в сложных грунтах"
+        ],
+        accent: "cyan",
+        relatedMachineryIds: ["bauer-bg28", "enteco-e400"]
     },
     {
         id: "slurry-wall",
-        title: "Стена в грунте",
-        subtitle: "Diaphragm Wall",
-        description: "Возведение подземных сооружений и ограждающих конструкций котлованов методом «стена в грунте».",
+        title: '«Стена в грунте»',
+        subtitle: "Diaphragm Wall (Slurry Wall)",
+        description: 'Устройство противофильтрационных завес и несущих конструкций методом «стена в грунте» глубиной до 45 м.',
         icon: Shield,
-        features: ["Глубина до 40+ метров", "Высокая водонепроницаемость", "Несущая способность"],
-        accent: "bg-slate-500/10",
-        relatedMachineryIds: ["bauer-bg28"] // Grab buckets usually used with heavy rigs
-    },
-    {
-        id: "vibroflotation",
-        title: "Виброфлотация",
-        subtitle: "Vibroflotation",
-        description: "Глубинное уплотнение несвязных грунтов виброустановками для повышения их несущей способности.",
-        icon: MoveVertical,
-        features: ["Уплотнение песков", "Снижение риска разжижения", "Экономичность"],
-        accent: "bg-yellow-500/10",
-        relatedMachineryIds: ["pve-2316"] // Vibrators used
+        features: [
+            "Глубина до 45 м",
+            "Толщина стены 600–1200 мм",
+            "Несущая и ограждающая функция",
+            "Минимальные деформации"
+        ],
+        accent: "indigo",
+        relatedMachineryIds: ["bauer-bg28"]
     },
     {
         id: "micropiles",
         title: "Микросваи",
-        subtitle: "Micropiles & Anchors",
-        description: "Устройство буроинъекционных свай малого диаметра и грунтовых анкеров для крепления котлованов.",
-        icon: Component,
-        features: ["Работа внутри зданий", "Усиление склонов", "Анкерное крепление"],
-        accent: "bg-teal-500/10",
-        relatedMachineryIds: ["inteco-e6050"] // Compact rigs
+        subtitle: "Micropiles (Root Piles)",
+        description: "Устройство микросвай диаметром до 300 мм для усиления фундаментов и работ в ограниченном пространстве.",
+        icon: Construction,
+        features: [
+            "Диаметр 100–300 мм",
+            "Высокая несущая способность",
+            "Усиление исторических фундаментов",
+            "Работа внутри зданий"
+        ],
+        accent: "orange",
+        relatedMachineryIds: ["inteco-e6050"]
+    },
+    {
+        id: "vibroflotation",
+        title: "Виброуплотнение",
+        subtitle: "Vibroflotation (Deep Compaction)",
+        description: "Глубинное уплотнение несвязных грунтов методом виброфлотации. Повышение несущей способности основания.",
+        icon: MoveVertical,
+        features: [
+            "Глубина обработки до 20 м",
+            "Песчаные и гравийные грунты",
+            "Повышение модуля деформации",
+            "Контроль по CPT до и после"
+        ],
+        accent: "teal",
+        relatedMachineryIds: ["pve-2316"]
+    },
+    {
+        id: "leader-drilling",
+        title: "Лидерное бурение",
+        subtitle: "Pre-drilling (Leader Drilling)",
+        description: "Предварительное бурение скважин для облегчения погружения свай и шпунта в плотных грунтах.",
+        icon: Pickaxe,
+        features: [
+            "Разрыхление плотных слоёв",
+            "Для свайных и шпунтовых работ",
+            "Позволяет снизить вибрации",
+            "Контроль глубины бурения"
+        ],
+        accent: "slate",
+        relatedMachineryIds: ["bauer-bg28", "enteco-e400", "inteco-e6050"]
     }
 ];
+
+/**
+ * @deprecated Use fetchServices() instead. Kept for backward compatibility.
+ */
+export const services = SERVICES_FALLBACK;

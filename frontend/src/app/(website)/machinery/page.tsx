@@ -2,9 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { SubPageHero } from "@/components/layout/SubPageHero";
-import { ArrowRight, Settings, Tractor } from "lucide-react";
+import { ArrowRight, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { LeadMagnetModal } from "@/components/layout/LeadMagnetModal";
 import { MachineryDetailsDialog } from "@/components/features/MachineryDetailsDialog";
 
@@ -13,7 +13,7 @@ import { services } from "@/lib/services-data";
 
 import { useSearchParams } from "next/navigation";
 
-export default function MachineryPage() {
+function MachineryContent() {
     const searchParams = useSearchParams();
     const initialId = searchParams.get('id');
     const [activeCategory, setActiveCategory] = useState('all');
@@ -294,5 +294,19 @@ export default function MachineryPage() {
                 magnetName={selectedItem || "General Machinery Inquiry"}
             />
         </main>
+    );
+}
+
+export default function MachineryPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-[#0F172A] text-white">
+                <div className="flex items-center gap-2 text-white/20 text-[9px] font-black uppercase tracking-widest animate-pulse">
+                    Loading Machinery Fleet...
+                </div>
+            </div>
+        }>
+            <MachineryContent />
+        </Suspense>
     );
 }

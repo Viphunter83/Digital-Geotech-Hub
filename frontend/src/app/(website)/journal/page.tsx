@@ -1,28 +1,58 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Filter, ArrowRight, Clock, User, ChevronRight } from "lucide-react";
+import { Search, ArrowRight, Clock, User } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
-
-import { ARTICLES } from "@/lib/journal-data";
-
-const CATEGORIES = ["Все", "Технологии", "Инновации", "Геология", "Кейсы", "Оборудование"];
-
 import { BackButton } from "@/components/ui/BackButton";
+import {
+    fetchArticles,
+    fetchArticleCategories,
+    ARTICLES_FALLBACK,
+    CATEGORIES_FALLBACK,
+    type Article,
+} from "@/lib/journal-data";
 
 export default function JournalPage() {
+    const [articles, setArticles] = useState<Article[]>(ARTICLES_FALLBACK);
+    const [categories, setCategories] = useState<string[]>(CATEGORIES_FALLBACK);
     const [selectedCategory, setSelectedCategory] = useState("Все");
     const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
 
-    const filteredArticles = ARTICLES.filter(article => {
-        const matchesCategory = selectedCategory === "Все" || article.category === selectedCategory;
-        const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
+    // Load articles and categories from Directus
+    useEffect(() => {
+        Promise.all([
+            fetchArticles(),
+            fetchArticleCategories(),
+        ]).then(([arts, cats]) => {
+            setArticles(arts);
+            setCategories(cats);
+        }).finally(() => setLoading(false));
+    }, []);
+
+    // Re-fetch when category changes (server-side filtering)
+    useEffect(() => {
+        if (!loading) {
+            setLoading(true);
+            fetchArticles({ category: selectedCategory })
+                .then(setArticles)
+                .finally(() => setLoading(false));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCategory]);
+
+    // Client-side search filtering
+    const filteredArticles = articles.filter(article => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return (
+            article.title.toLowerCase().includes(q) ||
+            article.excerpt.toLowerCase().includes(q)
+        );
     });
 
     return (
@@ -57,7 +87,7 @@ export default function JournalPage() {
                     <div className="flex flex-col lg:flex-row gap-8 justify-between items-center mb-16 p-8 bg-white/[0.02] border border-white/5 rounded-[32px] backdrop-blur-xl">
                         {/* Categories */}
                         <div className="flex flex-wrap gap-3 justify-center">
-                            {CATEGORIES.map(cat => (
+                            {categories.map(cat => (
                                 <button
                                     key={cat}
                                     onClick={() => setSelectedCategory(cat)}
@@ -85,57 +115,65 @@ export default function JournalPage() {
                     </div>
 
                     {/* Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                        {filteredArticles.length > 0 ? (
-                            filteredArticles.map((article, index) => (
-                                <motion.article
-                                    key={article.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
-                                    className="group flex flex-col h-full bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden hover:border-accent/40 transition-all duration-500"
-                                >
-                                    <Link href={`/journal/${article.slug}`} className="block relative aspect-[16/9] overflow-hidden">
-                                        <img
-                                            src={article.image}
-                                            alt={article.title}
-                                            className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
-                                        />
-                                        <div className="absolute top-6 left-6 px-4 py-1.5 bg-accent/20 border border-accent/40 backdrop-blur-md rounded-full">
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-accent">
-                                                {article.category}
-                                            </span>
-                                        </div>
-                                    </Link>
-
-                                    <div className="p-10 flex flex-col flex-grow">
-                                        <div className="flex items-center gap-6 mb-6 text-white/30 text-[10px] font-bold uppercase tracking-widest">
-                                            <span className="flex items-center gap-2"><Clock className="w-3 h-3 text-accent" /> {article.readTime}</span>
-                                            <span className="flex items-center gap-2"><User className="w-3 h-3 text-accent" /> {article.author}</span>
-                                        </div>
-                                        <h4 className="text-2xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500 leading-tight">
-                                            <Link href={`/journal/${article.slug}`}>
-                                                {article.title}
-                                            </Link>
-                                        </h4>
-                                        <p className="text-white/40 text-sm leading-relaxed font-medium mb-10 flex-grow">
-                                            {article.excerpt}
-                                        </p>
-                                        <Link
-                                            href={`/journal/${article.slug}`}
-                                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-accent group/link hover:text-white transition-colors"
-                                        >
-                                            Читать полностью <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="h-96 bg-white/5 animate-pulse rounded-[32px]" />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                            {filteredArticles.length > 0 ? (
+                                filteredArticles.map((article, index) => (
+                                    <motion.article
+                                        key={article.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className="group flex flex-col h-full bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden hover:border-accent/40 transition-all duration-500"
+                                    >
+                                        <Link href={`/journal/${article.slug}`} className="block relative aspect-[16/9] overflow-hidden">
+                                            <img
+                                                src={article.image}
+                                                alt={article.title}
+                                                className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                                            />
+                                            <div className="absolute top-6 left-6 px-4 py-1.5 bg-accent/20 border border-accent/40 backdrop-blur-md rounded-full">
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-accent">
+                                                    {article.category}
+                                                </span>
+                                            </div>
                                         </Link>
-                                    </div>
-                                </motion.article>
-                            ))
-                        ) : (
-                            <div className="col-span-full py-20 text-center">
-                                <p className="text-white/20 font-black uppercase tracking-[0.5em] text-xl">Ничего не найдено</p>
-                            </div>
-                        )}
-                    </div>
+
+                                        <div className="p-10 flex flex-col flex-grow">
+                                            <div className="flex items-center gap-6 mb-6 text-white/30 text-[10px] font-bold uppercase tracking-widest">
+                                                <span className="flex items-center gap-2"><Clock className="w-3 h-3 text-accent" /> {article.readTime}</span>
+                                                <span className="flex items-center gap-2"><User className="w-3 h-3 text-accent" /> {article.author}</span>
+                                            </div>
+                                            <h4 className="text-2xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500 leading-tight">
+                                                <Link href={`/journal/${article.slug}`}>
+                                                    {article.title}
+                                                </Link>
+                                            </h4>
+                                            <p className="text-white/40 text-sm leading-relaxed font-medium mb-10 flex-grow">
+                                                {article.excerpt}
+                                            </p>
+                                            <Link
+                                                href={`/journal/${article.slug}`}
+                                                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-accent group/link hover:text-white transition-colors"
+                                            >
+                                                Читать полностью <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
+                                            </Link>
+                                        </div>
+                                    </motion.article>
+                                ))
+                            ) : (
+                                <div className="col-span-full py-20 text-center">
+                                    <p className="text-white/20 font-black uppercase tracking-[0.5em] text-xl">Ничего не найдено</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </section>
 

@@ -28,8 +28,8 @@ services:
     ports:
       - "8055:8055"
     environment:
-      KEY: "${KEY:-replace-with-random-key}"
-      SECRET: "${SECRET:-replace-with-random-secret}"
+      KEY: "${KEY}"
+      SECRET: "${SECRET}"
       DB_CLIENT: "pg"
       DB_HOST: "postgres"
       DB_PORT: "5432"
@@ -41,12 +41,66 @@ services:
       CACHE_REDIS: "redis://redis:6379"
       REDIS: "redis://redis:6379"
       CORS_ENABLED: "true"
-      CORS_ORIGIN: "http://localhost:3000"
-      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@geotech.hub}"
-      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-geotech-hub-2026}"
+      CORS_ORIGIN: "true"
+      PUBLIC_URL: "http://localhost:8055"
+      ADMIN_EMAIL: "${ADMIN_EMAIL}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     depends_on:
       - postgres
       - redis
+    networks:
+      - geotech_network
+
+  backend:
+    build: ./backend
+    container_name: geotech_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://directus:password@postgres:5432/directus
+      DIRECTUS_URL: http://directus:8055
+      REDIS_URL: redis://redis:6379
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - geotech_network
+
+  frontend:
+    build: ./frontend
+    container_name: geotech_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "/api"
+      NEXT_PUBLIC_DIRECTUS_URL: "/directus"
+    networks:
+      - geotech_network
+
+  gateway:
+    image: nginx:alpine
+    container_name: geotech_gateway
+    restart: always
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+      - directus
+    networks:
+      - geotech_network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: geotech_tunnel
+    restart: unless-stopped
+    command: tunnel --url http://geotech_gateway:80 --protocol http2
     networks:
       - geotech_network
 

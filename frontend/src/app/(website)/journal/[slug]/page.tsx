@@ -4,22 +4,64 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Clock, User, Calendar, Share2, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
-import { ARTICLES } from "@/lib/journal-data";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
 import { BackButton } from "@/components/ui/BackButton";
+import { fetchArticleBySlug, fetchArticles, type Article } from "@/lib/journal-data";
 
 export default function ArticleDetailPage() {
     const params = useParams();
     const slug = params.slug as string;
-    const article = ARTICLES.find(a => a.slug === slug);
+
+    const [article, setArticle] = useState<Article | null>(null);
+    const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadData() {
+            const [art, allArticles] = await Promise.all([
+                fetchArticleBySlug(slug),
+                fetchArticles({ limit: 10 }),
+            ]);
+
+            setArticle(art);
+            if (art) {
+                setRelatedArticles(
+                    allArticles.filter(a => a.id !== art.id).slice(0, 2)
+                );
+            }
+            setLoading(false);
+        }
+        loadData();
+    }, [slug]);
+
+    if (loading) {
+        return (
+            <main className="min-h-screen bg-[#09090b] flex flex-col">
+                <EngineeringBackground />
+                <Navbar />
+                <div className="pt-40 pb-32 px-6 relative z-10">
+                    <div className="container mx-auto">
+                        <div className="h-12 w-64 bg-white/5 animate-pulse rounded-xl mb-10" />
+                        <div className="h-20 w-full max-w-2xl bg-white/5 animate-pulse rounded-xl mb-10" />
+                        <div className="aspect-video bg-white/5 animate-pulse rounded-[32px] mb-16" />
+                        <div className="space-y-4">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <div key={i} className="h-6 bg-white/5 animate-pulse rounded-lg" />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <Footer />
+            </main>
+        );
+    }
 
     if (!article) {
         return notFound();
     }
-
-    const relatedArticles = ARTICLES.filter(a => a.id !== article.id).slice(0, 2);
 
     return (
         <main className="min-h-screen bg-[#09090b] flex flex-col">

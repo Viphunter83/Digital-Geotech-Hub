@@ -1,4 +1,160 @@
-export const ARTICLES = [
+import { fetchFromDirectus, getDirectusFileUrl } from './directus-fetch';
+
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+export interface Article {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    date: string;
+    readTime: string;
+    author: string;
+    image: string;
+    seo?: {
+        title: string;
+        description: string;
+    };
+}
+
+/** Raw shape coming from Directus */
+interface DirectusArticle {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    category: { name: string } | null;
+    date_published: string;
+    read_time: string;
+    author: string;
+    image: string | null;
+    seo_title: string | null;
+    seo_description: string | null;
+}
+
+// ──────────────────────────────────────────────
+// Directus → Frontend transformer
+// ──────────────────────────────────────────────
+
+function transformArticle(d: DirectusArticle): Article {
+    return {
+        id: String(d.id),
+        title: d.title,
+        slug: d.slug,
+        excerpt: d.excerpt,
+        content: d.content,
+        category: d.category?.name ?? 'Без категории',
+        date: d.date_published
+            ? new Date(d.date_published).toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+            })
+            : '',
+        readTime: d.read_time ?? '',
+        author: d.author ?? '',
+        image: getDirectusFileUrl(d.image) ?? '/assets/journal-ai.png',
+        seo: d.seo_title
+            ? { title: d.seo_title, description: d.seo_description ?? '' }
+            : undefined,
+    };
+}
+
+// ──────────────────────────────────────────────
+// Fetch from Directus (with fallback)
+// ──────────────────────────────────────────────
+
+/**
+ * Fetch all published articles from Directus, sorted by publication date.
+ * Falls back to hardcoded ARTICLES_FALLBACK if Directus is unavailable.
+ */
+export async function fetchArticles(options?: { limit?: number; category?: string }): Promise<Article[]> {
+    const filter: Record<string, any> = { status: { _eq: 'published' } };
+    if (options?.category && options.category !== 'Все') {
+        filter.category = { name: { _eq: options.category } };
+    }
+
+    const data = await fetchFromDirectus<DirectusArticle>('articles', {
+        fields: [
+            'id', 'title', 'slug', 'excerpt', 'content',
+            'category.name', 'date_published', 'read_time',
+            'author', 'image', 'seo_title', 'seo_description',
+        ],
+        filter,
+        sort: ['-date_published'],
+        limit: options?.limit,
+    });
+
+    if (data.length > 0) {
+        return data.map(transformArticle);
+    }
+
+    // Fallback: apply client-side filtering
+    let fallback = ARTICLES_FALLBACK;
+    if (options?.category && options.category !== 'Все') {
+        fallback = fallback.filter(a => a.category === options.category);
+    }
+    if (options?.limit) {
+        fallback = fallback.slice(0, options.limit);
+    }
+    return fallback;
+}
+
+/**
+ * Fetch a single article by slug from Directus.
+ * Falls back to hardcoded data.
+ */
+export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
+    const data = await fetchFromDirectus<DirectusArticle>('articles', {
+        fields: [
+            'id', 'title', 'slug', 'excerpt', 'content',
+            'category.name', 'date_published', 'read_time',
+            'author', 'image', 'seo_title', 'seo_description',
+        ],
+        filter: {
+            slug: { _eq: slug },
+            status: { _eq: 'published' },
+        },
+        limit: 1,
+    });
+
+    if (data.length > 0) {
+        return transformArticle(data[0]);
+    }
+
+    // Fallback
+    return ARTICLES_FALLBACK.find(a => a.slug === slug) ?? null;
+}
+
+/**
+ * Fetch article categories from Directus.
+ * Falls back to hardcoded list.
+ */
+export async function fetchArticleCategories(): Promise<string[]> {
+    const data = await fetchFromDirectus<{ name: string }>('article_categories', {
+        fields: ['name'],
+        sort: ['sort'],
+    });
+
+    if (data.length > 0) {
+        return ['Все', ...data.map(c => c.name)];
+    }
+
+    return CATEGORIES_FALLBACK;
+}
+
+// ──────────────────────────────────────────────
+// Fallback Data (current hardcoded content)
+// ──────────────────────────────────────────────
+
+export const CATEGORIES_FALLBACK = ["Все", "Технологии", "Инновации", "Геология", "Кейсы", "Оборудование"];
+
+export const ARTICLES_FALLBACK: Article[] = [
     {
         id: "1",
         title: "Статическое вдавливание: как сохранить исторические здания при строительстве",
@@ -91,3 +247,8 @@ export const ARTICLES = [
         }
     }
 ];
+
+/**
+ * @deprecated Use fetchArticles() instead. Kept for backward compatibility.
+ */
+export const ARTICLES = ARTICLES_FALLBACK;

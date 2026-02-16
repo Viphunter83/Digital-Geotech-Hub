@@ -36,8 +36,8 @@ async function getProject(id: string): Promise<Project | null> {
             id: m.machinery_id.id,
             name: m.machinery_id.name,
             type: 'Оборудование',
-            description: m.machinery_id.description, // Assuming description exists in Directus
-            image: m.machinery_id.image ? `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${m.machinery_id.image}` : null,
+            description: m.machinery_id.description || '',
+            image: m.machinery_id.image ? `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${m.machinery_id.image}` : undefined,
         })) || [];
 
         // Add Soil Type as a "Method"/Condition if not present
@@ -60,8 +60,7 @@ async function getProject(id: string): Promise<Project | null> {
             challenge: 'Описание задачи уточняется...',
             solution: data.description, // Fallback
             year: data.duration,
-            latitude: 0,
-            longitude: 0,
+            coordinates: [0, 0] as [number, number],
             image: `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${data.image}`,
             tags: [data.soil_type],
             technologies,

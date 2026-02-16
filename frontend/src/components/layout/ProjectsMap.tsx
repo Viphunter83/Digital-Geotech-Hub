@@ -93,8 +93,8 @@ const REFERENCE_PROJECTS: MapProject[] = PROJECTS.map(p => ({
     title: p.title,
     location: p.location,
     description: p.description,
-    latitude: p.latitude,
-    longitude: p.longitude
+    latitude: p.coordinates[0],
+    longitude: p.coordinates[1]
 }));
 
 

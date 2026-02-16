@@ -168,7 +168,7 @@ async def parse_document(
         except Exception:
             pass
     background_tasks.add_task(
-        _save_audit_to_directus, file.filename or "unknown", json.loads(response_data.model_dump_json()), client_code
+        _save_audit_to_directus, file.filename or "unknown", response_data.model_dump(), client_code
     )
 
     return response_data

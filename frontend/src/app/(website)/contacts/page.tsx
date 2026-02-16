@@ -6,9 +6,18 @@ import { SubPageHero } from "@/components/layout/SubPageHero";
 import { Phone, Mail, MapPin, Clock, Globe, MessageSquare, Send, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchSingleton } from "@/lib/directus-fetch";
 
-const contactInfo = [
+interface ContactItem {
+    icon: any;
+    label: string;
+    value: string;
+    link: string | null;
+    color: string;
+}
+
+const contactInfoFallback: ContactItem[] = [
     {
         icon: Phone,
         label: "Телефон нашей линии",
@@ -42,6 +51,26 @@ const contactInfo = [
 export default function ContactsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [contactInfo, setContactInfo] = useState<ContactItem[]>(contactInfoFallback);
+
+    useEffect(() => {
+        fetchSingleton<{
+            phone: string;
+            email: string;
+            address: string;
+            work_hours: string;
+            map_link: string | null;
+        }>('company_info').then(data => {
+            if (data) {
+                setContactInfo([
+                    { icon: Phone, label: "Телефон нашей линии", value: data.phone, link: `tel:${data.phone.replace(/[\s()-]/g, '')}`, color: "text-orange-500" },
+                    { icon: Mail, label: "Почта для тендеров", value: data.email, link: `mailto:${data.email}`, color: "text-blue-500" },
+                    { icon: MapPin, label: "Главный офис", value: data.address, link: data.map_link ?? "#map", color: "text-red-500" },
+                    { icon: Clock, label: "Режим работы", value: data.work_hours, link: null, color: "text-green-500" },
+                ]);
+            }
+        });
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

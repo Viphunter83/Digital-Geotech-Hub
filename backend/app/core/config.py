@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -36,9 +36,10 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str = "noreply@geotech-hub.ru"
     EMAIL_ENABLED: bool = False  # Enable when SMTP credentials are set
 
-    class Config:
-        env_file = ["../.env", ".env"]
-        case_sensitive = True
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=["../.env", ".env"],
+        case_sensitive=True,
+        extra="ignore"
+    )
 
 settings = Settings()
