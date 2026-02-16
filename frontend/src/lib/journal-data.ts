@@ -42,6 +42,14 @@ interface DirectusArticle {
 // ──────────────────────────────────────────────
 
 function transformArticle(d: DirectusArticle): Article {
+    // Variety for placeholder images if not set in CMS
+    const placeholders = [
+        '/assets/journal-ai.png',
+        '/assets/journal-geology.png',
+        '/assets/static_piling_expert.png'
+    ];
+    const fallbackImage = placeholders[d.id % placeholders.length];
+
     return {
         id: String(d.id),
         title: d.title,
@@ -58,7 +66,7 @@ function transformArticle(d: DirectusArticle): Article {
             : '',
         readTime: d.read_time ?? '',
         author: d.author ?? '',
-        image: getDirectusFileUrl(d.image) ?? '/assets/journal-ai.png',
+        image: getDirectusFileUrl(d.image) ?? fallbackImage,
         seo: d.seo_title
             ? { title: d.seo_title, description: d.seo_description ?? '' }
             : undefined,

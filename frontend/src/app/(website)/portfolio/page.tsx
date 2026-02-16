@@ -1,70 +1,10 @@
+import { fetchProjects, Project } from "@/lib/projects-data";
 import { SubPageHero } from "@/components/layout/SubPageHero";
-import { PROJECTS, Project } from "@/lib/projects-data";
 import { PortfolioHeroDecorations } from "@/components/portfolio/PortfolioHeroDecorations";
 import { PortfolioClient } from "@/components/portfolio/PortfolioClient";
 
-// Типизация данных из Directus
-interface ProjectCase {
-    id: string;
-    title: string;
-    location: string;
-    soil_type: string;
-    duration: string;
-    description: string;
-    image: string; // ID файла в Directus
-    machinery: Array<{
-        machinery_id: {
-            name: string;
-        };
-    }>;
-}
-
-// Transform Directus data to Project interface
-function transformDirectusCase(item: ProjectCase): Project {
-    return {
-        id: item.id,
-        title: item.title,
-        location: item.location || 'РФ',
-        region: 'regions', // Default fallback
-        category: 'industrial', // Default fallback
-        description: item.description,
-        challenge: 'Уточняется...',
-        solution: item.description,
-        year: item.duration,
-        coordinates: [0, 0] as [number, number],
-        image: `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${item.image}`,
-        tags: [item.soil_type],
-        technologies: item.machinery?.map(m => ({
-            name: m.machinery_id.name,
-            type: 'Оборудование',
-            description: '',
-        })) ?? [],
-        stats: [
-            { label: 'Грунт', value: item.soil_type },
-            { label: 'Срок', value: item.duration }
-        ]
-    };
-}
-
-async function getPortfolioCases() {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/cases?fields=*,machinery.machinery_id.name`, {
-            next: { revalidate: 60 },
-        });
-
-        if (!res.ok) return [];
-        const { data } = await res.json();
-        return (data as ProjectCase[]).map(transformDirectusCase);
-    } catch (e) {
-        return [];
-    }
-}
-
 export default async function PortfolioPage() {
-    const directusCases = await getPortfolioCases();
-    // Combine static premium projects with dynamic CMS projects
-    // Put static projects first as they are "featured"
-    const allProjects = [...PROJECTS, ...directusCases];
+    const allProjects = await fetchProjects();
 
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 relative overflow-hidden">

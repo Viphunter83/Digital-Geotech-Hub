@@ -4,17 +4,30 @@ import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePres
 import { ArrowRight, Box, Shield, Zap, Globe, Cpu, Database, Cloud, FileText } from "lucide-react";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { LeadMagnetModal } from "./LeadMagnetModal";
-import { fetchFromDirectus } from "@/lib/directus-fetch";
+import { fetchFromDirectus, getDirectusFileUrl } from "@/lib/directus-fetch";
 import Link from "next/link";
 
 interface HeroProps {
     region: 'msk' | 'spb';
 }
 
+interface HeroBadge {
+    label: string;
+    href: string;
+    image: any;
+    parallax_factor: number;
+    pos_top?: string;
+    pos_left?: string;
+    pos_right?: string;
+    pos_bottom?: string;
+}
+
 interface GeoConfig {
     title: string;
     usp: string;
     cta: string;
+    background_image?: string | null;
+    image_opacity?: number | null;
 }
 
 const geoConfigsFallback: Record<string, GeoConfig> = {
@@ -32,19 +45,37 @@ const geoConfigsFallback: Record<string, GeoConfig> = {
 
 export function Hero({ region }: HeroProps) {
     const [geoConfigs, setGeoConfigs] = useState(geoConfigsFallback);
+    const [badges, setBadges] = useState<HeroBadge[]>([]);
     const config = geoConfigs[region] || geoConfigs.spb || geoConfigsFallback.spb;
 
     // Load hero configs from Directus
     useEffect(() => {
-        fetchFromDirectus<{ region: string; title: string; usp: string; cta_text: string }>('hero_configs', {
-            fields: ['region', 'title', 'usp', 'cta_text'],
+        // Fetch hero configs
+        fetchFromDirectus<{ region: string; title: string; usp: string; cta_text: string; background_image: any; image_opacity: number }>('hero_configs', {
+            fields: ['region', 'title', 'usp', 'cta_text', 'background_image', 'image_opacity'],
         }).then(data => {
             if (data.length > 0) {
                 const configs: Record<string, GeoConfig> = {};
                 data.forEach(d => {
-                    configs[d.region] = { title: d.title, usp: d.usp, cta: d.cta_text };
+                    configs[d.region] = {
+                        title: d.title,
+                        usp: d.usp,
+                        cta: d.cta_text,
+                        background_image: typeof d.background_image === 'object' ? d.background_image?.id : d.background_image,
+                        image_opacity: d.image_opacity
+                    };
                 });
                 setGeoConfigs(prev => ({ ...prev, ...configs }));
+            }
+        });
+
+        // Fetch dynamic badges
+        fetchFromDirectus<HeroBadge>('hero_badges', {
+            fields: ['label', 'href', 'image', 'parallax_factor', 'pos_top', 'pos_left', 'pos_right', 'pos_bottom'],
+            sort: ['sort']
+        }).then(data => {
+            if (data.length > 0) {
+                setBadges(data);
             }
         });
     }, []);
@@ -83,12 +114,13 @@ export function Hero({ region }: HeroProps) {
             {/* Background Image & Overlays - Parallax Layer */}
             <motion.div
                 style={{ x: bgX, y: bgY, scale: 1.15 }}
-                className="absolute inset-0 z-0 overflow-hidden bg-transparent"
+                className="absolute inset-0 z-0 overflow-hidden bg-transparent transition-opacity duration-1000"
             >
                 <img
-                    src="/hero-main.png"
+                    src={getDirectusFileUrl(config.background_image) || "/hero-main-v2.png"}
                     alt="Geotech Digital Hub"
-                    className="w-full h-full object-cover opacity-60 scale-110"
+                    className="w-full h-full object-cover scale-110"
+                    style={{ opacity: (config.image_opacity ?? 60) / 100 }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/95 via-[#0F172A]/60 to-[#0F172A]" />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/90 via-transparent to-[#0F172A]/90" />
@@ -176,36 +208,71 @@ export function Hero({ region }: HeroProps) {
             </motion.div>
 
             {/* Premium Technical Badges with 3D Assets and Independent Parallax */}
-            <TechnicalBadge
-                image="/assets/hero/drilling-rig.png"
-                className="top-[15%] left-[5%]"
-                label="Буровые"
-                delay={0}
-                mouseX={smoothX}
-                mouseY={smoothY}
-                factor={0.1}
-                href="/services#drilling"
-            />
-            <TechnicalBadge
-                image="/assets/hero/sheet-pile.png"
-                className="bottom-[20%] right-[8%]"
-                label="Шпунт"
-                delay={0.5}
-                mouseX={smoothX}
-                mouseY={smoothY}
-                factor={-0.12}
-                href="/services#catalog"
-            />
-            <TechnicalBadge
-                image="/assets/hero/truck.png"
-                className="top-[30%] right-[5%]"
-                label="Спецтехника"
-                delay={1}
-                mouseX={smoothX}
-                mouseY={smoothY}
-                factor={0.08}
-                href="/machinery"
-            />
+            {badges.length > 0 ? (
+                badges.map((badge, idx) => {
+                    // Fallback to local assets if no image is uploaded yet
+                    let badgeImage = getDirectusFileUrl(badge.image);
+                    if (!badgeImage) {
+                        if (badge.label === "Буровые") badgeImage = "/assets/hero/drilling-rig.png";
+                        else if (badge.label === "Шпунт") badgeImage = "/assets/hero/sheet-pile.png";
+                        else if (badge.label === "Спецтехника") badgeImage = "/assets/hero/truck.png";
+                        else badgeImage = ""; // Placeholder or empty
+                    }
+
+                    return (
+                        <TechnicalBadge
+                            key={idx}
+                            image={badgeImage}
+                            label={badge.label}
+                            delay={idx * 0.2}
+                            mouseX={smoothX}
+                            mouseY={smoothY}
+                            factor={badge.parallax_factor}
+                            href={badge.href}
+                            style={{
+                                top: badge.pos_top,
+                                left: badge.pos_left,
+                                right: badge.pos_right,
+                                bottom: badge.pos_bottom
+                            }}
+                        />
+                    );
+                })
+            ) : (
+                /* Fallback Badges */
+                <>
+                    <TechnicalBadge
+                        image="/assets/hero/drilling-rig.png"
+                        className="top-[15%] left-[5%]"
+                        label="Буровые"
+                        delay={0}
+                        mouseX={smoothX}
+                        mouseY={smoothY}
+                        factor={0.1}
+                        href="/services#drilling"
+                    />
+                    <TechnicalBadge
+                        image="/assets/hero/sheet-pile.png"
+                        className="bottom-[20%] right-[8%]"
+                        label="Шпунт"
+                        delay={0.5}
+                        mouseX={smoothX}
+                        mouseY={smoothY}
+                        factor={-0.12}
+                        href="/services#catalog"
+                    />
+                    <TechnicalBadge
+                        image="/assets/hero/truck.png"
+                        className="top-[30%] right-[5%]"
+                        label="Спецтехника"
+                        delay={1}
+                        mouseX={smoothX}
+                        mouseY={smoothY}
+                        factor={0.08}
+                        href="/machinery"
+                    />
+                </>
+            )}
             {/* Modal for Catalog/Price List */}
             <LeadMagnetModal
                 isOpen={isModalOpen}
@@ -218,13 +285,13 @@ export function Hero({ region }: HeroProps) {
     );
 }
 
-function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor, href }: { image: string, className?: string, label: string, delay: number, mouseX: any, mouseY: any, factor: number, href: string }) {
+function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor, href, style }: { image: string, className?: string, label: string, delay: number, mouseX: any, mouseY: any, factor: number, href: string, style?: any }) {
     const x = useTransform(mouseX, [-500, 500], [-500 * factor, 500 * factor]);
     const y = useTransform(mouseY, [-500, 500], [-500 * factor, 500 * factor]);
 
     return (
         <motion.div
-            style={{ x, y }}
+            style={{ x, y, ...style }}
             initial={{ opacity: 0, y: 20 }}
             animate={{
                 opacity: 0.8,
