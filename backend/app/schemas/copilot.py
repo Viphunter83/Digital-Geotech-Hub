@@ -9,6 +9,8 @@ class ParsedSpecSchema(BaseModel):
     depth: Optional[float] = Field(None, description="Глубина погружения (метры)")
     groundwater_level: Optional[float] = Field(None, description="Уровень грунтовых вод (если указан)")
     special_conditions: List[str] = Field(default_factory=list, description="Особые условия (стесненность, близость зданий и т.д.)")
+    complexity_coefficient: float = Field(1.0, description="Коэффициент сложности (1.0 - 1.5)")
+    estimated_shifts: int = Field(1, description="Ориентировочное количество смен")
 
 class RiskItem(BaseModel):
     risk: str
@@ -24,6 +26,7 @@ class MachineryInfo(BaseModel):
     name: str
     description: Optional[str] = None
     category: str
+    price_per_shift: float = Field(0.0, description="Стоимость аренды за смену")
 
 class DraftProposalResponse(BaseModel):
     parsed_data: ParsedSpecSchema

@@ -134,11 +134,50 @@ async def parse_document(
     
     # 4. Professional Estimate Calculation
     estimated_total = 0
-    if shpunts and parsed_data.volume:
-        # Use simple ton-based pricing for sheet piling
-        price_per_unit = shpunts[0].price
-        estimated_total = price_per_unit * parsed_data.volume
-        logger.info(f"Calc: {price_per_unit} * {parsed_data.volume} = {estimated_total}")
+    if parsed_data.volume:
+        # Default work rates (rub per ton for piling, rub per meter for drilling)
+        WORK_RATES = {
+            "погружение": 25000.0,
+            "вдавливание": 35000.0,
+            "бурение": 4500.0,
+            "выемка": 10000.0,
+            "извлечение": 10000.0
+        }
+        
+        # Determine work unit price based on work_type
+        work_type_lower = (parsed_data.work_type or "").lower()
+        work_unit_price = 0
+        for key, rate in WORK_RATES.items():
+            if key in work_type_lower:
+                work_unit_price = rate
+                break
+        if work_unit_price == 0:
+            work_unit_price = 15000.0 # Standard fallback
+            
+        # 1. Material Cost (Shpunts)
+        material_cost = 0
+        if shpunts:
+            material_cost = shpunts[0].price * parsed_data.volume
+            
+        # 2. Field Work Cost
+        field_work_total = work_unit_price * parsed_data.volume
+        
+        # 3. Machinery Rental Cost
+        machinery_rental_total = 0
+        if machinery and parsed_data.estimated_shifts:
+            # Sum up all recommended machinery for the estimate
+            shifts = parsed_data.estimated_shifts
+            machinery_rental_total = sum(m.price_per_shift for m in machinery) * shifts
+            
+        # Final weighted total with complexity coefficient
+        base_total = material_cost + field_work_total + machinery_rental_total
+        complexity = parsed_data.complexity_coefficient or 1.0
+        estimated_total = base_total * complexity
+        
+        logger.info(
+            f"PROF CALC: (Mat:{material_cost} + Work:{field_work_total} + Mach:{machinery_rental_total}) "
+            f"* Complex:{complexity} = {estimated_total}"
+        )
     
     response_data = DraftProposalResponse(
         parsed_data=parsed_data,

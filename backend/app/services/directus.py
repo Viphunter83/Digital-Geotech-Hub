@@ -34,10 +34,14 @@ async def fetch_matching_data(work_type: str, required_profile: str = None):
 
         # 2. Search for Machinery
         try:
-            m_params = {"filter[_or]": [
-                {"name": {"_contains": work_type}},
-                {"category": {"_contains": work_type}}
-            ], "limit": 3}
+            m_params = {
+                "filter[_or]": [
+                    {"name": {"_contains": work_type}},
+                    {"category": {"_contains": work_type}}
+                ],
+                "fields": "id,name,status,category,price_per_shift",
+                "limit": 3
+            }
             m_res = await client.get("/items/machinery", params=m_params)
             if m_res.status_code == 200:
                 m_items = m_res.json().get("data", [])
@@ -46,7 +50,8 @@ async def fetch_matching_data(work_type: str, required_profile: str = None):
                         id=str(m.get("id")),
                         name=m.get("name"),
                         description=m.get("status"),
-                        category=m.get("category") or "Спецтехника"
+                        category=m.get("category") or "Спецтехника",
+                        price_per_shift=float(m.get("price_per_shift") or 0)
                     ))
         except Exception as e:
             logger.warning(f"Machinery lookup failed: {e}")
