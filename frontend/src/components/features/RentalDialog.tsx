@@ -26,7 +26,9 @@ export function RentalDialog({ open, onOpenChange, machineId, machineName }: Ren
         comment: ""
     });
 
-    // Load user data from session if available
+    const [info, setInfo] = useState<{ phone: string, email: string } | null>(null);
+
+    // Load user data and CMS info
     useEffect(() => {
         if (open) {
             const raw = localStorage.getItem("geotech_session");
@@ -42,6 +44,13 @@ export function RentalDialog({ open, onOpenChange, machineId, machineName }: Ren
                     console.error("Failed to parse session", e);
                 }
             }
+
+            // Fetch dynamic contacts
+            import("@/lib/directus-fetch").then(m => {
+                m.fetchSingleton<{ phone: string, email: string }>('company_info', {
+                    fields: ['phone', 'email']
+                }).then(data => setInfo(data));
+            });
         }
     }, [open]);
 
@@ -183,11 +192,11 @@ export function RentalDialog({ open, onOpenChange, machineId, machineName }: Ren
                     <div className="pt-6 mt-6 border-t border-white/5 text-center">
                         <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Или свяжитесь напрямую</p>
                         <div className="flex justify-center gap-6 text-xs font-medium">
-                            <a href="tel:+79218844403" className="text-white hover:text-orange-500 transition-colors">
-                                +7 (921) 884-44-03
+                            <a href={`tel:${info?.phone || '+79218844403'}`} className="text-white hover:text-orange-500 transition-colors">
+                                {info?.phone || '+7 (921) 884-44-03'}
                             </a>
-                            <a href="mailto:drilling.rigs.info@yandex.ru" className="text-white hover:text-orange-500 transition-colors">
-                                drilling.rigs.info@yandex.ru
+                            <a href={`mailto:${info?.email || 'drilling.rigs.info@yandex.ru'}`} className="text-white hover:text-orange-500 transition-colors">
+                                {info?.email || 'drilling.rigs.info@yandex.ru'}
                             </a>
                         </div>
                     </div>

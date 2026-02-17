@@ -12,10 +12,18 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Digital Geotech Hub | B2B Инженерные решения",
-  description: "B2B-платформа для строительной компании ГеоТехнологии. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
-};
+import { fetchSingleton } from "@/lib/directus-fetch";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await fetchSingleton('site_settings', {
+    fields: ['meta_title', 'meta_description']
+  });
+
+  return {
+    title: settings?.meta_title || "Digital Geotech Hub | B2B Инженерные решения",
+    description: settings?.meta_description || "B2B-платформа для строительной компании ГеоТехнологии. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
+  };
+}
 
 
 export default function RootLayout({

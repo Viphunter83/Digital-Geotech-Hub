@@ -4,11 +4,18 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchSingleton } from "@/lib/directus-fetch";
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [contact, setContact] = useState<{ phone: string } | null>(null);
     const pathname = usePathname();
+
+    useEffect(() => {
+        fetchSingleton<{ phone: string }>('company_info', { fields: ['phone'] })
+            .then(data => setContact(data));
+    }, []);
 
     if (pathname?.startsWith('/dashboard') || pathname === '/login') return null;
 
@@ -34,8 +41,10 @@ export function Navbar() {
                     <NavLink href="/contacts">Контакты</NavLink>
 
                     <div className="flex items-center gap-4 border-l border-white/10 pl-6">
-                        <a href="tel:+79218844403" className="flex flex-col items-end group">
-                            <span className="text-xs font-bold text-white group-hover:text-orange-500 transition-colors">+7 (921) 884-44-03</span>
+                        <a href={`tel:${contact?.phone || '+79218844403'}`} className="flex flex-col items-end group">
+                            <span className="text-xs font-bold text-white group-hover:text-orange-500 transition-colors">
+                                {contact?.phone || '+7 (921) 884-44-03'}
+                            </span>
                             <span className="text-[10px] text-white/40 uppercase tracking-wider">Отдел аренды</span>
                         </a>
                     </div>

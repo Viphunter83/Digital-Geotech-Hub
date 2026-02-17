@@ -39,8 +39,37 @@ const services = (region: 'msk' | 'spb') => [
     }
 ];
 
+import { fetchFromDirectus } from "@/lib/directus-fetch";
+import { useEffect, useState } from "react";
+
+const ICON_MAP: Record<string, any> = {
+    "Ruler": Ruler,
+    "Hammer": Hammer,
+    "Truck": Truck,
+    "ShieldCheck": ShieldCheck
+};
+
 export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) {
-    const currentServices = services(region);
+    const [cmsServices, setCmsServices] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetchFromDirectus('services', {
+            filter: { featured: { _eq: true } },
+            fields: ['id', 'title', 'description', 'icon_name', 'tag_msk', 'tag_spb', 'stats_label']
+        }).then(data => setCmsServices(data));
+    }, []);
+
+    const currentServices = cmsServices.length > 0
+        ? cmsServices.map((s, i) => ({
+            title: s.title,
+            description: s.description,
+            icon: ICON_MAP[s.icon_name] ? <span className="w-8 h-8 flex items-center justify-center">{ICON_MAP[s.icon_name]({ className: "w-8 h-8" })}</span> : <Ruler className="w-8 h-8" />,
+            stats: s.stats_label || "15+ лет опыта",
+            id: String(i + 1).padStart(2, '0'),
+            tag: region === 'spb' ? s.tag_spb : s.tag_msk
+        }))
+        : services(region);
+
     return (
         <section className="py-32 px-6 bg-transparent relative overflow-hidden">
             {/* Background elements */}

@@ -4,8 +4,14 @@ import { motion } from "framer-motion";
 import { SubPageHero } from "@/components/layout/SubPageHero";
 import { Shield, Target, Users, Award, Building, HardHat, TrendingUp, Cpu, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { fetchFromDirectus } from "@/lib/directus-fetch";
+import { fetchFromDirectus, fetchSingleton } from "@/lib/directus-fetch";
 import { resolveIcon } from "@/lib/icon-map";
+
+interface AboutCMS {
+    mission_title: string;
+    mission_text: string;
+    history_text: string;
+}
 
 interface Stat {
     label: string;
@@ -66,6 +72,7 @@ const valuesFallback: Value[] = [
 export default function AboutPage() {
     const [stats, setStats] = useState<Stat[]>(statsFallback);
     const [values, setValues] = useState<Value[]>(valuesFallback);
+    const [cmsData, setCmsData] = useState<AboutCMS | null>(null);
 
     useEffect(() => {
         // Load stats
@@ -88,7 +95,13 @@ export default function AboutPage() {
                 })));
             }
         });
+
+        // Load About Page CMS data
+        fetchSingleton<AboutCMS>('about_page', {
+            fields: ['mission_title', 'mission_text', 'history_text']
+        }).then(data => setCmsData(data));
     }, []);
+
     return (
         <main className="min-h-screen bg-[#0F172A] text-white pt-32 pb-20 px-6 overflow-hidden relative">
             {/* Background elements */}
@@ -130,18 +143,16 @@ export default function AboutPage() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-4xl font-black uppercase mb-8 leading-tight">
-                            Наша миссия — <br />
-                            <span className="text-orange-500 text-6xl underline decoration-orange-500/20 underline-offset-8">Превосходить </span> <br />
-                            ожидания рынка
+                            {cmsData?.mission_title || "Наша миссия — Превосходить ожидания рынка"}
                         </h2>
-                        <div className="space-y-6 text-white/60 font-medium text-lg leading-relaxed">
-                            <p>
-                                За 15 лет работы мы прошли путь от небольшой подрядной организации до одного из лидеров отрасли шпунтовых и свайных работ в России.
-                            </p>
-                            <p>
-                                Наша специализация — сложные проекты в условиях сверхплотной городской застройки, где требуются исключительная точность, деликатность и владение современными технологиями бесшумного погружения.
-                            </p>
-                        </div>
+                        <div
+                            className="space-y-6 text-white/60 font-medium text-lg leading-relaxed"
+                            dangerouslySetInnerHTML={{
+                                __html: cmsData?.mission_text || `
+                                <p>За 15 лет работы мы прошли путь от небольшой подрядной организации до одного из лидеров отрасли шпунтовых и свайных работ в России.</p>
+                                <p>Наша специализация — сложные проекты в условиях сверхплотной городской застройки, где требуются исключительная точность, деликатность и владение современными технологиями бесшумного погружения.</p>
+                            `}}
+                        />
                     </motion.div>
 
                     <motion.div

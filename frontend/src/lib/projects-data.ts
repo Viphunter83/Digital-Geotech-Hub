@@ -58,6 +58,16 @@ interface DirectusProject {
         specs?: { text: string }[];
     }[];
     stats?: { label: string; value: string; sort: number }[];
+    used_machinery?: {
+        machinery_id: {
+            id: string;
+            name: string;
+            category_label: string;
+            description: string;
+            image: string | null;
+            specs: { label: string; value: string; icon: string }[];
+        };
+    }[];
 }
 
 // ──────────────────────────────────────────────
@@ -81,6 +91,24 @@ function transformProject(d: DirectusProject): Project {
             value: s.value || '',
         })) ?? [],
     }));
+
+    // Merge used_machinery from dynamic M2M
+    if (d.used_machinery && d.used_machinery.length > 0) {
+        const linkedTech: ProjectTech[] = d.used_machinery
+            .filter(item => item.machinery_id)
+            .map(item => {
+                const m = item.machinery_id;
+                return {
+                    id: m.id,
+                    name: m.name,
+                    type: m.category_label || 'Оборудование',
+                    description: m.description || '',
+                    image: getDirectusFileUrl(m.image) || undefined,
+                    specs: m.specs?.map(s => ({ label: s.label, value: s.value })) || []
+                };
+            });
+        technologies = [...technologies, ...linkedTech];
+    }
 
     // If dynamic technologies are empty, but we have a work_type, we can use it as a simulated tech
     if (technologies.length === 0 && (d as any).work_type) {
@@ -127,6 +155,7 @@ export async function fetchProjects(): Promise<Project[]> {
             'tags.tag',
             'technologies.name', 'technologies.type', 'technologies.description', 'technologies.image',
             'stats.label', 'stats.value', 'stats.sort',
+            'used_machinery.machinery_id.*',
         ],
         filter: { status: { _eq: 'published' } },
         sort: ['sort'],
@@ -148,6 +177,7 @@ export async function fetchProjectById(id: string): Promise<Project | null> {
             'tags.tag',
             'technologies.name', 'technologies.type', 'technologies.description', 'technologies.image',
             'stats.label', 'stats.value', 'stats.sort',
+            'used_machinery.machinery_id.*',
         ],
         filter: {
             id: { _eq: id },

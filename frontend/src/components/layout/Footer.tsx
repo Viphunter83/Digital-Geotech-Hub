@@ -2,7 +2,24 @@
 
 import Link from "next/link";
 
+import { useEffect, useState } from "react";
+import { fetchSingleton } from "@/lib/directus-fetch";
+
+interface CompanyInfo {
+    phone: string;
+    email: string;
+    address: string;
+}
+
 export function Footer() {
+    const [info, setInfo] = useState<CompanyInfo | null>(null);
+
+    useEffect(() => {
+        fetchSingleton<CompanyInfo>('company_info', {
+            fields: ['phone', 'email', 'address']
+        }).then(data => setInfo(data));
+    }, []);
+
     return (
         <footer className="bg-white/[0.02] backdrop-blur-xl border-t border-white/10 py-32 px-6 relative z-10">
             <div className="container mx-auto">
@@ -40,9 +57,9 @@ export function Footer() {
                     <div>
                         <h5 className="font-black uppercase text-xs tracking-widest mb-6 text-white">Контакты</h5>
                         <div className="text-sm text-white/40 space-y-2">
-                            <p>Санкт-Петербург, тер. промзона Парнас</p>
-                            <p className="font-bold text-accent">+7 (921) 884-44-03</p>
-                            <p>drilling.rigs.info@yandex.ru</p>
+                            <p>{info?.address || 'Санкт-Петербург, тер. промзона Парнас'}</p>
+                            <p className="font-bold text-accent">{info?.phone || '+7 (921) 884-44-03'}</p>
+                            <p>{info?.email || 'drilling.rigs.info@yandex.ru'}</p>
                         </div>
                     </div>
                 </div>
