@@ -214,8 +214,8 @@ export default function ContactsPage() {
                                         )}
                                     </Button>
 
-                                    <p className="text-[9px] text-white/10 text-center mt-6 font-bold uppercase tracking-widest leading-relaxed">
-                                        Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности <br />
+                                    <p className="text-[9px] text-white/60 text-center mt-6 font-bold uppercase tracking-widest leading-relaxed">
+                                        Нажимая кнопку, вы соглашаетесь с <a href="/privacy" className="underline hover:text-orange-500 transition-colors">политикой конфиденциальности</a> <br />
                                         и обработкой персональных данных согласно стандартам ФЗ-152
                                     </p>
                                 </form>

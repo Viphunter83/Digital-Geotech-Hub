@@ -107,7 +107,7 @@ function MachineryContent() {
                                     : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/20'}
                             `}
                         >
-                            <cat.icon className={`w-4 h-4 ${activeCategory === cat.id ? 'text-[#0F172A]' : 'text-orange-500'}`} />
+                            {cat.icon && <cat.icon className={`w-4 h-4 ${activeCategory === cat.id ? 'text-[#0F172A]' : 'text-orange-500'}`} />}
                             {cat.label}
                         </button>
                     ))}
@@ -163,7 +163,7 @@ function MachineryContent() {
                                         <div className="absolute bottom-6 right-6 z-20 flex flex-col items-end">
                                             <span className="text-[10px] font-mono text-orange-500/50 uppercase tracking-widest">unit_ref_id</span>
                                             <span className="text-xs font-mono text-white/80 font-bold uppercase tracking-widest leading-none mt-1">
-                                                #{item.id.toUpperCase()}
+                                                #{String(item.id).toUpperCase()}
                                             </span>
                                         </div>
                                     </div>

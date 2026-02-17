@@ -118,8 +118,8 @@ export function LeadMagnetModal({ isOpen, onClose, title, subtitle, magnetName }
                                         >
                                             {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Получить материалы"}
                                         </Button>
-                                        <p className="text-[10px] text-white/20 text-center font-bold uppercase tracking-widest mt-6">
-                                            Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
+                                        <p className="text-[10px] text-white/60 text-center font-bold uppercase tracking-widest mt-6">
+                                            Нажимая кнопку, вы даете согласие на <a href="/privacy" target="_blank" className="text-orange-500 underline hover:text-orange-400 decoration-orange-500/50">обработку персональных данных</a> и соглашаетесь с политикой конфиденциальности согласно 152-ФЗ РФ
                                         </p>
                                     </form>
                                 </>

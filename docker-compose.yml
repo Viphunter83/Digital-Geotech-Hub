@@ -4,9 +4,9 @@ services:
     container_name: geotech_db
     restart: always
     environment:
-      POSTGRES_USER: directus
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: directus
+      POSTGRES_USER: ${DB_USER:-directus}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_DATABASE:-directus}
     volumes:
       - geotech_db_data:/var/lib/postgresql/data
     networks:
@@ -35,14 +35,15 @@ services:
       DB_PORT: "5432"
       DB_DATABASE: "directus"
       DB_USER: "directus"
-      DB_PASSWORD: "password"
+      DB_PASSWORD: "${DB_PASSWORD:-password}"
       CACHE_ENABLED: "true"
       CACHE_STORE: "redis"
       CACHE_REDIS: "redis://redis:6379"
       REDIS: "redis://redis:6379"
       CORS_ENABLED: "true"
-      CORS_ORIGIN: "true"
-      PUBLIC_URL: "http://localhost:8055"
+      CORS_ORIGIN: "*"
+      PUBLIC_URL: "${NEXT_PUBLIC_CMS_URL:-http://localhost:8055}"
+      TRUST_PROXY: "true"
       ADMIN_EMAIL: "${ADMIN_EMAIL}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     depends_on:
@@ -58,9 +59,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://directus:password@postgres:5432/directus
-      DIRECTUS_URL: http://directus:8055
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://${DB_USER:-directus}:${DB_PASSWORD:-password}@postgres:5432/${DB_DATABASE:-directus}
+      DIRECTUS_URL: http://geotech_cms:8055
+      REDIS_URL: redis://geotech_redis:6379
     env_file:
       - .env
     depends_on:

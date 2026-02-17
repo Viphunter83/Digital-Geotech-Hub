@@ -1,23 +1,37 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import ai_copilot, leads, auth, dashboard
 from app.core.config import settings
+from app.core.http_client import http_manager
+from app.api.v1.endpoints import auth, dashboard, ai_copilot, leads
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize global HTTP client
+    http_manager.start()
+    yield
+    # Shutdown: Close global HTTP client
+    await http_manager.stop()
 
 app = FastAPI(
     title="Digital Geotech Hub API",
     description="API for B2B platform of Geotechnologies",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
-# Set all CORS enabled origins
+# Dynamically set origins from settings
+allowed_origins = [
+    "http://localhost:3000",
+    "https://geotech-hub.ru",
+    "https://www.geotech-hub.ru",
+]
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in allowed_origins:
+    allowed_origins.append(settings.FRONTEND_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.FRONTEND_URL,
-        "http://localhost:3000",
-        "https://geotech-hub.ru",
-        "https://www.geotech-hub.ru",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

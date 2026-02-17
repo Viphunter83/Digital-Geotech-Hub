@@ -8,10 +8,13 @@
  * - Support for fields, filter, sort, limit, deep
  */
 
-const CMS_URL =
-    process.env.NEXT_PUBLIC_DIRECTUS_URL ||
-    process.env.NEXT_PUBLIC_CMS_URL ||
-    'http://directus:8055';
+const IS_SERVER = typeof window === 'undefined';
+
+// On Server (SSR/Docker): hit the container directly via internal network
+// On Client (Browser): use the /directus proxy to avoid CORS/403 issues
+const CMS_URL = IS_SERVER
+    ? (process.env.DIRECTUS_URL_INTERNAL || 'http://geotech_cms:8055')
+    : '/directus';
 
 interface FetchOptions {
     fields?: string[];

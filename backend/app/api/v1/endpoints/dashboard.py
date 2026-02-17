@@ -9,23 +9,29 @@ from fastapi import APIRouter, Depends, HTTPException
 import httpx
 from app.core.config import settings
 from app.core.security import get_current_client
+from app.core.http_client import http_manager
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-
-async def _directus_get(path: str, params: dict = None) -> Any:
-    """Helper: fetch data from Directus."""
+async def _directus_get(path: str, params: Optional[Dict] = None) -> Optional[Any]:
+    """Helper to fetch data from Directus."""
     headers = {}
     if settings.DIRECTUS_ADMIN_TOKEN:
         headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
-        
-    async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
-        res = await client.get(path, params=params or {}, headers=headers)
-        if res.status_code != 200:
-            logger.warning(f"Directus GET {path} returned {res.status_code}: {res.text[:200]}")
-            return None
-        return res.json().get("data")
+
+    async def _do_get():
+        if not http_manager.client:
+            # Fallback if lifecycle failing or in tests
+            async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as client:
+                return await client.get(path, params=params or {}, headers=headers)
+        return await http_manager.client.get(f"{settings.DIRECTUS_URL}{path}", params=params or {}, headers=headers)
+
+    res = await _do_get()
+    if res.status_code != 200:
+        logger.warning(f"Directus GET {path} returned {res.status_code}: {res.text[:200]}")
+        return None
+    return res.json().get("data")
 
 
 async def _get_client_id(access_code: str) -> Optional[int]:
@@ -175,17 +181,25 @@ async def update_profile(
     if not safe_updates:
         raise HTTPException(status_code=400, detail="Нет допустимых полей для обновления")
 
-    async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as http_client:
-        headers = {}
-        if settings.DIRECTUS_ADMIN_TOKEN:
-            headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
-            
-        res = await http_client.patch(
-            f"/items/clients/{client_id}",
+    headers = {}
+    if settings.DIRECTUS_ADMIN_TOKEN:
+        headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
+        
+    if http_manager.client:
+        res = await http_manager.client.patch(
+            f"{settings.DIRECTUS_URL}/items/clients/{client_id}",
             json=safe_updates,
             headers=headers
         )
-        if res.status_code != 200:
-            raise HTTPException(status_code=500, detail="Ошибка обновления профиля")
+    else:
+        async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as http_client:
+            res = await http_client.patch(
+                f"/items/clients/{client_id}",
+                json=safe_updates,
+                headers=headers
+            )
+            
+    if res.status_code != 200:
+        raise HTTPException(status_code=500, detail="Ошибка обновления профиля")
 
     return {"success": True, "updated": safe_updates}

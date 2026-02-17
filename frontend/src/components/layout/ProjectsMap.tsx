@@ -104,6 +104,7 @@ interface ProjectMapProps {
 
 export default function ProjectsMap({ region }: ProjectMapProps) {
     const [projects, setProjects] = useState<MapProject[]>(REFERENCE_PROJECTS);
+    const [geologyPoints, setGeologyPoints] = useState<GeologyPoint[]>(GEOLOGY_POINTS);
     const [loading, setLoading] = useState(true);
     const [activeLayer, setActiveLayer] = useState<'projects' | 'geology'>('projects');
 
@@ -114,18 +115,28 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
         async function fetchPoints() {
             try {
                 const CMS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:8055';
-                const res = await fetch(`${CMS_URL}/items/cases?fields=id,title,geo_location,latitude,longitude`);
-                if (res.ok) {
-                    const { data } = await res.json();
+
+                // Fetch Unified Projects
+                const projRes = await fetch(`${CMS_URL}/items/projects?fields=id,title,location,latitude,longitude,description&filter[status][_eq]=published`);
+                if (projRes.ok) {
+                    const { data } = await projRes.json();
                     if (data && data.length > 0) {
                         const mappedData = data.map((item: any) => ({
                             ...item,
-                            location: item.geo_location || 'Объект',
-                            description: 'Информация из базы данных.'
+                            location: item.location || 'Объект',
+                            description: item.description || 'Информация из базы данных.'
                         })).filter((p: any) => p.latitude && p.longitude);
 
-                        // Merge with reference projects avoiding duplicates
-                        setProjects([...REFERENCE_PROJECTS, ...mappedData]);
+                        setProjects(mappedData);
+                    }
+                }
+
+                // Fetch Geology Points
+                const geoRes = await fetch(`${CMS_URL}/items/geology_points?fields=id,title,depth,soil_layers,water_level,latitude,longitude`);
+                if (geoRes.ok) {
+                    const { data } = await geoRes.json();
+                    if (data && data.length > 0) {
+                        setGeologyPoints(data);
                     }
                 }
             } catch (err) {
@@ -242,7 +253,7 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                                             }}
                                         />
                                     ))}
-                                    {GEOLOGY_POINTS.map((point) => (
+                                    {geologyPoints.map((point) => (
                                         <Marker key={point.id} position={[point.latitude, point.longitude]} icon={geoIcon}>
                                             <Popup className="custom-brutalist-popup">
                                                 <div className="p-5 border-l-4 border-sky-500 bg-[#0F172A] text-white -m-2 min-w-[280px]">

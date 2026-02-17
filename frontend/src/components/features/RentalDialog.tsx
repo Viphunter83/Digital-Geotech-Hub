@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button"; // Assuming Button exists, usually does in shadcn
+import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 interface RentalDialogProps {
@@ -17,6 +17,7 @@ interface RentalDialogProps {
 export function RentalDialog({ open, onOpenChange, machineId, machineName }: RentalDialogProps) {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [agreed, setAgreed] = useState(true); // Default to true but needs checkbox
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
@@ -152,10 +153,24 @@ export function RentalDialog({ open, onOpenChange, machineId, machineName }: Ren
                             </div>
                         </div>
 
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10 mt-2">
+                            <input
+                                type="checkbox"
+                                id="privacy-consent"
+                                checked={agreed}
+                                onChange={(e) => setAgreed(e.target.checked)}
+                                required
+                                className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-orange-500 focus:ring-orange-500/50"
+                            />
+                            <Label htmlFor="privacy-consent" className="text-[10px] leading-relaxed text-white/60 cursor-pointer">
+                                Я даю согласие на <a href="/privacy" target="_blank" className="text-orange-500 underline hover:text-orange-400">обработку персональных данных</a> и соглашаюсь с политикой конфиденциальности согласно 152-ФЗ РФ.
+                            </Label>
+                        </div>
+
                         <DialogFooter className="pt-4">
                             <Button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || !agreed}
                                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest text-xs h-10"
                             >
                                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Отправить запрос"}

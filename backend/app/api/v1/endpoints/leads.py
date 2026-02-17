@@ -23,21 +23,26 @@ async def submit_lead(lead_data: LeadInput):
         if settings.DIRECTUS_ADMIN_TOKEN:
             headers["Authorization"] = f"Bearer {settings.DIRECTUS_ADMIN_TOKEN}"
             
-        async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as cms_client:
-            res = await cms_client.post(
-                "/items/leads",
-                json={
-                    "name": lead_data.name,
-                    "phone": lead_data.phone,
-                    "email": lead_data.email,
-                    "company": lead_data.company,
-                    "audit_data": lead_data.audit_data,
-                    "status": "new"
-                },
-                headers=headers
-            )
-            if res.status_code not in (200, 201, 204):
-                logging.warning(f"Failed to save lead to Directus: {res.status_code} {res.text}")
+        from app.core.http_client import http_manager
+        
+        async def _save_to_cms():
+            payload = {
+                "name": lead_data.name,
+                "phone": lead_data.phone,
+                "email": lead_data.email,
+                "company": lead_data.company,
+                "audit_data": lead_data.audit_data,
+                "status": "new"
+            }
+            if http_manager.client:
+                return await http_manager.client.post(f"{settings.DIRECTUS_URL}/items/leads", json=payload, headers=headers)
+            else:
+                async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=10.0) as cms_client:
+                    return await cms_client.post("/items/leads", json=payload, headers=headers)
+
+        res = await _save_to_cms()
+        if res.status_code not in (200, 201, 204):
+            logging.warning(f"Failed to save lead to Directus: {res.status_code} {res.text}")
 
         # 2. Call AmoCRM (or mock)
         lead_id = await amocrm_service.create_lead(

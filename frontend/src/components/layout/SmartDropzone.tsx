@@ -482,6 +482,9 @@ export function SmartDropzone() {
                                                         >
                                                             {isLeadSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Отправить инженеру"}
                                                         </Button>
+                                                        <p className="text-[9px] text-white/60 text-center font-bold uppercase tracking-widest mt-4">
+                                                            Нажимая кнопку, вы даете согласие на <a href="/privacy" target="_blank" className="text-orange-500 underline">обработку персональных данных</a> согласно 152-ФЗ РФ
+                                                        </p>
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowLeadForm(false)}
