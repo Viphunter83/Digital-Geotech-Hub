@@ -12,9 +12,16 @@ const IS_SERVER = typeof window === 'undefined';
 
 // On Server (SSR/Docker): hit the container directly via internal network
 // On Client (Browser): use the /directus proxy to avoid CORS/403 issues
-const CMS_URL = IS_SERVER
+const CMS_FETCH_URL = IS_SERVER
     ? (process.env.DIRECTUS_URL_INTERNAL || 'http://geotech_cms:8055')
-    : (process.env.NEXT_PUBLIC_CMS_URL || '/directus');
+    : (process.env.NEXT_PUBLIC_DIRECTUS_URL || '/directus');
+
+// Assets MUST always be accessible to the browser.
+// On Client: relative /directus/assets works.
+// On Server (during SSR): we must use the PUBLIC URL because it's going into the HTML.
+const CMS_ASSETS_URL = IS_SERVER
+    ? (process.env.NEXT_PUBLIC_CMS_URL || 'https://terra-expert.ru/directus')
+    : (process.env.NEXT_PUBLIC_DIRECTUS_URL || '/directus');
 
 interface FetchOptions {
     fields?: string[];
@@ -59,7 +66,7 @@ export async function fetchFromDirectus<T = any>(
             params.set('deep', JSON.stringify(options.deep));
         }
 
-        const url = `${CMS_URL}/items/${collection}?${params.toString()}`;
+        const url = `${CMS_FETCH_URL}/items/${collection}?${params.toString()}`;
 
         const res = await fetch(url, {
             next: { revalidate: options?.revalidate ?? 60 },
@@ -97,7 +104,7 @@ export async function fetchOneFromDirectus<T = any>(
             params.set('deep', JSON.stringify(options.deep));
         }
 
-        const url = `${CMS_URL}/items/${collection}/${id}?${params.toString()}`;
+        const url = `${CMS_FETCH_URL}/items/${collection}/${id}?${params.toString()}`;
 
         const res = await fetch(url, {
             next: { revalidate: options?.revalidate ?? 60 },
@@ -130,7 +137,7 @@ export async function fetchSingleton<T = any>(
             params.set('fields', options.fields.join(','));
         }
 
-        const url = `${CMS_URL}/items/${collection}?${params.toString()}`;
+        const url = `${CMS_FETCH_URL}/items/${collection}?${params.toString()}`;
 
         const res = await fetch(url, {
             next: { revalidate: options?.revalidate ?? 60 },
@@ -155,5 +162,5 @@ export async function fetchSingleton<T = any>(
  */
 export function getDirectusFileUrl(fileId: string | null | undefined): string | null {
     if (!fileId) return null;
-    return `${CMS_URL}/assets/${fileId}`;
+    return `${CMS_ASSETS_URL}/assets/${fileId}`;
 }
