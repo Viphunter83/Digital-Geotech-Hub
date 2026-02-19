@@ -53,6 +53,7 @@ services:
       - geotech_network
 
   backend:
+    image: ghcr.io/${REPO_LOWER:-viphunter83/digital-geotech-hub}/backend:latest
     build: ./backend
     container_name: geotech_api
     restart: always
@@ -71,6 +72,7 @@ services:
       - geotech_network
 
   frontend:
+    image: ghcr.io/${REPO_LOWER:-viphunter83/digital-geotech-hub}/frontend:latest
     build: ./frontend
     container_name: geotech_frontend
     restart: always

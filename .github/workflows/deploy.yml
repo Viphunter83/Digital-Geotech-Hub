@@ -21,13 +21,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker meta
+        id: meta
+        run: |
+          echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
       # Build & Push Backend
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:latest
+          tags: ghcr.io/${{ env.REPO_LOWER }}/backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -37,7 +42,7 @@ jobs:
         with:
           context: ./frontend
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          tags: ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -56,8 +61,8 @@ jobs:
             # Pull latest code for docker-compose.yml and nginx configs
             git pull origin main
             
-            # Login to registry on the server (using temporary token from env if needed, or just relying on public if images are public)
-            # For private images, we'd need a PAT. Assuming images are linked to public repo for now.
+            # Export the lowercase repository name for docker compose to find the right images
+            export REPO_LOWER=${{ env.REPO_LOWER }}
             
             docker compose pull
             docker compose up -d --remove-orphans
