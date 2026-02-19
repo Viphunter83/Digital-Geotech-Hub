@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Hammer, Truck, Ruler, ShieldCheck, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { resolveIcon } from "@/lib/icon-map";
 
 const services = (region: 'msk' | 'spb') => [
     {
@@ -42,13 +43,6 @@ const services = (region: 'msk' | 'spb') => [
 import { fetchFromDirectus } from "@/lib/directus-fetch";
 import { useEffect, useState } from "react";
 
-const ICON_MAP: Record<string, any> = {
-    "Ruler": Ruler,
-    "Hammer": Hammer,
-    "Truck": Truck,
-    "ShieldCheck": ShieldCheck
-};
-
 export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) {
     const [cmsServices, setCmsServices] = useState<any[]>([]);
 
@@ -56,18 +50,25 @@ export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) 
         fetchFromDirectus('services', {
             filter: { featured: { _eq: true } },
             fields: ['id', 'title', 'description', 'icon_name', 'tag_msk', 'tag_spb', 'stats_label']
-        }).then(data => setCmsServices(data));
+        }).then(data => {
+            if (data && Array.isArray(data)) {
+                setCmsServices(data);
+            }
+        });
     }, []);
 
     const currentServices = cmsServices.length > 0
-        ? cmsServices.map((s, i) => ({
-            title: s.title,
-            description: s.description,
-            icon: ICON_MAP[s.icon_name] ? <span className="w-8 h-8 flex items-center justify-center">{ICON_MAP[s.icon_name]({ className: "w-8 h-8" })}</span> : <Ruler className="w-8 h-8" />,
-            stats: s.stats_label || "15+ лет опыта",
-            id: String(i + 1).padStart(2, '0'),
-            tag: region === 'spb' ? s.tag_spb : s.tag_msk
-        }))
+        ? cmsServices.map((s, i) => {
+            const IconComponent = resolveIcon(s.icon_name);
+            return {
+                title: s.title || "Служба",
+                description: s.description || "",
+                icon: <IconComponent className="w-8 h-8" />,
+                stats: s.stats_label || "15+ лет опыта",
+                id: String(i + 1).padStart(2, '0'),
+                tag: region === 'spb' ? s.tag_spb : s.tag_msk
+            };
+        })
         : services(region);
 
     return (

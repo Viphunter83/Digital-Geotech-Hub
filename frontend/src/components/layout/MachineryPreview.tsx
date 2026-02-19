@@ -5,23 +5,21 @@ import { Gauge, Settings, Zap, ArrowRight, ShieldCheck, Weight, type LucideIcon 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { RentalDialog } from "@/components/features/RentalDialog";
-import { machinery } from "@/lib/machinery-data";
-
-import { fetchFromDirectus } from "@/lib/directus-fetch";
+import { fetchMachinery, type Machinery } from "@/lib/machinery-data";
 
 export function MachineryPreview() {
     const [selectedMachine, setSelectedMachine] = useState<{ id: string; name: string } | null>(null);
-    const [cmsItems, setCmsItems] = useState<any[]>([]);
+    const [cmsItems, setCmsItems] = useState<Machinery[]>([]);
 
     useEffect(() => {
-        fetchFromDirectus('machinery', {
-            filter: { show_on_home: { _eq: true } },
-            fields: ['id', 'name', 'image', 'category_label', 'description', 'specs']
-        }).then(data => setCmsItems(data));
+        fetchMachinery().then(data => {
+            // Only use top 3 for preview
+            setCmsItems(data.slice(0, 3));
+        });
     }, []);
 
     // Use CMS items if available, otherwise fallback
-    const previewItems = cmsItems.length > 0 ? cmsItems : machinery.slice(0, 3);
+    const previewItems = cmsItems.length > 0 ? cmsItems : [];
 
 
     return (

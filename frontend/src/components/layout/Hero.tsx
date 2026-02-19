@@ -167,7 +167,7 @@ export function Hero({ region }: HeroProps) {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="mb-8 text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl text-white drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
                 >
-                    {config.title.split('—')[0]} <span className="text-accent">{config.title.split('—')[1]}</span>
+                    {(config.title || '').split('—')[0]} <span className="text-accent">{(config.title || '').split('—')[1] || ''}</span>
                 </motion.h1>
 
                 <motion.p
@@ -176,7 +176,7 @@ export function Hero({ region }: HeroProps) {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     className="mx-auto mb-12 max-w-4xl text-lg font-medium text-white/90 sm:text-2xl leading-relaxed drop-shadow-[0_10px_20px_rgba(0,0,0,1)]"
                 >
-                    {config.usp.split('. ').map((sentence, i, arr) => (
+                    {(config.usp || '').split('. ').map((sentence, i, arr) => (
                         <span key={i} className="block">
                             {sentence}{i < arr.length - 1 ? '.' : ''}
                         </span>

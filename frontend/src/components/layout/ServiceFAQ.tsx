@@ -117,7 +117,7 @@ export function ServiceFAQ({ serviceSlug }: ServiceFAQProps) {
                                     <AccordionContent className="text-white/60 leading-relaxed pb-8 pl-12 font-medium">
                                         <div
                                             className="prose prose-invert max-w-none text-sm md:text-base"
-                                            dangerouslySetInnerHTML={{ __html: item.answer }}
+                                            dangerouslySetInnerHTML={{ __html: item.answer || "" }}
                                         />
                                     </AccordionContent>
                                 </AccordionItem>

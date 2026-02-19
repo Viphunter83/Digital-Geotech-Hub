@@ -123,9 +123,11 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                     if (data && data.length > 0) {
                         const mappedData = data.map((item: any) => ({
                             ...item,
+                            latitude: Number(item.latitude),
+                            longitude: Number(item.longitude),
                             location: item.location || 'Объект',
                             description: item.description || 'Информация из базы данных.'
-                        })).filter((p: any) => p.latitude && p.longitude);
+                        })).filter((p: any) => !isNaN(p.latitude) && !isNaN(p.longitude) && p.latitude !== 0);
 
                         setProjects(mappedData);
                     }
@@ -136,7 +138,13 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                 if (geoRes.ok) {
                     const { data } = await geoRes.json();
                     if (data && data.length > 0) {
-                        setGeologyPoints(data);
+                        const validatedGeo = data.map((point: any) => ({
+                            ...point,
+                            latitude: Number(point.latitude),
+                            longitude: Number(point.longitude),
+                            soil_layers: Array.isArray(point.soil_layers) ? point.soil_layers : []
+                        })).filter((p: any) => !isNaN(p.latitude) && !isNaN(p.longitude) && p.latitude !== 0);
+                        setGeologyPoints(validatedGeo);
                     }
                 }
             } catch (err) {
@@ -270,12 +278,15 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                                                         <div>
                                                             <p className="text-[9px] font-black uppercase text-white/30 mb-2">Разрез отложений</p>
                                                             <div className="space-y-1">
-                                                                {point.soil_layers.map((layer, i) => (
+                                                                {Array.isArray(point.soil_layers) && point.soil_layers.map((layer: string, i: number) => (
                                                                     <div key={i} className="text-[10px] flex items-center gap-2">
                                                                         <span className="w-1 h-1 rounded-full bg-sky-500/50" />
                                                                         {layer}
                                                                     </div>
                                                                 ))}
+                                                                {(!point.soil_layers || point.soil_layers.length === 0) && (
+                                                                    <div className="text-[10px] text-white/30 italic">Данные разреза отсутствуют</div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="pt-2 border-t border-white/5">

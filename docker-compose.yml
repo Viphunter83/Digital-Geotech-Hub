@@ -42,7 +42,7 @@ services:
       REDIS: "redis://redis:6379"
       CORS_ENABLED: "true"
       CORS_ORIGIN: "*"
-      PUBLIC_URL: "${NEXT_PUBLIC_CMS_URL:-http://localhost:8055}"
+      PUBLIC_URL: "https://terra-expert.ru/directus/"
       TRUST_PROXY: "true"
       ADMIN_EMAIL: "${ADMIN_EMAIL}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
