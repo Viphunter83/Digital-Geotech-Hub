@@ -46,6 +46,8 @@ services:
       TRUST_PROXY: "true"
       ADMIN_EMAIL: "${ADMIN_EMAIL}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+    volumes:
+      - geotech_cms_data:/directus/uploads
     depends_on:
       - postgres
       - redis
@@ -117,3 +119,4 @@ networks:
 
 volumes:
   geotech_db_data:
+  geotech_cms_data:
