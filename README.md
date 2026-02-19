@@ -52,3 +52,5 @@ cp .env.example .env
 
 ---
 Разработано для «ГеоТехнологии» в Antigravity IDE (2026).
+
+<!-- Last deployment: Thu Feb 19 11:41:40 MSK 2026 -->
