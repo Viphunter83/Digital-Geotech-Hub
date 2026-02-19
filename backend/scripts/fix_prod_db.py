@@ -31,7 +31,8 @@ collections = [
     'articles', 'article_categories', 'machinery', 'machinery_categories', 
     'services', 'service_features', 'faq', 'hero_configs', 'hero_badges', 
     'advantages', 'company_stats', 'company_values', 'company_info', 
-    'projects', 'geology_points', 'about_page', 'site_settings'
+    'projects', 'geology_points', 'about_page', 'site_settings',
+    'directus_files', 'directus_folders'
 ]
 
 for coll in collections:

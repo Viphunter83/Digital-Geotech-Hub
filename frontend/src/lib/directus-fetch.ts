@@ -17,10 +17,9 @@ const CMS_FETCH_URL = IS_SERVER
     : (process.env.NEXT_PUBLIC_DIRECTUS_URL || '/directus');
 
 // Assets MUST always be accessible to the browser.
-// On Client: relative /directus/assets works.
-// On Server (during SSR): we must use the PUBLIC URL because it's going into the HTML.
+// Using relative path is most robust for different domains/tunnels.
 const CMS_ASSETS_URL = IS_SERVER
-    ? (process.env.NEXT_PUBLIC_CMS_URL || 'https://terra-expert.ru/directus')
+    ? (process.env.NEXT_PUBLIC_CMS_URL || '/directus')
     : (process.env.NEXT_PUBLIC_DIRECTUS_URL || '/directus');
 
 interface FetchOptions {
