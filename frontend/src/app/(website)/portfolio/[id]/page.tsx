@@ -22,7 +22,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     }
 
     return (
-        <main className="min-h-screen bg-[#0F172A] text-white pt-20 relative overflow-hidden">
+        <main className="min-h-screen bg-[#0F172A] text-white pt-32 relative overflow-hidden">
             {/* Background Noise & Gradient */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
@@ -33,7 +33,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
             <div className="relative z-10">
                 {/* Parallax Hero Section */}
-                <div className="relative h-[90vh] w-full overflow-hidden flex items-end pb-24">
+                <div className="relative min-h-[85vh] flex flex-col justify-end pt-32 pb-24">
                     <motion.div
                         initial={{ scale: 1.1, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -51,13 +51,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/60 to-transparent" />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/80 via-transparent to-transparent" />
 
-                    {/* Back Link - Positioned Absolute Top */}
-                    <div className="absolute top-32 left-0 w-full z-20">
+                    {/* Back Link - Positioned Relative Top within Hero */}
+                    <div className="absolute top-8 left-0 w-full z-20">
                         <div className="container mx-auto px-4">
                             <BackButton
                                 href="/portfolio"
                                 label="Все Проекты"
-                                className="bg-black/20 backdrop-blur-md px-6 py-2.5 rounded-full border border-white/10 hover:bg-black/40 mb-0 transition-all hover:scale-105 active:scale-95"
+                                className="bg-black/40 backdrop-blur-xl px-6 py-2.5 rounded-full border border-white/10 hover:bg-black/60 mb-0 transition-all hover:scale-105 active:scale-95 shadow-2xl"
                             />
                         </div>
                     </div>

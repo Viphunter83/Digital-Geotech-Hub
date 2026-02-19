@@ -62,6 +62,7 @@ print("Adding 'machinery_used' alias to 'projects'...")
 httpx.post(f"{BASE}/fields/projects", headers=headers, json={
     "field": "machinery_used",
     "type": "alias",
+    "schema": None, # CRITICAL: This tells Directus there is no DB column
     "meta": {
         "interface": "list-m2m",
         "special": ["m2m"],
