@@ -62,11 +62,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/digital-geotech-hub
-            # Pull latest code for docker-compose.yml and nginx configs
             git pull origin main
             
-            # Export the lowercase repository name for docker compose to find the right images
-            export REPO_LOWER=${{ env.REPO_LOWER }}
+            # Recalculate REPO_LOWER inside the script
+            REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+            export REPO_LOWER
             
             docker compose pull
             docker compose up -d --remove-orphans
