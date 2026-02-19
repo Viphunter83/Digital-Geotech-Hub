@@ -1,8 +1,13 @@
-import subprocess
+import os
 
 def run_remote_sql(sql):
+    password = os.getenv("PROD_SSH_PASS")
+    if not password:
+        print("Error: PROD_SSH_PASS is not set.")
+        return
+        
     cmd = [
-        "sshpass", "-p", "PeRpWu52*f%X", 
+        "sshpass", "-p", password, 
         "ssh", "-o", "StrictHostKeyChecking=no", "root@155.212.209.113",
         f"docker exec geotech_db psql -U directus -d directus -c \"{sql}\""
     ]

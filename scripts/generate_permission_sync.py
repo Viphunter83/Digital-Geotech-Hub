@@ -1,10 +1,8 @@
-import subprocess
-import uuid
+import os
 
-# Production Database Connection
-PROD_DB_CONFIG = "postgres://directus:directus@155.212.209.113:5432/directus"
-# (Wait, I should use the SSH tunnel or docker exec, but I can also use the direct connection if available. 
-# Better use docker exec command generation)
+# Production Database Connection should be provided via environment variable
+PROD_DB_CONFIG = os.getenv("PROD_DB_URL") 
+# Example: postgres://user:pass@host:5432/dbname
 
 def get_local_permissions():
     import subprocess

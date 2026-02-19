@@ -1,9 +1,8 @@
-import paramiko
-import sys
+import os
 
-host = "155.212.209.113"
+host = os.getenv("PROD_SERVER_IP", "155.212.209.113")
 user = "root"
-password = "PeRpWu52*f%X"
+password = os.getenv("PROD_SSH_PASS")
 
 def get_env():
     try:

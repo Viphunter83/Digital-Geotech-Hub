@@ -14,7 +14,7 @@ const IS_SERVER = typeof window === 'undefined';
 // On Client (Browser): use the /directus proxy to avoid CORS/403 issues
 const CMS_URL = IS_SERVER
     ? (process.env.DIRECTUS_URL_INTERNAL || 'http://geotech_cms:8055')
-    : '/directus';
+    : (process.env.NEXT_PUBLIC_CMS_URL || '/directus');
 
 interface FetchOptions {
     fields?: string[];

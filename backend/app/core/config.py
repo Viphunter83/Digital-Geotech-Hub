@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DIRECTUS_URL: str = "http://localhost:8055"
     DIRECTUS_ADMIN_TOKEN: Optional[str] = None
     ADMIN_EMAIL: str = "admin@example.com"
-    ADMIN_PASSWORD: str = "admin-password"
+    ADMIN_PASSWORD: str = "password-must-be-set-via-env"
     
     # ProxyAPI
     PROXY_API_KEY: Optional[str] = None
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Auth
-    JWT_SECRET: str = "change-me-in-production-geotech-hub-2026"
+    JWT_SECRET: str = "static-placeholder-secret-replace-in-prod"
     
     # Frontend (for CORS)
     FRONTEND_URL: str = "http://localhost:3000"

@@ -1,7 +1,11 @@
-import sys
-import subprocess
+import os
 
-SSH_CMD = "sshpass -p 'PeRpWu52*f%X' ssh -o StrictHostKeyChecking=no root@155.212.209.113"
+# Use environment variables for connection to avoid hardcoding secrets
+PROD_IP = os.getenv("PROD_SERVER_IP", "155.212.209.113")
+# Use SSH keys instead of passwords. If password is needed, provide it via PROD_SSH_PASS env var.
+SSH_PASS = os.getenv("PROD_SSH_PASS")
+SSH_BASE = f"ssh -o StrictHostKeyChecking=no root@{PROD_IP}"
+SSH_CMD = f"sshpass -p '{SSH_PASS}' {SSH_BASE}" if SSH_PASS else SSH_BASE
 
 def run_psql(query):
     # Escape single quotes and double quotes for the shell command

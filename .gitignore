@@ -7,3 +7,7 @@ __pycache__/
 
 # Added by ggshield
 .cache_ggshield
+
+# Local and generated sensitive files
+frontend/.env.local
+scripts/*.sql
