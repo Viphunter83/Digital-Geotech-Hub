@@ -130,7 +130,7 @@ export function Hero({ region }: HeroProps) {
                 <div
                     className="absolute inset-0 opacity-20 mix-blend-overlay"
                     style={{
-                        backgroundImage: `linear - gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear - gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+                        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
                         backgroundSize: '50px 50px'
                     }}
                 />
@@ -302,7 +302,7 @@ function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor
                 delay: delay
             }}
             whileHover={{ opacity: 1, scale: 1.05 }}
-            className={`absolute hidden lg:flex flex - col items - center gap - 4 pointer - events - auto z - 30 ${className} `}
+            className={`absolute hidden lg:flex flex-col items-center gap-4 pointer-events-auto z-30 ${className}`}
         >
             <Link href={href} className="group/badge flex flex-col items-center gap-4 w-full h-full">
                 <div className="relative">
