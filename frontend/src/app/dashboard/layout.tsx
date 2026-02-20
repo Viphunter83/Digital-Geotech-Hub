@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
     LayoutDashboard,
     FileSearch,
@@ -77,8 +78,13 @@ export default function DashboardLayout({
                 {/* Logo */}
                 <div className="h-16 flex items-center px-4 border-b border-white/5">
                     <Link href="/" className="flex items-center gap-3 group overflow-hidden">
-                        <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center rounded-lg shrink-0 shadow-lg shadow-orange-500/10">
-                            <span className="text-white font-black text-lg">T</span>
+                        <div className="w-9 h-9 relative overflow-hidden rounded-lg shrink-0 shadow-lg shadow-orange-500/10">
+                            <Image
+                                src="/logo.png?v=2"
+                                alt="Terra Expert"
+                                fill
+                                className="object-contain"
+                            />
                         </div>
                         {!collapsed && (
                             <div className="flex flex-col whitespace-nowrap">
@@ -140,8 +146,13 @@ export default function DashboardLayout({
                     <aside className="absolute left-0 top-0 h-full w-[260px] bg-[#0D1117] border-r border-white/5 p-4 flex flex-col">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center rounded-lg">
-                                    <span className="text-white font-black text-lg">T</span>
+                                <div className="w-9 h-9 relative overflow-hidden rounded-lg">
+                                    <Image
+                                        src="/logo.png?v=2"
+                                        alt="Terra Expert"
+                                        fill
+                                        className="object-contain"
+                                    />
                                 </div>
                                 <span className="font-black text-sm uppercase tracking-tighter">Terra Expert</span>
                             </div>

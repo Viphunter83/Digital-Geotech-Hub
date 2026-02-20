@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -23,8 +24,13 @@ export function Navbar() {
         <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5">
             <div className="w-full max-w-[1920px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg group-hover:bg-accent transition-colors">
-                        <span className="text-white font-black text-xl">T</span>
+                    <div className="w-10 h-10 relative overflow-hidden rounded-lg group-hover:scale-105 transition-transform duration-300">
+                        <Image
+                            src="/logo.png?v=2"
+                            alt="Terra Expert"
+                            fill
+                            className="object-contain"
+                        />
                     </div>
                     <div className="flex flex-col">
                         <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Terra Expert</span>

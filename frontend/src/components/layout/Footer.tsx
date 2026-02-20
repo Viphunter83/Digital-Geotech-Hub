@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { useEffect, useState } from "react";
 import { fetchSingleton } from "@/lib/directus-fetch";
@@ -26,8 +27,13 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
                     <div className="col-span-1 lg:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 bg-accent flex items-center justify-center rounded-lg">
-                                <span className="text-white font-black text-lg">T</span>
+                            <div className="w-12 h-12 relative overflow-hidden rounded-lg">
+                                <Image
+                                    src="/logo.png?v=2"
+                                    alt="Terra Expert"
+                                    fill
+                                    className="object-contain"
+                                />
                             </div>
                             <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Terra Expert</span>
                         </Link>
