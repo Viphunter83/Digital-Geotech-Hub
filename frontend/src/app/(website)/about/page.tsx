@@ -8,9 +8,9 @@ import { fetchFromDirectus, fetchSingleton } from "@/lib/directus-fetch";
 import { resolveIcon } from "@/lib/icon-map";
 
 interface AboutCMS {
-    mission_title: string;
     mission_text: string;
     history_text: string;
+    hero_image: string | null;
 }
 
 interface Stat {
@@ -98,7 +98,7 @@ export default function AboutPage() {
 
         // Load About Page CMS data
         fetchSingleton<AboutCMS>('about_page', {
-            fields: ['mission_title', 'mission_text', 'history_text']
+            fields: ['mission_title', 'mission_text', 'history_text', 'hero_image']
         }).then(data => setCmsData(data));
     }, []);
 
@@ -163,7 +163,9 @@ export default function AboutPage() {
                     >
                         <div className="aspect-square rounded-3xl overflow-hidden border border-white/10 relative group">
                             <img
-                                src="https://images.unsplash.com/photo-1503387762-592eca589d4f?auto=format&fit=crop&q=80&w=1200"
+                                src={cmsData?.hero_image
+                                    ? `${process.env.NEXT_PUBLIC_CMS_URL}/assets/${cmsData.hero_image}`
+                                    : "https://images.unsplash.com/photo-1503387762-592eca589d4f?auto=format&fit=crop&q=80&w=1200"}
                                 alt="Construction Project"
                                 className="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-700"
                             />

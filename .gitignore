@@ -11,3 +11,5 @@ __pycache__/
 # Local and generated sensitive files
 frontend/.env.local
 scripts/*.sql
+training_data/*
+!training_data/.gitkeep
