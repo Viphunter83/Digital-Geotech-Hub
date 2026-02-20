@@ -13,7 +13,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for build time
-ENV NEXT_PUBLIC_API_URL=/api
+ENV NEXT_PUBLIC_API_URL=
 ENV NEXT_PUBLIC_DIRECTUS_URL=/directus
 
 # Build Next.js

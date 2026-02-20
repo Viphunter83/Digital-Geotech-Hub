@@ -81,7 +81,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "/api"
       NEXT_PUBLIC_DIRECTUS_URL: "/directus"
       NEXT_PUBLIC_CMS_URL: "https://terra-expert.ru/directus"
     networks:
