@@ -61,8 +61,8 @@ export function Navbar() {
                 </div>
 
                 {/* Mobile Toggle */}
-                <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)}>
-                    {isOpen ? <X /> : <Menu />}
+                <button className="md:hidden p-2 text-white" onClick={() => setIsOpen(!isOpen)}>
+                    {isOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
             </div>
 
