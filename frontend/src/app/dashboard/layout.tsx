@@ -37,22 +37,25 @@ export default function DashboardLayout({
     const [session, setSession] = useState<{ authenticated: boolean; token: string; company: string; email: string; level: string } | null>(null);
 
     useEffect(() => {
-        const raw = localStorage.getItem("geotech_session");
-        if (!raw) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const data = JSON.parse(raw);
-            if (!data.authenticated || !data.token) {
+        const frame = requestAnimationFrame(() => {
+            const raw = localStorage.getItem("geotech_session");
+            if (!raw) {
                 router.push("/login");
                 return;
             }
-            setSession(data);
-        } catch {
-            localStorage.removeItem("geotech_session");
-            router.push("/login");
-        }
+            try {
+                const data = JSON.parse(raw);
+                if (!data.authenticated || !data.token) {
+                    router.push("/login");
+                    return;
+                }
+                setSession(data);
+            } catch {
+                localStorage.removeItem("geotech_session");
+                router.push("/login");
+            }
+        });
+        return () => cancelAnimationFrame(frame);
     }, [router]);
 
     const handleLogout = () => {

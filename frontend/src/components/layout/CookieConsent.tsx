@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, X } from "lucide-react";
+import { Info } from "lucide-react";
 import Link from "next/link";
 
 export function CookieConsent() {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const consent = localStorage.getItem("cookie-consent");
-        if (!consent) {
-            setIsVisible(true);
-        }
+        const frame = requestAnimationFrame(() => {
+            const consent = localStorage.getItem("cookie-consent");
+            if (!consent) {
+                setIsVisible(true);
+            }
+        });
+        return () => cancelAnimationFrame(frame);
     }, []);
 
     const accept = () => {

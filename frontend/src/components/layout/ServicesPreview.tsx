@@ -3,7 +3,9 @@
 import { motion } from "framer-motion";
 import { Hammer, Truck, Ruler, ShieldCheck, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { resolveIcon } from "@/lib/icon-map";
+import { fetchFromDirectus } from "@/lib/directus-fetch";
 
 const services = (region: 'msk' | 'spb') => [
     {
@@ -40,11 +42,18 @@ const services = (region: 'msk' | 'spb') => [
     }
 ];
 
-import { fetchFromDirectus } from "@/lib/directus-fetch";
-import { useEffect, useState } from "react";
+interface ServiceItem {
+    id: string;
+    title: string;
+    description: string;
+    icon_name: string;
+    tag_msk: string;
+    tag_spb: string;
+    stats_label: string;
+}
 
 export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) {
-    const [cmsServices, setCmsServices] = useState<any[]>([]);
+    const [cmsServices, setCmsServices] = useState<ServiceItem[]>([]);
 
     useEffect(() => {
         fetchFromDirectus('services', {
@@ -52,7 +61,7 @@ export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) 
             fields: ['id', 'title', 'description', 'icon_name', 'tag_msk', 'tag_spb', 'stats_label']
         }).then(data => {
             if (data && Array.isArray(data)) {
-                setCmsServices(data);
+                setCmsServices(data as ServiceItem[]);
             }
         });
     }, []);

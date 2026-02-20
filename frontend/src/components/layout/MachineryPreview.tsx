@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gauge, Settings, Zap, ArrowRight, ShieldCheck, Weight, type LucideIcon } from "lucide-react";
+import { ArrowRight, type LucideIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { RentalDialog } from "@/components/features/RentalDialog";
@@ -94,8 +94,8 @@ export function MachineryPreview() {
                                         </h4>
 
                                         <div className="grid grid-cols-2 gap-y-8 gap-x-4 mb-12">
-                                            {item.specs.slice(0, 4).map((spec: any, sIndex: number) => {
-                                                const Icon = spec.icon as LucideIcon;
+                                            {item.specs.slice(0, 4).map((spec, sIndex: number) => {
+                                                const Icon = spec.icon;
                                                 return (
                                                     <div key={sIndex} className="flex flex-col gap-2">
                                                         <div className="flex items-center gap-2 text-white/30 truncate">

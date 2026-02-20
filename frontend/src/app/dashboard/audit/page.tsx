@@ -5,12 +5,10 @@ import {
     Upload,
     FileText,
     Sparkles,
-    Loader2,
     Download,
     RotateCcw,
     AlertTriangle,
     CheckCircle2,
-    Info,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -130,8 +128,8 @@ export default function AuditPage() {
             const data: AuditResult = await response.json();
             setResult(data);
             setStep("complete");
-        } catch (err: any) {
-            setError(err.message || "Неизвестная ошибка");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Неизвестная ошибка");
             setStep("error");
         }
     };
@@ -163,8 +161,9 @@ export default function AuditPage() {
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
-        } catch (err: any) {
-            setError("Ошибка при скачивании: " + err.message);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Неизвестная ошибка";
+            setError("Ошибка при скачивании: " + msg);
         }
     };
 
@@ -210,10 +209,10 @@ export default function AuditPage() {
 
                     <div
                         className={`rounded-2xl border-2 border-dashed transition-all p-8 min-h-[300px] flex flex-col items-center justify-center text-center ${step === "uploading"
-                                ? "border-orange-500/30 bg-orange-500/5"
-                                : file
-                                    ? "border-green-500/30 bg-green-500/5"
-                                    : "border-white/10 bg-white/[0.02] hover:border-orange-500/30 cursor-pointer"
+                            ? "border-orange-500/30 bg-orange-500/5"
+                            : file
+                                ? "border-green-500/30 bg-green-500/5"
+                                : "border-white/10 bg-white/[0.02] hover:border-orange-500/30 cursor-pointer"
                             }`}
                         onClick={() => step === "idle" && !file && fileInputRef.current?.click()}
                         onDragOver={(e) => e.preventDefault()}
@@ -244,8 +243,8 @@ export default function AuditPage() {
                                         <div key={i} className="flex items-center gap-3">
                                             <div
                                                 className={`w-2 h-2 rounded-full transition-all ${i <= auditStepIdx
-                                                        ? "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]"
-                                                        : "bg-white/10"
+                                                    ? "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]"
+                                                    : "bg-white/10"
                                                     }`}
                                             />
                                             <p

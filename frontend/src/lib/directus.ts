@@ -13,7 +13,7 @@ export interface Machinery {
     name: string;
     type: string;
     status: string;
-    technical_specs: any;
+    technical_specs: unknown;
     category: number;
 }
 

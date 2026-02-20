@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Clock, User } from "lucide-react";
+import { ArrowRight, Clock, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchArticles, ARTICLES_FALLBACK, type Article } from "@/lib/journal-data";

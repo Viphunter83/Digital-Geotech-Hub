@@ -3,14 +3,14 @@
 import { motion } from "framer-motion";
 import { EngineeringBackground } from "@/components/ui/EngineeringBackground";
 import { SubPageHero } from "@/components/layout/SubPageHero";
-import { Phone, Mail, MapPin, Clock, Globe, MessageSquare, Send, CheckCircle2 } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageSquare, Send, CheckCircle2, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { fetchSingleton } from "@/lib/directus-fetch";
 
 interface ContactItem {
-    icon: any;
+    icon: LucideIcon;
     label: string;
     value: string;
     link: string | null;
@@ -52,6 +52,7 @@ export default function ContactsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [contactInfo, setContactInfo] = useState<ContactItem[]>(contactInfoFallback);
+    const [productionImage, setProductionImage] = useState<string | null>(null);
 
     useEffect(() => {
         fetchSingleton<{
@@ -63,6 +64,7 @@ export default function ContactsPage() {
             production_image: string | null;
         }>('company_info', { fields: ['*', 'production_image'] }).then(data => {
             if (data) {
+                setProductionImage(data.production_image);
                 setContactInfo([
                     { icon: Phone, label: "Телефон нашей линии", value: data.phone, link: `tel:${data.phone.replace(/[\s()-]/g, '')}`, color: "text-orange-500" },
                     { icon: Mail, label: "Почта для тендеров", value: data.email, link: `mailto:${data.email}`, color: "text-blue-500" },
@@ -230,8 +232,8 @@ export default function ContactsPage() {
 
                 <div id="map" className="mt-32 rounded-[40px] overflow-hidden border border-white/10 bg-black/60 backdrop-blur-xl aspect-[21/9] relative group">
                     <img
-                        src={contactInfo.length > 0 && (contactInfo as any).production_image
-                            ? `${process.env.NEXT_PUBLIC_CMS_URL}/assets/${(contactInfo as any).production_image}`
+                        src={productionImage
+                            ? `${process.env.NEXT_PUBLIC_CMS_URL}/assets/${productionImage}`
                             : "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=2000"}
                         alt="Location Map"
                         className="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-60 transition-all duration-1000 group-hover:scale-105"

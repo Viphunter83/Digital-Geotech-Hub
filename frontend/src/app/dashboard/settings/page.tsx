@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Shield, Save, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
+import { User, Bell, Save, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
 
 interface Profile {
     company_name: string;
@@ -80,8 +80,8 @@ export default function SettingsPage() {
             }
             setSaved(true);
             setTimeout(() => setSaved(false), 2500);
-        } catch (err: any) {
-            setError(err.message || "Ошибка");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Ошибка");
         } finally {
             setSaving(false);
         }
@@ -193,8 +193,8 @@ export default function SettingsPage() {
                 onClick={handleSave}
                 disabled={saving}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${saved
-                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                        : "bg-orange-500 text-[#0A0F1C] hover:bg-orange-400 shadow-lg shadow-orange-500/20"
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                    : "bg-orange-500 text-[#0A0F1C] hover:bg-orange-400 shadow-lg shadow-orange-500/20"
                     }`}
             >
                 {saving ? (

@@ -119,15 +119,16 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                 // Fetch Unified Projects
                 const projRes = await fetch(`${CMS_URL}/items/projects?fields=id,title,location,latitude,longitude,description&filter[status][_eq]=published`);
                 if (projRes.ok) {
-                    const { data } = await projRes.json();
+                    const { data } = (await projRes.json()) as { data: { id: string; title: string; location: string | null; latitude: string | number; longitude: string | number; description: string | null }[] };
                     if (data && data.length > 0) {
-                        const mappedData = data.map((item: any) => ({
-                            ...item,
+                        const mappedData = data.map((item) => ({
+                            id: item.id,
+                            title: item.title,
                             latitude: Number(item.latitude),
                             longitude: Number(item.longitude),
                             location: item.location || 'Объект',
                             description: item.description || 'Информация из базы данных.'
-                        })).filter((p: any) => !isNaN(p.latitude) && !isNaN(p.longitude) && p.latitude !== 0);
+                        })).filter((p) => !isNaN(p.latitude) && !isNaN(p.longitude) && p.latitude !== 0);
 
                         setProjects(mappedData);
                     }
@@ -136,18 +137,21 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
                 // Fetch Geology Points
                 const geoRes = await fetch(`${CMS_URL}/items/geology_points?fields=id,title,depth,soil_layers,water_level,latitude,longitude`);
                 if (geoRes.ok) {
-                    const { data } = await geoRes.json();
+                    const { data } = (await geoRes.json()) as { data: { id: string; title: string; depth: string; soil_layers: string[] | string; water_level: string; latitude: string | number; longitude: string | number }[] };
                     if (data && data.length > 0) {
-                        const validatedGeo = data.map((point: any) => ({
-                            ...point,
+                        const validatedGeo = data.map((point) => ({
+                            id: point.id,
+                            title: point.title,
+                            depth: point.depth,
+                            water_level: point.water_level,
                             latitude: Number(point.latitude),
                             longitude: Number(point.longitude),
                             soil_layers: Array.isArray(point.soil_layers) ? point.soil_layers : []
-                        })).filter((p: any) => !isNaN(p.latitude) && !isNaN(p.longitude) && p.latitude !== 0);
+                        })).filter((p) => !isNaN(p.latitude) && !isNaN(p.longitude) && p.latitude !== 0);
                         setGeologyPoints(validatedGeo);
                     }
                 }
-            } catch (err) {
+            } catch {
                 console.error('Map fetch failed, using fallback.');
             } finally {
                 setLoading(false);

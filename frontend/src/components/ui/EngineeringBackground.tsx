@@ -6,9 +6,19 @@ import { useRef, useState, useEffect } from "react";
 export function EngineeringBackground() {
     const { scrollYProgress } = useScroll();
     const [mounted, setMounted] = useState(false);
+    const [particles, setParticles] = useState<{ top: string; left: string; duration: number; delay: number }[]>([]);
 
     useEffect(() => {
-        setMounted(true);
+        const frame = requestAnimationFrame(() => {
+            setMounted(true);
+            setParticles([...Array(20)].map(() => ({
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                duration: 5 + Math.random() * 10,
+                delay: Math.random() * 5
+            })));
+        });
+        return () => cancelAnimationFrame(frame);
     }, []);
 
     // Create smooth spring-based motion
@@ -76,13 +86,13 @@ export function EngineeringBackground() {
             {/* Floating Particles for Volume - Only on Client */}
             {mounted && (
                 <div className="absolute inset-0">
-                    {[...Array(20)].map((_, i) => (
+                    {particles.map((p, i) => (
                         <motion.div
                             key={i}
                             className="absolute w-1 h-1 bg-accent/30 rounded-full"
                             initial={{
-                                top: `${Math.random() * 100}%`,
-                                left: `${Math.random() * 100}%`,
+                                top: p.top,
+                                left: p.left,
                                 opacity: 0
                             }}
                             animate={{
@@ -91,9 +101,9 @@ export function EngineeringBackground() {
                                 scale: [0.5, 1.2, 0.5]
                             }}
                             transition={{
-                                duration: 5 + Math.random() * 10,
+                                duration: p.duration,
                                 repeat: Infinity,
-                                delay: Math.random() * 5
+                                delay: p.delay
                             }}
                         />
                     ))}

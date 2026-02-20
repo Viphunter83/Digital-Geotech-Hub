@@ -82,7 +82,7 @@ function transformArticle(d: DirectusArticle): Article {
  * Falls back to hardcoded ARTICLES_FALLBACK if Directus is unavailable.
  */
 export async function fetchArticles(options?: { limit?: number; category?: string }): Promise<Article[]> {
-    const filter: Record<string, any> = { status: { _eq: 'published' } };
+    const filter: Record<string, unknown> = { status: { _eq: 'published' } };
     if (options?.category && options.category !== 'Все') {
         filter.category = { name: { _eq: options.category } };
     }

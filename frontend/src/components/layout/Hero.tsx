@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePresence } from "framer-motion";
-import { ArrowRight, Box, Shield, Zap, Globe, Cpu, Database, Cloud, FileText } from "lucide-react";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { LeadMagnetModal } from "./LeadMagnetModal";
 import { fetchFromDirectus, getDirectusFileUrl } from "@/lib/directus-fetch";
 import Link from "next/link";
@@ -14,7 +14,7 @@ interface HeroProps {
 interface HeroBadge {
     label: string;
     href: string;
-    image: any;
+    image: string | null;
     parallax_factor: number;
     pos_top?: string;
     pos_left?: string;
@@ -51,7 +51,7 @@ export function Hero({ region }: HeroProps) {
     // Load hero configs from Directus
     useEffect(() => {
         // Fetch hero configs
-        fetchFromDirectus<{ region: string; title: string; usp: string; cta_text: string; background_image: any; image_opacity: number }>('hero_configs', {
+        fetchFromDirectus<{ region: string; title: string; usp: string; cta_text: string; background_image: string | { id: string } | null; image_opacity: number }>('hero_configs', { // Type of RAW data from Directus
             fields: ['region', 'title', 'usp', 'cta_text', 'background_image', 'image_opacity'],
         }).then(data => {
             if (data.length > 0) {
@@ -61,7 +61,7 @@ export function Hero({ region }: HeroProps) {
                         title: d.title,
                         usp: d.usp,
                         cta: d.cta_text,
-                        background_image: typeof d.background_image === 'object' ? d.background_image?.id : d.background_image,
+                        background_image: typeof d.background_image === 'object' && d.background_image !== null ? d.background_image.id : d.background_image, // Handle null case
                         image_opacity: d.image_opacity
                     };
                 });
@@ -70,20 +70,21 @@ export function Hero({ region }: HeroProps) {
         });
 
         // Fetch dynamic badges
-        fetchFromDirectus<HeroBadge>('hero_badges', {
+        fetchFromDirectus<{ label: string; href: string; image: string | { id: string } | null; parallax_factor: number; pos_top?: string; pos_left?: string; pos_right?: string; pos_bottom?: string }>('hero_badges', {
             fields: ['label', 'href', 'image', 'parallax_factor', 'pos_top', 'pos_left', 'pos_right', 'pos_bottom'],
             sort: ['sort']
         }).then(data => {
             if (data.length > 0) {
-                setBadges(data);
+                const processed = data.map(d => ({
+                    ...d,
+                    image: typeof d.image === 'object' && d.image !== null ? d.image.id : d.image
+                }));
+                setBadges(processed);
             }
         });
     }, []);
 
-    // Mouse Tracking for Parallax
-    const [activeBadge, setActiveBadge] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const containerRef = useRef(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
@@ -129,7 +130,7 @@ export function Hero({ region }: HeroProps) {
                 <div
                     className="absolute inset-0 opacity-20 mix-blend-overlay"
                     style={{
-                        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+                        backgroundImage: `linear - gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear - gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
                         backgroundSize: '50px 50px'
                     }}
                 />
@@ -285,7 +286,7 @@ export function Hero({ region }: HeroProps) {
     );
 }
 
-function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor, href, style }: { image: string, className?: string, label: string, delay: number, mouseX: any, mouseY: any, factor: number, href: string, style?: any }) {
+function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor, href, style }: { image: string, className?: string, label: string, delay: number, mouseX: import("framer-motion").MotionValue<number>, mouseY: import("framer-motion").MotionValue<number>, factor: number, href: string, style?: React.CSSProperties }) {
     const x = useTransform(mouseX, [-500, 500], [-500 * factor, 500 * factor]);
     const y = useTransform(mouseY, [-500, 500], [-500 * factor, 500 * factor]);
 
@@ -301,7 +302,7 @@ function TechnicalBadge({ image, className, label, delay, mouseX, mouseY, factor
                 delay: delay
             }}
             whileHover={{ opacity: 1, scale: 1.05 }}
-            className={`absolute hidden lg:flex flex-col items-center gap-4 pointer-events-auto z-30 ${className}`}
+            className={`absolute hidden lg:flex flex - col items - center gap - 4 pointer - events - auto z - 30 ${className} `}
         >
             <Link href={href} className="group/badge flex flex-col items-center gap-4 w-full h-full">
                 <div className="relative">

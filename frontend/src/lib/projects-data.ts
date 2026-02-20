@@ -77,7 +77,7 @@ interface DirectusProject {
 function transformProject(d: DirectusProject): Project {
     const rawTags = d.tags ?? [];
     const tags = Array.isArray(rawTags)
-        ? (rawTags.every(t => typeof t === 'string') ? rawTags : rawTags.map((t: any) => t.tag))
+        ? (rawTags.every(t => typeof t === 'string') ? rawTags : rawTags.map((t: { tag: string }) => t.tag))
         : [];
 
     const rawTech = d.technologies ?? [];
@@ -86,7 +86,7 @@ function transformProject(d: DirectusProject): Project {
         type: t.type ?? '',
         description: t.description ?? '',
         image: getDirectusFileUrl(t.image) ?? undefined,
-        specs: (t as any).specs?.map((s: any) => ({
+        specs: (t as { specs?: { label?: string; text?: string; value: string }[] }).specs?.map((s) => ({
             label: s.label || s.text || '',
             value: s.value || '',
         })) ?? [],
@@ -111,9 +111,9 @@ function transformProject(d: DirectusProject): Project {
     }
 
     // If dynamic technologies are empty, but we have a work_type, we can use it as a simulated tech
-    if (technologies.length === 0 && (d as any).work_type) {
+    if (technologies.length === 0 && (d as unknown as { work_type: string }).work_type) {
         technologies.push({
-            name: (d as any).work_type,
+            name: (d as unknown as { work_type: string }).work_type,
             type: 'Метод',
             description: 'Основной технологический метод, примененный в данном проекте.',
         });

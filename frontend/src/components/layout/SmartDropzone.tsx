@@ -126,10 +126,10 @@ export function SmartDropzone() {
                 throw new Error(errData.detail || "Ошибка при обработке документа");
             }
 
-            const data = await response.json();
+            const data = await response.json() as DraftProposal;
             setProposal(data);
-        } catch (err: any) {
-            setError(err.message || "Неизвестная ошибка");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Неизвестная ошибка");
         } finally {
             setIsUploading(false);
         }
@@ -162,9 +162,9 @@ export function SmartDropzone() {
 
             if (!response.ok) throw new Error("Ошибка связи с AI");
 
-            const data = await response.json();
+            const data = await response.json() as { answer: string };
             setChatMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
-        } catch (err: any) {
+        } catch {
             setChatMessages(prev => [...prev, { role: 'assistant', content: "Извините, произошла ошибка. Попробуйте позже." }]);
         } finally {
             setIsThinking(false);
@@ -192,9 +192,10 @@ export function SmartDropzone() {
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
-        } catch (err: any) {
-            console.error("Ошибка при скачивании отчета:", err.message);
-            setError("Ошибка при скачивании отчета: " + err.message);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Неизвестная ошибка";
+            console.error("Ошибка при скачивании отчета:", msg);
+            setError("Ошибка при скачивании отчета: " + msg);
         }
     };
 
@@ -221,8 +222,8 @@ export function SmartDropzone() {
             setLeadSubmitted(true);
             setShowLeadForm(false);
             setLeadForm({ name: "", phone: "", company: "" }); // Reset form
-        } catch (err: any) {
-            setError(err.message || "Неизвестная ошибка при отправке данных");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Неизвестная ошибка при отправке данных");
         } finally {
             setIsLeadSubmitting(false);
         }
@@ -504,7 +505,7 @@ export function SmartDropzone() {
                                                         <CheckCircle2 className="w-10 h-10 text-green-500" />
                                                     </div>
                                                     <h5 className="text-xl font-black uppercase mb-4">Заявка принята!</h5>
-                                                    <p className="text-[11px] text-white/50 leading-relaxed max-w-xs mb-8">Инженер ООО "Диджитал Геотех Хаб" свяжется с вами в течение 30 минут для уточнения деталей.</p>
+                                                    <p className="text-[11px] text-white/50 leading-relaxed max-w-xs mb-8">Инженер ООО &quot;Диджитал Геотех Хаб&quot; свяжется с вами в течение 30 минут для уточнения деталей.</p>
                                                     <Button
                                                         variant="secondary"
                                                         onClick={() => setLeadSubmitted(false)}

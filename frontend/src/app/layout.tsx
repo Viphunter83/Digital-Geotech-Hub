@@ -15,7 +15,7 @@ const outfit = Outfit({
 import { fetchSingleton } from "@/lib/directus-fetch";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await fetchSingleton('site_settings', {
+  const settings = await fetchSingleton<{ meta_title: string; meta_description: string }>('site_settings', {
     fields: ['meta_title', 'meta_description']
   });
 

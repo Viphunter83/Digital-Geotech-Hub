@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Project } from "@/lib/projects-data";
 import Image from "next/image";
-import { MapPin, ArrowUpRight, Filter, Layers, Zap } from "lucide-react";
+import { ArrowUpRight, Zap } from "lucide-react";
 import Link from "next/link";
 import { LeadMagnetModal } from "@/components/layout/LeadMagnetModal";
 
@@ -43,7 +43,7 @@ export function PortfolioClient({ initialProjects }: PortfolioClientProps) {
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setFilterRegion(tab.id as any)}
+                                    onClick={() => setFilterRegion(tab.id as typeof filterRegion)}
                                     className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${filterRegion === tab.id
                                         ? 'bg-orange-500 text-white shadow-lg'
                                         : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -66,7 +66,7 @@ export function PortfolioClient({ initialProjects }: PortfolioClientProps) {
                             ].map((cat) => (
                                 <button
                                     key={cat.id}
-                                    onClick={() => setFilterCategory(cat.id as any)}
+                                    onClick={() => setFilterCategory(cat.id as typeof filterCategory)}
                                     className={`px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap flex-shrink-0 ${filterCategory === cat.id
                                         ? 'bg-white text-[#0F172A] border-white'
                                         : 'bg-transparent text-white/40 border-white/10 hover:border-white/30 hover:text-white'

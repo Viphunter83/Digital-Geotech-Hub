@@ -52,8 +52,8 @@ export default function LoginPage() {
             );
 
             router.push("/dashboard");
-        } catch (err: any) {
-            setError(err.message || "Произошла ошибка");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Неизвестная ошибка");
         } finally {
             setLoading(false);
         }

@@ -24,10 +24,10 @@ const CMS_ASSETS_URL = IS_SERVER
 
 interface FetchOptions {
     fields?: string[];
-    filter?: Record<string, any>;
+    filter?: Record<string, unknown>;
     sort?: string[];
     limit?: number;
-    deep?: Record<string, any>;
+    deep?: Record<string, unknown>;
     revalidate?: number; // ISR revalidation in seconds (default: 60)
 }
 
@@ -42,7 +42,7 @@ interface FetchOptions {
  *   limit: 10,
  * });
  */
-export async function fetchFromDirectus<T = any>(
+export async function fetchFromDirectus<T = unknown>(
     collection: string,
     options?: FetchOptions,
 ): Promise<T[]> {
@@ -89,7 +89,7 @@ export async function fetchFromDirectus<T = any>(
 /**
  * Fetch a single item from a Directus collection by primary key.
  */
-export async function fetchOneFromDirectus<T = any>(
+export async function fetchOneFromDirectus<T = unknown>(
     collection: string,
     id: string | number,
     options?: Pick<FetchOptions, 'fields' | 'deep' | 'revalidate'>,
@@ -126,7 +126,7 @@ export async function fetchOneFromDirectus<T = any>(
  * Fetch a singleton (single-item collection) from Directus.
  * Used for collections like `company_info` that have only one record.
  */
-export async function fetchSingleton<T = any>(
+export async function fetchSingleton<T = unknown>(
     collection: string,
     options?: Pick<FetchOptions, 'fields' | 'revalidate'>,
 ): Promise<T | null> {
