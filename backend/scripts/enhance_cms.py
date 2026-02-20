@@ -13,8 +13,8 @@ def run():
 
         # 1. Update site_settings singleton
         client.patch("/items/site_settings", json={
-            "site_name": "Digital Geotech Hub",
-            "meta_title": "Digital Geotech Hub | B2B Инженерные решения",
+            "site_name": "Terra Expert",
+            "meta_title": "Terra Expert | B2B Инженерные решения",
             "meta_description": "B2B-платформа для строительной компании ГеоТехнологии. Погружение шпунта, аренда спецтехники, AI-расчет смет."
         })
         print("✅ Seeded site_settings")

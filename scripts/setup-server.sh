@@ -4,7 +4,7 @@
 PROJECT_DIR="/var/www/digital-geotech-hub"
 REPO_URL="https://github.com/Viphunter83/Digital-Geotech-Hub.git"
 
-echo "🚀 Starting server setup for Digital Geotech Hub..."
+echo "🚀 Starting server setup for Terra Expert..."
 
 # 1. Update system and install dependencies
 sudo apt-get update

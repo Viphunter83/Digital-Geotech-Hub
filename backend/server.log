@@ -1,4 +1,4 @@
-/Users/apple/Digital Geotech Hub/backend/venv/lib/python3.14/site-packages/openai/_compat.py:48: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+/Users/apple/Terra Expert/backend/venv/lib/python3.14/site-packages/openai/_compat.py:48: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
   from pydantic.v1.typing import (
 INFO:     Started server process [48876]
 INFO:     Waiting for application startup.

@@ -27,7 +27,7 @@ export default async function PortfolioPage() {
                     <SubPageHero
                         title="Знаковые"
                         accentTitle="проекты"
-                        description="Портфолио Digital Geotech Hub. От работы в условиях исторической застройки до реализации масштабных инфраструктурных объектов государственного значения."
+                        description="Портфолио Terra Expert. От работы в условиях исторической застройки до реализации масштабных инфраструктурных объектов государственного значения."
                         badgeText="Portfolio & Cases"
                         backLink="/"
                         backLabel="На главную"

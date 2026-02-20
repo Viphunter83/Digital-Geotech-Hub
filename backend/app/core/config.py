@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Digital Geotech Hub"
+    PROJECT_NAME: str = "Terra Expert"
     API_V1_STR: str = "/api/v1"
     
     # CMS
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 465
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    SMTP_FROM_NAME: str = "Digital Geotech Hub"
+    SMTP_FROM_NAME: str = "Terra Expert"
     SMTP_FROM_EMAIL: str = "noreply@geotech-hub.ru"
     EMAIL_ENABLED: bool = False  # Enable when SMTP credentials are set
 

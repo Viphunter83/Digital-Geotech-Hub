@@ -6,8 +6,8 @@ PROD_URL = "https://terra-expert.ru/directus"
 PROD_ADMIN = {"email": "manager@geotech-hub.ru", "password": "admin-password"}
 
 # Base paths
-BASE_MACHINERY = "/Users/apple/Digital Geotech Hub/frontend/public/images/machinery"
-BASE_ASSETS = "/Users/apple/Digital Geotech Hub/frontend/public/assets"
+BASE_MACHINERY = "/Users/apple/Terra Expert/frontend/public/images/machinery"
+BASE_ASSETS = "/Users/apple/Terra Expert/frontend/public/assets"
 
 # Mapping: Prod Machine Name -> Local File Path
 m_mapping = {

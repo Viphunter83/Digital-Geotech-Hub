@@ -24,10 +24,10 @@ export function Navbar() {
             <div className="w-full max-w-[1920px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg group-hover:bg-accent transition-colors">
-                        <span className="text-white font-black text-xl">G</span>
+                        <span className="text-white font-black text-xl">T</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Geotech Hub</span>
+                        <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Terra Expert</span>
                         <span className="text-[10px] text-white/40 font-medium uppercase tracking-[0.2em]">Engineering Group</span>
                     </div>
                 </Link>

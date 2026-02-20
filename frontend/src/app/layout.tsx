@@ -20,8 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 
   return {
-    title: settings?.meta_title || "Digital Geotech Hub | B2B Инженерные решения",
-    description: settings?.meta_description || "B2B-платформа для строительной компании ГеоТехнологии. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
+    title: settings?.meta_title || "Terra Expert | B2B Инженерные решения",
+    description: settings?.meta_description || "B2B-платформа для строительной компании Terra Expert. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
   };
 }
 

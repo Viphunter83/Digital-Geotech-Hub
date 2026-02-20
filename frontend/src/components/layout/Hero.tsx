@@ -32,12 +32,12 @@ interface GeoConfig {
 
 const geoConfigsFallback: Record<string, GeoConfig> = {
     spb: {
-        title: "Digital Geotech Hub — СПб",
+        title: "Terra Expert — СПб",
         usp: "Нулевой цикл в условиях исторической застройки Санкт-Петербурга. 15+ лет опыта и деликатное погружение шпунта (Silent Piler).",
         cta: "Рассчитать смету для СПб"
     },
     msk: {
-        title: "Digital Geotech Hub — МСК",
+        title: "Terra Expert — МСК",
         usp: "Оперативная перебазировка тяжелой техники в Москву и МО. Лидерное бурение и устройство свайных полей в рекордные сроки.",
         cta: "Рассчитать смету для МСК"
     }

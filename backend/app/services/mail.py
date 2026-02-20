@@ -32,7 +32,7 @@ class MailService:
         
         # Plain text content
         text_content = f"""
-Новая заявка на платформе Digital Geotech Hub!
+Новая заявка на платформе Terra Expert!
 
 👤 Имя: {lead_data.get('name')}
 🏢 Компания: {lead_data.get('company')}
@@ -52,7 +52,7 @@ class MailService:
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
     <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;">
         <h2 style="color: #F97316; border-bottom: 2px solid #F97316; padding-bottom: 10px;">🔔 Новая заявка</h2>
-        <p>На платформе <strong>Digital Geotech Hub</strong> зарегистрировано новое обращение:</p>
+        <p>На платформе <strong>Terra Expert</strong> зарегистрировано новое обращение:</p>
         
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
@@ -80,7 +80,7 @@ class MailService:
 
         <p style="margin-top: 25px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
             Это автоматическое системное сообщение.<br>
-            Digital Geotech Hub &copy; 2026
+            Terra Expert &copy; 2026
         </p>
     </div>
 </body>

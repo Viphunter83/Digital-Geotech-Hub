@@ -101,7 +101,7 @@ class EmailService:
 
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px; color: #4b5563; font-size: 11px;">
-      <p>Digital Geotech Hub • geotech-hub.ru</p>
+      <p>Terra Expert • geotech-hub.ru</p>
       <p>Это автоматическое уведомление. Отвечать на это письмо не нужно.</p>
     </div>
   </div>

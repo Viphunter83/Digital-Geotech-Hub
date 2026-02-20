@@ -90,7 +90,7 @@ class PDFGeneratorService:
             y = 810
             page.draw_line((40, y), (555, y), color=LINE_GRAY, width=0.5)
             page.insert_text(
-                (40, y + 14), "Digital Geotech Hub  •  geotech-hub.ru",
+                (40, y + 14), "Terra Expert  •  geotech-hub.ru",
                 fontname=self._fr, fontsize=7, color=TEXT_LIGHT,
             )
             page.insert_text(
@@ -297,7 +297,7 @@ class PDFGeneratorService:
         # Set PDF metadata
         doc.set_metadata({
             "title": f"Геотехнический AI-аудит — {parsed.get('work_type', 'Отчет')}",
-            "author": "Digital Geotech Hub",
+            "author": "Terra Expert",
             "subject": "Engineering Audit Report",
             "creator": "DGH AI Pipeline v2",
             "producer": f"PyMuPDF {fitz.VersionBind}",

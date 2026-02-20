@@ -111,7 +111,7 @@ export default function AboutPage() {
                 <SubPageHero
                     title="Инженерная"
                     accentTitle="экосистема"
-                    description="Digital Geotech Hub — это союз технологий, опыта и ответственности. Мы создаем фундамент для амбициозных строительных проектов по всей России."
+                    description="Terra Expert — это союз технологий, опыта и ответственности. Мы создаем фундамент для амбициозных строительных проектов по всей России."
                     badgeText="Corporation Profile v1.4"
                     backLink="/"
                     backLabel="На главную"

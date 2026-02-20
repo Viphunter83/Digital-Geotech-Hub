@@ -27,9 +27,9 @@ export function Footer() {
                     <div className="col-span-1 lg:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-6">
                             <div className="w-8 h-8 bg-accent flex items-center justify-center rounded-lg">
-                                <span className="text-white font-black text-lg">G</span>
+                                <span className="text-white font-black text-lg">T</span>
                             </div>
-                            <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Geotech Hub</span>
+                            <span className="font-outfit font-black text-lg leading-none tracking-tighter uppercase text-white">Terra Expert</span>
                         </Link>
                         <p className="text-sm text-white/40 leading-relaxed">
                             15+ лет лидерства в области шпунтовых работ и фундаментостроения. Свой парк современной техники для проектов любой сложности по всей России.
@@ -66,7 +66,7 @@ export function Footer() {
 
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[10px] text-white/20 uppercase tracking-widest">
-                        © 2026 Digital Geotech Hub. Все права защищены.
+                        © 2026 Terra Expert. Все права защищены.
                     </p>
                     <div className="flex gap-6 text-[10px] uppercase font-bold tracking-widest">
                         <Link href="/privacy" className="text-white/40 hover:text-accent">Privacy Policy</Link>

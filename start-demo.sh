@@ -2,7 +2,7 @@
 
 # start-demo.sh - Автоматизация запуска демо-среды (Apple Silicon / ARM64)
 
-echo "🚀 Запуск Digital Geotech Hub Demo..."
+echo "🚀 Запуск Terra Expert Demo..."
 
 # 1. Проверка Docker
 if ! docker info > /dev/null 2>&1; then

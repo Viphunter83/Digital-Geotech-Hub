@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
     await http_manager.stop()
 
 app = FastAPI(
-    title="Digital Geotech Hub API",
+    title="Terra Expert API",
     description="API for B2B platform of Geotechnologies",
     version="1.0.0",
     lifespan=lifespan,
@@ -48,4 +48,4 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Digital Geotech Hub API"}
+    return {"message": "Welcome to Terra Expert API"}
