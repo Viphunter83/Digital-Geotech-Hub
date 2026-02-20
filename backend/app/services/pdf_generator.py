@@ -117,7 +117,7 @@ class PDFGeneratorService:
         # Top brand bar
         p1.draw_rect(fitz.Rect(0, 0, 595, 90), fill=DARK_BG)
         p1.insert_text(
-            (40, 35), "DIGITAL GEOTECH HUB",
+            (40, 35), "TERRA EXPERT",
             fontname=self._fb, fontsize=20, color=BRAND_ORANGE,
         )
         p1.insert_text(

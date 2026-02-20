@@ -73,7 +73,7 @@ class EmailService:
 
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <h1 style="color: #F97316; font-size: 20px; margin: 0;">DIGITAL GEOTECH HUB</h1>
+      <h1 style="color: #F97316; font-size: 20px; margin: 0;">TERRA EXPERT</h1>
       <p style="color: #666; font-size: 12px; margin: 4px 0 0;">AI-аудит завершён</p>
     </div>
 
