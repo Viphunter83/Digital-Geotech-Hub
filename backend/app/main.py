@@ -23,8 +23,8 @@ app = FastAPI(
 # Dynamically set origins from settings
 allowed_origins = [
     "http://localhost:3000",
-    "https://geotech-hub.ru",
-    "https://www.geotech-hub.ru",
+    "https://terra-expert.ru",
+    "https://www.terra-expert.ru",
 ]
 if settings.FRONTEND_URL and settings.FRONTEND_URL not in allowed_origins:
     allowed_origins.append(settings.FRONTEND_URL)
