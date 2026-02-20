@@ -23,8 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: settings?.meta_title || "Terra Expert | B2B Инженерные решения",
     description: settings?.meta_description || "B2B-платформа для строительной компании Terra Expert. Погружение шпунта, аренда спецтехники, AI-расчет смет.",
     icons: {
-      icon: "/favicon.png",
-      apple: "/favicon.png",
+      icon: "/favicon.png?v=2",
+      apple: "/favicon.png?v=2",
     },
   };
 }
