@@ -126,8 +126,27 @@ async def seed_data():
         for s in stats_data:
             await upsert('project_stats', s, 'label')
 
-        # 7. Cases
-        print("[7/7] Seeding Cases...")
+        # 7. Hero Configs
+        print("[7/8] Seeding Hero Configs...")
+        heros = [
+            {
+                "region": "spb",
+                "title": "Terra Expert — СПб",
+                "usp": "Нулевой цикл в условиях исторической застройки Санкт-Петербурга. 15+ лет опыта и деликатное погружение шпунта (Silent Piler).",
+                "cta_text": "Рассчитать смету для СПб"
+            },
+            {
+                "region": "msk",
+                "title": "Terra Expert — МСК",
+                "usp": "Оперативная перебазировка тяжелой техники в Москву и МО. Лидерное бурение и устройство свайных полей в рекордные сроки.",
+                "cta_text": "Рассчитать смету для МСК"
+            }
+        ]
+        for h in heros:
+            await upsert('hero_configs', h, 'region')
+
+        # 8. Cases
+        print("[8/8] Seeding Cases...")
         cases = [
             {
                 "title": "МФК «Лахта Центр 2»",

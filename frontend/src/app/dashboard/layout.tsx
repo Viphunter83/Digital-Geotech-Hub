@@ -78,12 +78,12 @@ export default function DashboardLayout({
                 <div className="h-16 flex items-center px-4 border-b border-white/5">
                     <Link href="/" className="flex items-center gap-3 group overflow-hidden">
                         <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center rounded-lg shrink-0 shadow-lg shadow-orange-500/10">
-                            <span className="text-white font-black text-lg">G</span>
+                            <span className="text-white font-black text-lg">T</span>
                         </div>
                         {!collapsed && (
                             <div className="flex flex-col whitespace-nowrap">
                                 <span className="font-black text-sm leading-none tracking-tighter uppercase">
-                                    Geotech Hub
+                                    Terra Expert
                                 </span>
                                 <span className="text-[9px] text-white/30 font-medium uppercase tracking-[0.15em]">
                                     Client Portal
@@ -141,9 +141,9 @@ export default function DashboardLayout({
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center rounded-lg">
-                                    <span className="text-white font-black text-lg">G</span>
+                                    <span className="text-white font-black text-lg">T</span>
                                 </div>
-                                <span className="font-black text-sm uppercase tracking-tighter">Geotech Hub</span>
+                                <span className="font-black text-sm uppercase tracking-tighter">Terra Expert</span>
                             </div>
                             <button onClick={() => setMobileOpen(false)}>
                                 <X className="w-5 h-5 text-white/40" />
