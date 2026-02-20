@@ -8,6 +8,7 @@ import { fetchFromDirectus, fetchSingleton } from "@/lib/directus-fetch";
 import { resolveIcon } from "@/lib/icon-map";
 
 interface AboutCMS {
+    mission_title: string;
     mission_text: string;
     history_text: string;
     hero_image: string | null;
