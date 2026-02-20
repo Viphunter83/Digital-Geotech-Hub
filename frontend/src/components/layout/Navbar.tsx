@@ -26,7 +26,7 @@ export function Navbar() {
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="w-10 h-10 relative overflow-hidden rounded-lg group-hover:scale-105 transition-transform duration-300">
                         <Image
-                            src="/logo.png?v=2"
+                            src="/logo.png"
                             alt="Terra Expert"
                             fill
                             className="object-contain"

@@ -80,7 +80,7 @@ export default function DashboardLayout({
                     <Link href="/" className="flex items-center gap-3 group overflow-hidden">
                         <div className="w-9 h-9 relative overflow-hidden rounded-lg shrink-0 shadow-lg shadow-orange-500/10">
                             <Image
-                                src="/logo.png?v=2"
+                                src="/logo.png"
                                 alt="Terra Expert"
                                 fill
                                 className="object-contain"
@@ -148,7 +148,7 @@ export default function DashboardLayout({
                             <div className="flex items-center gap-3">
                                 <div className="w-9 h-9 relative overflow-hidden rounded-lg">
                                     <Image
-                                        src="/logo.png?v=2"
+                                        src="/logo.png"
                                         alt="Terra Expert"
                                         fill
                                         className="object-contain"

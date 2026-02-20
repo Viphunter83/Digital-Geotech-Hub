@@ -29,7 +29,7 @@ export function Footer() {
                         <Link href="/" className="flex items-center gap-2 mb-6">
                             <div className="w-12 h-12 relative overflow-hidden rounded-lg">
                                 <Image
-                                    src="/logo.png?v=2"
+                                    src="/logo.png"
                                     alt="Terra Expert"
                                     fill
                                     className="object-contain"
