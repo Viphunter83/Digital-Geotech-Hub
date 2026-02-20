@@ -16,8 +16,15 @@ rsync -avz --exclude 'node_modules' --exclude '.next' frontend/ root@155.212.209
 ### 2. Синхронизация Прав Доступа (Directus Permissions)
 Права доступа в Directus хранятся в БД. При добавлении новых коллекций локально, необходимо синхронизировать их с продакшном.
 
-**Использование скрипта:**
-1. Выполните `python3 scripts/generate_permission_sync.py` для генерации SQL-файла на основе локальной БД.
+**Вариант А. Через API (если нет SSH-доступа):**
+Если на продакшне данные (например, `projects`) возвращают только `id`, значит права доступа ограничены. Исправьте это через PATCH запрос к Directus API:
+```bash
+# Получите токен админа в Directus
+# Выполните PATCH на эндпоинт /permissions/{id} с телом {"fields": ["*"]}
+```
+
+**Вариант Б. Через SSH и SQL (рекомендуемый):**
+1. Выполните `python3 scripts/generate_permission_sync.py`.
 2. Примените SQL на сервере:
 ```bash
 ssh root@155.212.209.113 "cat << 'EOF' | docker exec -i geotech_db psql -U directus -d directus
