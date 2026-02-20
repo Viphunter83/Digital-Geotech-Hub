@@ -63,3 +63,30 @@ async def fetch_matching_data(work_type: str, required_profile: str = None):
             
     return shpunts, machinery
 
+
+async def fetch_global_settings():
+    """Fetch global calculator settings (labor rates) from Directus."""
+    # Default rates as fallback
+    defaults = {
+        "rate_piling": 25000.0,
+        "rate_vibration": 35000.0,
+        "rate_drilling": 4500.0,
+        "rate_extraction": 10000.0,
+        "rate_excavation": 10000.0
+    }
+    try:
+        async with httpx.AsyncClient(base_url=settings.DIRECTUS_URL, timeout=5.0) as client:
+            res = await client.get("/items/site_settings")
+            if res.status_code == 200:
+                data = res.json().get("data")
+                if data:
+                    # Merge data override defaults
+                    for key in defaults.keys():
+                        if key in data and data[key] is not None:
+                            defaults[key] = float(data[key])
+                    logger.info("Global settings fetched from Directus")
+    except Exception as e:
+        logger.warning(f"Failed to fetch global settings, using defaults: {e}")
+    
+    return defaults
+

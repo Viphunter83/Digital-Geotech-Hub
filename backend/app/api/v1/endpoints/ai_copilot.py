@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Response, Backgr
 from app.schemas.copilot import DraftProposalResponse, ChatRequest, ChatResponse, ProposalSchema
 from app.services.ai.document_processor import doc_processor
 from app.services.ai.geotech_analyzer import geotech_analyzer
-from app.services.directus import fetch_matching_data
+from app.services.directus import fetch_matching_data, fetch_global_settings
 from app.core.config import settings
 from app.core.redis import get_redis
 from app.services.pdf_generator import pdf_generator
@@ -135,24 +135,26 @@ async def parse_document(
     # 4. Professional Estimate Calculation
     estimated_total = 0
     if parsed_data.volume:
-        # Default work rates (rub per ton for piling, rub per meter for drilling)
-        WORK_RATES = {
-            "погружение": 25000.0,
-            "вдавливание": 35000.0,
-            "бурение": 4500.0,
-            "выемка": 10000.0,
-            "извлечение": 10000.0
+        # Fetch rates from Directus (with fallbacks)
+        rates = await fetch_global_settings()
+        
+        WORK_RATES_MAP = {
+            "погружение": rates["rate_piling"],
+            "вдавливание": rates["rate_vibration"],
+            "бурение": rates["rate_drilling"],
+            "выемка": rates["rate_excavation"],
+            "извлечение": rates["rate_extraction"]
         }
         
         # Determine work unit price based on work_type
         work_type_lower = (parsed_data.work_type or "").lower()
         work_unit_price = 0
-        for key, rate in WORK_RATES.items():
+        for key, rate in WORK_RATES_MAP.items():
             if key in work_type_lower:
                 work_unit_price = rate
                 break
         if work_unit_price == 0:
-            work_unit_price = 15000.0 # Standard fallback
+            work_unit_price = rates["rate_piling"] # Default to piling if unknown
             
         # 1. Material Cost (Shpunts)
         material_cost = 0
