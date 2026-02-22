@@ -23,7 +23,7 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                 <DialogTitle className="sr-only">{machinery.name}</DialogTitle>
                 <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[85vh] overflow-y-auto lg:overflow-hidden">
                     {/* Left Side: Image & Technical Blueprint */}
-                    <div className="relative bg-[#0b101e] p-8 lg:p-12 flex flex-col justify-between min-h-[300px] lg:min-h-full">
+                    <div className="relative bg-[#0b101e] p-6 lg:p-12 flex flex-col justify-between min-h-[300px] lg:min-h-full overflow-hidden">
                         <div className="absolute inset-0 opacity-20 pointer-events-none">
                             <div className="absolute top-0 left-0 w-full h-px bg-orange-500/30" />
                             <div className="absolute top-0 left-0 w-px h-full bg-orange-500/30" />
@@ -51,14 +51,14 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                             />
                         </div>
 
-                        <div className="relative z-10 hidden xl:flex gap-4">
+                        <div className="relative z-10 hidden xl:flex gap-2 2xl:gap-4 w-full">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3">
-                                    <div className="flex items-center gap-2 mb-1 opacity-50">
-                                        <spec.icon className="w-3 h-3" />
-                                        <span className="text-[8px] font-black uppercase tracking-widest">{spec.label}</span>
+                                <div key={idx} className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl p-3">
+                                    <div className="flex items-center gap-1.5 mb-1 opacity-50">
+                                        <spec.icon className="w-3 h-3 shrink-0" />
+                                        <span className="text-[8px] font-black uppercase tracking-widest truncate">{spec.label}</span>
                                     </div>
-                                    <div className="text-sm font-bold font-mono text-white">{spec.value}</div>
+                                    <div className="text-xs 2xl:text-sm font-bold font-mono text-white truncate">{spec.value}</div>
                                 </div>
                             ))}
                         </div>
@@ -120,16 +120,16 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                         </div>
 
                         {/* CTA Button pinned to bottom */}
-                        <div className="mt-8 pt-6 border-t border-white/10 sticky bottom-0 bg-[#0F172A] pb-4">
+                        <div className="mt-8 pt-4 border-t border-white/10 sticky bottom-0 bg-[#0F172A] pb-2 z-20">
                             <Button
                                 onClick={() => {
                                     onClose();
                                     onRentRequest(machinery.name);
                                 }}
-                                className="relative z-20 w-full h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-sm font-black uppercase tracking-wide rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-3 transition-all"
+                                className="relative w-full h-12 lg:h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-xs lg:text-sm font-black uppercase tracking-wide rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-3 transition-all"
                             >
                                 <span className="truncate">Рассчитать смену</span>
-                                <ArrowRight className="w-5 h-5 shrink-0" />
+                                <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
                             </Button>
                         </div>
                     </div>
