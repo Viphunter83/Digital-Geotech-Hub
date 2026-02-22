@@ -38,7 +38,7 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                                 {machinery.name}
                             </h2>
                             <p className="text-white/30 font-mono text-xs uppercase tracking-widest">
-                                UNIT_ID: #{machinery.id.toUpperCase()}
+                                UNIT_ID: #{String(machinery.id).toUpperCase()}
                             </p>
                         </div>
 
