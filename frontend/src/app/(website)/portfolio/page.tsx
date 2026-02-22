@@ -3,6 +3,8 @@ import { SubPageHero } from "@/components/layout/SubPageHero";
 import { PortfolioHeroDecorations } from "@/components/portfolio/PortfolioHeroDecorations";
 import { PortfolioClient } from "@/components/portfolio/PortfolioClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function PortfolioPage() {
     const allProjects = await fetchProjects();
 
