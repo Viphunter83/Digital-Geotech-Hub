@@ -93,22 +93,7 @@ export function MachineryPreview() {
                                             {item.name}
                                         </h4>
 
-                                        <div className="flex flex-col gap-3 mb-12">
-                                            {item.specs.slice(0, 4).map((spec, sIndex: number) => {
-                                                const Icon = spec.icon;
-                                                return (
-                                                    <div key={sIndex} className="bg-white/5 border border-white/5 rounded-xl p-3 flex items-center justify-between gap-4 group-hover:bg-white/10 transition-colors">
-                                                        <div className="flex items-center gap-3 text-white/40">
-                                                            <div className="w-6 h-6 rounded bg-orange-500/10 flex items-center justify-center shrink-0 border border-orange-500/20">
-                                                                <Icon className="w-3 h-3 text-orange-500" />
-                                                            </div>
-                                                            <span className="text-[10px] font-bold uppercase tracking-widest">{spec.label}</span>
-                                                        </div>
-                                                        <span className="text-xs font-black text-white shrink-0 tracking-wider whitespace-nowrap">{spec.value}</span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                        <div className="flex-1" />
 
                                         <div
                                             onClick={(e) => {
