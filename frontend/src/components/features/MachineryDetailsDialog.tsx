@@ -21,9 +21,9 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
         <Dialog open={isOpen} onOpenChange={(val) => !val && onClose()}>
             <DialogContent className="max-w-6xl 2xl:max-w-7xl bg-[#0F172A] border-white/10 p-0 overflow-hidden text-white rounded-[40px]">
                 <DialogTitle className="sr-only">{machinery.name}</DialogTitle>
-                <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[85vh] overflow-y-auto lg:overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[90vh] overflow-y-auto lg:overflow-hidden">
                     {/* Left Side: Image & Technical Blueprint */}
-                    <div className="relative bg-[#0b101e] p-6 lg:p-12 flex flex-col justify-between min-h-[300px] lg:min-h-full">
+                    <div className="relative bg-[#0b101e] p-6 xl:p-8 2xl:p-12 flex flex-col justify-between min-h-[300px] lg:h-full lg:overflow-y-auto custom-scrollbar">
                         <div className="absolute inset-0 opacity-20 pointer-events-none">
                             <div className="absolute top-0 left-0 w-full h-px bg-orange-500/30" />
                             <div className="absolute top-0 left-0 w-px h-full bg-orange-500/30" />
@@ -42,7 +42,7 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                             </p>
                         </div>
 
-                        <div className="relative flex-1 flex items-center justify-center py-8">
+                        <div className="relative flex-1 flex items-center justify-center py-6 min-h-[200px]">
                             <div className="absolute inset-0 bg-orange-500/5 blur-[100px] rounded-full" />
                             <img
                                 src={machinery.image}
@@ -53,14 +53,14 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
 
                         <div className="relative z-10 hidden xl:flex flex-col gap-3 w-full mt-auto">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 2xl:p-5 flex items-center justify-between w-full h-auto min-h-0 gap-4">
-                                    <div className="flex items-center gap-3 opacity-70">
-                                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                                            <spec.icon className="w-4 h-4" />
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between w-full h-auto gap-4 shrink-0 hover:bg-white/10 transition-colors">
+                                    <div className="flex items-center gap-3 opacity-80">
+                                        <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0 border border-orange-500/20">
+                                            <spec.icon className="w-4 h-4 text-orange-500" />
                                         </div>
-                                        <span className="text-xs font-black uppercase tracking-widest leading-tight">{spec.label}</span>
+                                        <span className="text-[11px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
                                     </div>
-                                    <div className="text-base 2xl:text-lg font-bold font-mono text-white text-right">{spec.value}</div>
+                                    <div className="text-base font-bold font-mono text-white text-right shrink-0">{spec.value}</div>
                                 </div>
                             ))}
                         </div>
