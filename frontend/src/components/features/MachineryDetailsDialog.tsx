@@ -19,7 +19,7 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
 
     return (
         <Dialog open={isOpen} onOpenChange={(val) => !val && onClose()}>
-            <DialogContent className="max-w-5xl bg-[#0F172A] border-white/10 p-0 overflow-hidden text-white rounded-[40px]">
+            <DialogContent className="max-w-6xl 2xl:max-w-7xl bg-[#0F172A] border-white/10 p-0 overflow-hidden text-white rounded-[40px]">
                 <DialogTitle className="sr-only">{machinery.name}</DialogTitle>
                 <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[85vh] overflow-y-auto lg:overflow-hidden">
                     {/* Left Side: Image & Technical Blueprint */}
@@ -51,16 +51,16 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                             />
                         </div>
 
-                        <div className="relative z-10 hidden xl:flex flex-col gap-2 w-full mt-auto">
+                        <div className="relative z-10 hidden xl:flex flex-col gap-3 w-full mt-auto">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between w-full h-auto min-h-0 gap-4">
-                                    <div className="flex items-center gap-2 opacity-70">
-                                        <div className="w-7 h-7 rounded bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                                            <spec.icon className="w-3.5 h-3.5" />
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 2xl:p-5 flex items-center justify-between w-full h-auto min-h-0 gap-4">
+                                    <div className="flex items-center gap-3 opacity-70">
+                                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                                            <spec.icon className="w-4 h-4" />
                                         </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
+                                        <span className="text-xs font-black uppercase tracking-widest leading-tight">{spec.label}</span>
                                     </div>
-                                    <div className="text-sm 2xl:text-base font-bold font-mono text-white text-right">{spec.value}</div>
+                                    <div className="text-base 2xl:text-lg font-bold font-mono text-white text-right">{spec.value}</div>
                                 </div>
                             ))}
                         </div>
