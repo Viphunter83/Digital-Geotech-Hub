@@ -53,14 +53,16 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
 
                         <div className="relative z-10 hidden xl:flex flex-col gap-3 w-full mt-auto">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between w-full h-auto gap-4 shrink-0 hover:bg-white/10 transition-colors">
-                                    <div className="flex items-center gap-3 opacity-80">
-                                        <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0 border border-orange-500/20">
-                                            <spec.icon className="w-4 h-4 text-orange-500" />
-                                        </div>
-                                        <span className="text-[11px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 w-full shrink-0 hover:bg-white/10 transition-colors">
+                                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                                        <spec.icon className="w-4 h-4 text-orange-500" />
                                     </div>
-                                    <div className="text-base font-bold font-mono text-white text-right shrink-0">{spec.value}</div>
+                                    <span className="text-[11px] font-black uppercase tracking-widest leading-snug text-white/80">
+                                        {spec.label}
+                                    </span>
+                                    <span className="text-base font-bold font-mono text-white text-right whitespace-nowrap drop-shadow-md">
+                                        {spec.value}
+                                    </span>
                                 </div>
                             ))}
                         </div>
