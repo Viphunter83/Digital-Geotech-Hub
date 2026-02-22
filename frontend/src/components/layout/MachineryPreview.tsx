@@ -88,10 +88,27 @@ export function MachineryPreview() {
                                         </div>
                                     </div>
 
-                                    <div className="p-12 flex flex-col flex-1">
-                                        <h4 className="text-3xl font-black mb-10 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500">
+                                    <div className="p-10 flex flex-col flex-1 relative z-10">
+                                        <h4 className="text-3xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-accent transition-colors duration-500">
                                             {item.name}
                                         </h4>
+
+                                        {/* Specs Grid */}
+                                        {item.specs && item.specs.length > 0 && (
+                                            <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-8">
+                                                {item.specs.slice(0, 4).map((spec, sIdx) => (
+                                                    <div key={sIdx} className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-1.5 text-white/30">
+                                                            <spec.icon className="w-3 h-3 text-accent" />
+                                                            <span className="text-[8px] font-black uppercase tracking-widest">{spec.label}</span>
+                                                        </div>
+                                                        <div className="text-sm font-black font-mono text-white tracking-wider">
+                                                            {spec.value}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
 
                                         <div className="flex-1" />
 
@@ -101,9 +118,10 @@ export function MachineryPreview() {
                                                 e.preventDefault();
                                                 setSelectedMachine({ id: item.id, name: item.name });
                                             }}
-                                            className="w-full py-5 text-center rounded-2xl bg-white/[0.03] border border-white/5 font-black text-[10px] uppercase tracking-[0.2em] text-white/40 hover:bg-white hover:text-black hover:border-white transition-all duration-500 cursor-pointer mt-auto"
+                                            className="w-full py-4 text-center rounded-2xl bg-white/[0.03] border border-white/5 font-black text-[10px] uppercase tracking-[0.2em] text-white/40 hover:bg-white hover:text-black hover:border-white transition-all duration-500 cursor-pointer mt-auto flex items-center justify-center gap-2 group/btn"
                                         >
-                                            Запросить расчёт аренды
+                                            Запросить расчёт
+                                            <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
                                         </div>
                                     </div>
                                 </Link>

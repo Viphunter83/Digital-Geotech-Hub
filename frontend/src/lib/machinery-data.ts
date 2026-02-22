@@ -96,7 +96,7 @@ function resolveSpecIcon(name: string | null | undefined): LucideIcon {
 function transformMachinery(d: DirectusMachinery): Machinery {
     const categoryId = typeof d.category === 'object' && d.category ? d.category.id : (d.category ?? 'auxiliary');
     return {
-        id: d.id,
+        id: String(d.id),
         name: d.name,
         category: categoryId,
         categoryLabel: d.category_label ?? '',
