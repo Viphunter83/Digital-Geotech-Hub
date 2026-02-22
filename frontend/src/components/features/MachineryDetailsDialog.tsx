@@ -65,68 +65,73 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                     </div>
 
                     {/* Right Side: Description & Actions */}
-                    <div className="p-5 pb-40 lg:p-12 bg-[#0F172A] flex flex-col lg:h-full lg:overflow-y-auto">
-                        <div className="mb-8">
-                            <h3 className="text-xl font-black uppercase text-white mb-6 flex items-center gap-3">
-                                <span className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
-                                    <Settings className="w-4 h-4 text-orange-500" />
-                                </span>
-                                Описание техники
-                            </h3>
-                            <div className="prose prose-invert max-w-none">
-                                <p className="text-white/70 text-sm leading-relaxed font-medium">
-                                    {machinery.description}
-                                </p>
+                    <div className="p-6 lg:p-12 bg-[#0F172A] flex flex-col lg:h-full lg:overflow-y-auto w-full relative">
+                        <div className="flex-1">
+                            <div className="mb-8">
+                                <h3 className="text-xl font-black uppercase text-white mb-6 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+                                        <Settings className="w-4 h-4 text-orange-500" />
+                                    </span>
+                                    Описание техники
+                                </h3>
+                                <div className="prose prose-invert max-w-none">
+                                    <p className="text-white/70 text-sm leading-relaxed font-medium">
+                                        {machinery.description}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Full Specs List */}
-                        <div className="mb-10">
-                            <h4 className="text-xs font-black uppercase text-white/40 tracking-widest mb-4 border-b border-white/10 pb-2">
-                                Технические характеристики
-                            </h4>
-                            <div className="space-y-3">
-                                {machinery.specs.map((spec, idx) => (
-                                    <div key={idx} className="flex items-center justify-between group">
-                                        <div className="flex items-center gap-3 text-white/60 group-hover:text-white transition-colors w-[50%] min-w-[50%]">
-                                            <div className="w-6 h-6 rounded bg-white/5 flex items-center justify-center shrink-0">
-                                                <spec.icon className="w-3 h-3" />
-                                            </div>
-                                            <span className="text-xs font-bold uppercase tracking-wide leading-tight">{spec.label}</span>
-                                        </div>
-                                        <div className="h-px flex-1 bg-white/10 mx-4" />
-                                        <span className="text-sm font-mono font-bold text-orange-500 whitespace-nowrap min-w-[100px] text-right">{spec.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Related Services */}
-                        {machinery.relatedServiceIds && (
-                            <div className="mt-auto mb-8">
-                                <h4 className="text-xs font-black uppercase text-white/40 tracking-widest mb-4">
-                                    Применяется в работах
+                            {/* Full Specs List */}
+                            <div className="mb-10">
+                                <h4 className="text-xs font-black uppercase text-white/40 tracking-widest mb-4 border-b border-white/10 pb-2">
+                                    Технические характеристики
                                 </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {machinery.relatedServiceIds.map((srv, i) => (
-                                        <span key={i} className="px-3 py-1.5 rounded-lg bg-orange-500/5 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
-                                            {srv}
-                                        </span>
+                                <div className="space-y-4">
+                                    {machinery.specs.map((spec, idx) => (
+                                        <div key={idx} className="flex items-center justify-between group gap-4">
+                                            <div className="flex items-center gap-3 text-white/60 group-hover:text-white transition-colors flex-1 min-w-0">
+                                                <div className="w-8 h-8 rounded bg-white/5 flex items-center justify-center shrink-0">
+                                                    <spec.icon className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-xs font-bold uppercase tracking-wide leading-tight truncate">{spec.label}</span>
+                                            </div>
+                                            <div className="h-px flex-1 bg-white/10 hidden sm:block mx-2" />
+                                            <span className="text-sm font-mono font-bold text-orange-500 whitespace-nowrap text-right shrink-0">{spec.value}</span>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
-                        )}
 
-                        <Button
-                            onClick={() => {
-                                onClose();
-                                onRentRequest(machinery.name);
-                            }}
-                            className="relative z-20 w-full h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-xs font-black uppercase tracking-wide rounded-xl shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2 transition-colors px-2"
-                        >
-                            <span className="truncate">Рассчитать смену</span>
-                            <ArrowRight className="w-4 h-4 shrink-0" />
-                        </Button>
+                            {/* Related Services */}
+                            {machinery.relatedServiceIds && machinery.relatedServiceIds.length > 0 && (
+                                <div className="mb-8">
+                                    <h4 className="text-xs font-black uppercase text-white/40 tracking-widest mb-4">
+                                        Применяется в работах
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {machinery.relatedServiceIds.map((srv, i) => (
+                                            <span key={i} className="px-3 py-1.5 rounded-lg bg-orange-500/5 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                                                {srv}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* CTA Button pinned to bottom */}
+                        <div className="mt-8 pt-6 border-t border-white/10 sticky bottom-0 bg-[#0F172A] pb-4">
+                            <Button
+                                onClick={() => {
+                                    onClose();
+                                    onRentRequest(machinery.name);
+                                }}
+                                className="relative z-20 w-full h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-sm font-black uppercase tracking-wide rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-3 transition-all"
+                            >
+                                <span className="truncate">Рассчитать смену</span>
+                                <ArrowRight className="w-5 h-5 shrink-0" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </DialogContent>
