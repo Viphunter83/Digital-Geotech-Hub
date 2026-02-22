@@ -23,7 +23,7 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                 <DialogTitle className="sr-only">{machinery.name}</DialogTitle>
                 <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[85vh] overflow-y-auto lg:overflow-hidden">
                     {/* Left Side: Image & Technical Blueprint */}
-                    <div className="relative bg-[#0b101e] p-6 lg:p-12 flex flex-col justify-between min-h-[300px] lg:min-h-full overflow-hidden">
+                    <div className="relative bg-[#0b101e] p-6 lg:p-12 flex flex-col justify-between min-h-[300px] lg:min-h-full">
                         <div className="absolute inset-0 opacity-20 pointer-events-none">
                             <div className="absolute top-0 left-0 w-full h-px bg-orange-500/30" />
                             <div className="absolute top-0 left-0 w-px h-full bg-orange-500/30" />
@@ -53,12 +53,12 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
 
                         <div className="relative z-10 hidden xl:grid grid-cols-2 2xl:grid-cols-3 gap-2 2xl:gap-3 w-full mt-auto">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col justify-between">
-                                    <div className="flex flex-col gap-1 mb-2 opacity-50">
-                                        <spec.icon className="w-4 h-4 shrink-0" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col justify-between h-auto min-h-0">
+                                    <div className="flex items-start gap-1.5 mb-2 opacity-50">
+                                        <spec.icon className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
                                     </div>
-                                    <div className="text-sm 2xl:text-base font-bold font-mono text-white break-words">{spec.value}</div>
+                                    <div className="text-sm 2xl:text-base font-bold font-mono text-white break-words mt-auto">{spec.value}</div>
                                 </div>
                             ))}
                         </div>
@@ -120,13 +120,13 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                         </div>
 
                         {/* CTA Button pinned to bottom */}
-                        <div className="mt-8 pt-4 border-t border-white/10 sticky bottom-0 bg-[#0F172A] pb-2 z-20">
+                        <div className="mt-8 pt-4 border-t border-white/10 sticky bottom-0 bg-[#0F172A] pb-0 z-30">
                             <Button
                                 onClick={() => {
                                     onClose();
                                     onRentRequest(machinery.name);
                                 }}
-                                className="relative w-full h-12 lg:h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-xs lg:text-sm font-black uppercase tracking-wide rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-2 lg:gap-3 transition-all"
+                                className="relative w-full h-12 lg:h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-xs lg:text-sm font-black uppercase tracking-wide rounded-lg lg:rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-2 lg:gap-3 transition-all"
                             >
                                 <span className="whitespace-normal text-center leading-tight">Рассчитать смену</span>
                                 <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 shrink-0 hidden sm:block" />
