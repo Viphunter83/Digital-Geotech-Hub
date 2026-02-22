@@ -51,14 +51,14 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                             />
                         </div>
 
-                        <div className="relative z-10 hidden xl:flex gap-2 2xl:gap-4 w-full">
+                        <div className="relative z-10 hidden xl:grid grid-cols-2 2xl:grid-cols-3 gap-2 2xl:gap-3 w-full mt-auto">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl p-3">
-                                    <div className="flex items-center gap-1.5 mb-1 opacity-50">
-                                        <spec.icon className="w-3 h-3 shrink-0" />
-                                        <span className="text-[8px] font-black uppercase tracking-widest truncate">{spec.label}</span>
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col justify-between">
+                                    <div className="flex flex-col gap-1 mb-2 opacity-50">
+                                        <spec.icon className="w-4 h-4 shrink-0" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
                                     </div>
-                                    <div className="text-xs 2xl:text-sm font-bold font-mono text-white truncate">{spec.value}</div>
+                                    <div className="text-sm 2xl:text-base font-bold font-mono text-white break-words">{spec.value}</div>
                                 </div>
                             ))}
                         </div>
@@ -126,10 +126,10 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                                     onClose();
                                     onRentRequest(machinery.name);
                                 }}
-                                className="relative w-full h-12 lg:h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-xs lg:text-sm font-black uppercase tracking-wide rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-3 transition-all"
+                                className="relative w-full h-12 lg:h-14 bg-orange-500 hover:bg-orange-600 text-[#0F172A] text-xs lg:text-sm font-black uppercase tracking-wide rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.2)] flex items-center justify-center gap-2 lg:gap-3 transition-all"
                             >
-                                <span className="truncate">Рассчитать смену</span>
-                                <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+                                <span className="whitespace-normal text-center leading-tight">Рассчитать смену</span>
+                                <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 shrink-0 hidden sm:block" />
                             </Button>
                         </div>
                     </div>
