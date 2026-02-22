@@ -2,7 +2,7 @@
 
 Этот документ предназначен для разработчика, который продолжит работу над проектом.
 
-## 🔑 Доступы и Ссылки (v0.6.8)
+## 🔑 Доступы и Ссылки (v0.6.9)
 - **Live Site**: [https://terra-expert.ru](https://terra-expert.ru)
 - **Directus Admin**: [https://terra-expert.ru/admin](https://terra-expert.ru/admin) (используйте постоянный токен из `.env`)
 - **FastAPI Docs**: [https://terra-expert.ru/api/docs](https://terra-expert.ru/api/docs)
@@ -16,7 +16,7 @@
 
 ## 🛠️ Как продолжить разработку
 1. **Environment**: В продакшне `.env` файл — единственный источник правды для секретов и URL.
-2. **Maintenance**: Все технические процедуры и команды (`rsync`, `docker reload`) описаны в [MAINTENANCE_GUIDE.md](./MAINTENANCE_GUIDE.md).
+2. **Maintenance & SSH**: Для подключения к серверу используйте `export SSHPASS="PeRpWu52*f%X" && sshpass -e ssh -o StrictHostKeyChecking=no root@155.212.209.113`. Все технические процедуры и команды описаны в [MAINTENANCE_GUIDE.md](./MAINTENANCE_GUIDE.md). **Внимание на ловушки кэша Docker.**
 3. **Permission Sync**: Используйте `scripts/generate_permission_sync.py` для синхронизации прав Directus.
 
 ## 📈 Roadmap (Next Steps)
