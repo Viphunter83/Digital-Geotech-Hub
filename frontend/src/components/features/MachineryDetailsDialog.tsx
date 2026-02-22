@@ -51,18 +51,20 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                             />
                         </div>
 
-                        <div className="relative z-10 hidden xl:flex flex-col gap-3 w-full mt-auto">
+                        <div className="relative z-10 hidden xl:block w-full mt-8" style={{ width: '100%', minWidth: '100%' }}>
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 w-full shrink-0 hover:bg-white/10 transition-colors">
-                                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                                        <spec.icon className="w-4 h-4 text-orange-500" />
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-row items-center justify-between w-full mb-3 shrink-0 hover:bg-white/10 transition-colors" style={{ width: '100%', minWidth: '100%', boxSizing: 'border-box' }}>
+                                    <div className="flex items-center gap-3 w-full min-w-0" style={{ flex: '1 1 auto' }}>
+                                        <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0 border border-orange-500/20">
+                                            <spec.icon className="w-4 h-4 text-orange-500" />
+                                        </div>
+                                        <span className="text-[11px] font-black uppercase tracking-widest leading-snug text-white/80 whitespace-normal min-w-0 break-words flex-1">
+                                            {spec.label}
+                                        </span>
                                     </div>
-                                    <span className="text-[11px] font-black uppercase tracking-widest leading-snug text-white/80">
-                                        {spec.label}
-                                    </span>
-                                    <span className="text-base font-bold font-mono text-white text-right whitespace-nowrap drop-shadow-md">
+                                    <div className="text-base font-bold font-mono text-white text-right whitespace-nowrap pl-4 drop-shadow-md shrink-0">
                                         {spec.value}
-                                    </span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
