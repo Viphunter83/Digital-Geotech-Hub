@@ -51,14 +51,16 @@ export function MachineryDetailsDialog({ isOpen, onClose, machinery, onRentReque
                             />
                         </div>
 
-                        <div className="relative z-10 hidden xl:grid grid-cols-2 2xl:grid-cols-3 gap-2 2xl:gap-3 w-full mt-auto">
+                        <div className="relative z-10 hidden xl:flex flex-col gap-2 w-full mt-auto">
                             {machinery.specs.slice(0, 3).map((spec, idx) => (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col justify-between h-auto min-h-0">
-                                    <div className="flex items-start gap-1.5 mb-2 opacity-50">
-                                        <spec.icon className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between w-full h-auto min-h-0 gap-4">
+                                    <div className="flex items-center gap-2 opacity-70">
+                                        <div className="w-7 h-7 rounded bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                                            <spec.icon className="w-3.5 h-3.5" />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{spec.label}</span>
                                     </div>
-                                    <div className="text-sm 2xl:text-base font-bold font-mono text-white break-words mt-auto">{spec.value}</div>
+                                    <div className="text-sm 2xl:text-base font-bold font-mono text-white text-right">{spec.value}</div>
                                 </div>
                             ))}
                         </div>
