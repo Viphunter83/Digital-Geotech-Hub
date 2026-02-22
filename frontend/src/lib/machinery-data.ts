@@ -121,7 +121,6 @@ function transformMachinery(d: DirectusMachinery): Machinery {
 export async function fetchMachineryCategories(): Promise<MachineryCategory[]> {
     const data = await fetchFromDirectus<DirectusMachineryCategory>('machinery_categories', {
         fields: ['id', 'name', 'icon'],
-        sort: ['sort'],
     });
 
     if (data.length > 0) {
