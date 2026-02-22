@@ -22,8 +22,9 @@
 
 ### Production Infra & CI/CD
 - **GitHub Actions**: Автоматизированный пайплайн сборки и деплоя. При пуше в `main` образы пушатся в **GHCR (GitHub Container Registry)**, после чего инициируется обновление на сервере через SSH.
-- **Reverse Proxy**: **Nginx** в качестве шлюза (Gateway), обеспечивающий терминацию SSL и роутинг между фронтендом, API и CMS.
-- **Security**: **Let's Encrypt** SSL-сертификаты с автоматическим продлением через Certbot.
+- **Reverse Proxy**: **Nginx** (Gateway) в контейнере `geotech_gateway`. Использует **изолированные имена апстримов** (`geotech_api`, `geotech_cms`) для предотвращения конфликтов с соседними проектами в Docker-сети.
+- **Routing Strategy**: Настроен прозрачный прокси-пасс (Transparent Proxying) для сохранения путей `/api/v1/...`, что исключает 404 ошибки на FastAPI.
+- **Security**: **Let's Encrypt** SSL-сертификаты. Directus защищен постоянным Bearer-токеном.
 - **Directus 11.2**: Централизованное управление контентом.
 - **PostgreSQL 17**: Реляционная база данных.
 - **Redis 7**: Кэширование и управление очередями.

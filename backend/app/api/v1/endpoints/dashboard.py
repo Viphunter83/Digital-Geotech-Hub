@@ -115,6 +115,45 @@ async def get_projects(client: Dict = Depends(get_current_client)):
     return {"projects": projects or []}
 
 
+@router.get("/projects/{project_id}")
+async def get_project_detail(project_id: int, client: Dict = Depends(get_current_client)):
+    """
+    Get detailed information for a specific project.
+    Includes security check for client ownership.
+    """
+    access_code = client.get("sub")
+    client_id = await _get_client_id(access_code)
+
+    if not client_id:
+        raise HTTPException(status_code=403, detail="Доступ запрещен")
+
+    project = await _directus_get(f"/items/projects/{project_id}", {
+        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title,machinery_used.machinery_id.*",
+    })
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+
+    # Security Check: Compare project's client_id with current authenticated client_id
+    # Note: Directus might return client_id as a dict or int depending on configuration.
+    project_client = project.get("client_id")
+    if isinstance(project_client, dict):
+        p_cid = project_client.get("id")
+    else:
+        # If it's just the ID (standard) or not returned in fields, we need to ensure it's there
+        # Let's re-fetch with client_id if not present
+        if "client_id" not in project:
+             # Basic check: if we can't verify ownership, we must deny
+             raise HTTPException(status_code=403, detail="Ошибка верификации прав доступа")
+        p_cid = project_client
+
+    if p_cid != client_id:
+        logger.warning(f"Client {client_id} attempted access to project {project_id} owned by {p_cid}")
+        raise HTTPException(status_code=403, detail="У вас нет прав доступа к этому проекту")
+
+    return project
+
+
 @router.get("/audit-history")
 async def get_audit_history(client: Dict = Depends(get_current_client)):
     """

@@ -90,10 +90,14 @@ export default function ProjectsPage() {
             ) : (
                 <div className="space-y-4">
                     {projects.map((project) => (
-                        <div
+                        <a
                             key={project.id}
-                            className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:bg-white/[0.04] transition-colors group"
+                            href={`/dashboard/projects/${project.id}`}
+                            className="block bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:bg-white/[0.04] transition-colors group relative"
                         >
+                            <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ArrowUpRight className="w-4 h-4 text-orange-500" />
+                            </div>
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-start gap-4">
                                     <div className="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0 mt-0.5">
@@ -127,7 +131,6 @@ export default function ProjectsPage() {
                                 </span>
                             </div>
 
-                            {/* Progress + tags */}
                             <div className="pl-[60px]">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
@@ -154,14 +157,12 @@ export default function ProjectsPage() {
                                     />
                                 </div>
 
-                                {/* Photos & Docs (Evidence-Based) */}
                                 {project.photos && project.photos.length > 0 && (
                                     <div className="mt-6">
                                         <p className="text-[10px] font-bold uppercase text-white/30 mb-2">Фотоотчет</p>
                                         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                                             {project.photos.map((p, k) => (
                                                 <div key={k} className="shrink-0 w-24 h-16 rounded-lg bg-white/5 border border-white/10 overflow-hidden relative group/img">
-                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
                                                         src={`${process.env.NEXT_PUBLIC_CMS_URL}/assets/${p.directus_files_id.id}?key=system-medium-contain`}
                                                         alt="Photo"
@@ -179,13 +180,12 @@ export default function ProjectsPage() {
                                             <p className="text-[10px] font-bold uppercase text-white/30 mb-2">Техника на объекте</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {project.machinery_used.map((m, k) => (
-                                                    <a
+                                                    <div
                                                         key={k}
-                                                        href={`/machinery#${m.machinery_id.id}`}
-                                                        className="text-[9px] font-black uppercase tracking-wider bg-orange-500/10 text-orange-500 px-2 py-1 rounded border border-orange-500/20 hover:bg-orange-500/20 transition-all"
+                                                        className="text-[9px] font-black uppercase tracking-wider bg-orange-500/10 text-orange-500 px-2 py-1 rounded border border-orange-500/20 transition-all"
                                                     >
                                                         {m.machinery_id.name}
-                                                    </a>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
@@ -196,33 +196,29 @@ export default function ProjectsPage() {
                                             <p className="text-[10px] font-bold uppercase text-white/30 mb-2">Документы</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {project.documents.map((d, k) => (
-                                                    <a
+                                                    <div
                                                         key={k}
-                                                        href={`${process.env.NEXT_PUBLIC_CMS_URL}/assets/${d.directus_files_id.id}?download`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group/doc"
+                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 transition-colors"
                                                     >
                                                         <div className="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-blue-400">
                                                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                             </svg>
                                                         </div>
-                                                        <span className="text-xs text-white/60 group-hover/doc:text-white transition-colors">
+                                                        <span className="text-xs text-white/60">
                                                             {d.directus_files_id.title || d.directus_files_id.filename_download}
                                                         </span>
-                                                    </a>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     ))}
                 </div>
-            )
-            }
-        </div >
+            )}
+        </div>
     );
 }
