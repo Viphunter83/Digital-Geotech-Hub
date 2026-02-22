@@ -99,7 +99,7 @@ function transformProject(d: DirectusProject): Project {
             .map(item => {
                 const m = item.machinery_id;
                 return {
-                    id: m.id,
+                    id: String(m.id),
                     name: m.name,
                     type: m.category_label || 'Оборудование',
                     description: m.description || '',
