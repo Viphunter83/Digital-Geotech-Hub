@@ -104,14 +104,6 @@ services:
     networks:
       - geotech_network
 
-  tunnel:
-    image: cloudflare/cloudflared:latest
-    container_name: geotech_tunnel
-    restart: unless-stopped
-    command: tunnel --url http://geotech_gateway:80 --protocol http2
-    networks:
-      - geotech_network
-
 networks:
   geotech_network:
     driver: bridge

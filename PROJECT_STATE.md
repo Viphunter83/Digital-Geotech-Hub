@@ -30,8 +30,7 @@
 ### 4. Full Data Restoration & Infrastructure
 - **CMS Recovery (Admin UI)**: Восстановлен интерфейс администратора. Добавлено недостающее O2M поле `projects` в коллекцию `clients`, позволяющее управлять проектами клиента напрямую из его профиля.
 - **CI/CD**: Автоматический деплой через GitHub Actions на сервер с SSL (Let's Encrypt).
-- **Network & Caching (Critical Fix)**: Исправлена конфигурация `geotech_gateway` (Nginx). Nginx переведен на обслуживание только HTTP трафика (так как SSL терминируется на Cloudflare Tunnel), а жесткие привязки `proxy_pass` заменены на динамический Docker DNS (`set $upstream...`). Это устранило проблему 6-дневного зависания кэша Cloudflare (Always Online), когда фронтенд отображал устаревшую версию сайта.
-- **UI Polish**: Удалена хардкодинг-плашка "STATUS: ACTIVE SYSTEM" с главной страницы. Оживлена кнопка "Связаться" на странице деталей проекта (добавлен `mailto:` с автоматической подстановкой названия проекта в тему письма).
+- **Network & Caching (Critical Fix)**: Исправлена конфигурация `geotech_gateway` (Nginx). Жесткие привязки `proxy_pass` заменены на динамический Docker DNS (`set $upstream...`), а Nginx напрямую терминирует HTTPS-трафик с использованием Let's Encrypt. Это предотвращает ошибки 500 Bad Gateway при перезапуске фронтенд-контейнеров.
 
 ---
 
