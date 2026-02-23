@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
         port: "8055",
         pathname: "/assets/**",
       },
+      {
+        protocol: "https",
+        hostname: "terra-expert.ru",
+        pathname: "/directus/assets/**",
+      },
     ],
   },
 };
