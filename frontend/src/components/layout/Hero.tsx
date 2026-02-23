@@ -118,7 +118,7 @@ export function Hero({ region }: HeroProps) {
                 className="absolute inset-0 z-0 overflow-hidden bg-transparent transition-opacity duration-1000"
             >
                 <img
-                    src={getDirectusFileUrl(config.background_image) || "/hero-main-v3.webp"}
+                    src={getDirectusFileUrl(config.background_image) || "/hero-main-v4.webp"}
                     alt="Geotech Digital Hub"
                     className="w-full h-full object-cover scale-110"
                     style={{ opacity: (config.image_opacity ?? 60) / 100 }}
