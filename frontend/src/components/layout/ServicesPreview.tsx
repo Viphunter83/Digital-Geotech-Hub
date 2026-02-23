@@ -7,14 +7,14 @@ import { useState, useEffect } from "react";
 import { resolveIcon } from "@/lib/icon-map";
 import { fetchFromDirectus } from "@/lib/directus-fetch";
 
-const services = (region: 'msk' | 'spb') => [
+const services = (region: 'msk' | 'spb' | 'all') => [
     {
         title: "Буронабивные сваи",
         description: "Устройство БНС любой сложности, включая работу в скальных породах и в условиях Крайнего Севера.",
         icon: <Ruler className="w-8 h-8" />,
-        stats: "15+ лет опыта",
+        stats: "20+ лет опыта",
         id: "01",
-        tag: region === 'spb' ? "Реставрация" : "Heavy-Duty"
+        tag: region === 'spb' ? "Реставрация" : (region === 'msk' ? "Heavy-Duty" : "Лидерство")
     },
     {
         title: "Шпунтовые работы",
@@ -22,7 +22,7 @@ const services = (region: 'msk' | 'spb') => [
         icon: <Hammer className="w-8 h-8" />,
         stats: "Свой парк техники",
         id: "02",
-        tag: region === 'spb' ? "Silent Piler" : "Парк 20+ ед."
+        tag: region === 'spb' ? "Silent Piler" : (region === 'msk' ? "Парк 20+ ед." : "Эко-метод")
     },
     {
         title: "Аренда техники",
@@ -30,7 +30,7 @@ const services = (region: 'msk' | 'spb') => [
         icon: <Truck className="w-8 h-8" />,
         stats: "Доставка по РФ",
         id: "03",
-        tag: region === 'msk' ? "Склады в МО" : "Оперативно"
+        tag: region === 'msk' ? "Склады в МО" : "В наличии"
     },
     {
         title: "Нулевой цикл",
@@ -38,7 +38,7 @@ const services = (region: 'msk' | 'spb') => [
         icon: <ShieldCheck className="w-8 h-8" />,
         stats: "Гарантия качества",
         id: "04",
-        tag: region === 'spb' ? "Сложные глины" : "Макс. темп"
+        tag: region === 'spb' ? "Сложные глины" : (region === 'msk' ? "Макс. темп" : "Надежно")
     }
 ];
 
@@ -52,7 +52,7 @@ interface ServiceItem {
     stats_label: string;
 }
 
-export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) {
+export function ServicesPreview({ region = 'all' }: { region?: 'msk' | 'spb' | 'all' }) {
     const [cmsServices, setCmsServices] = useState<ServiceItem[]>([]);
 
     useEffect(() => {
@@ -73,9 +73,9 @@ export function ServicesPreview({ region = 'spb' }: { region?: 'msk' | 'spb' }) 
                 title: s.title || "Служба",
                 description: s.description || "",
                 icon: <IconComponent className="w-8 h-8" />,
-                stats: s.stats_label || "15+ лет опыта",
+                stats: s.stats_label || "20+ лет опыта",
                 id: String(i + 1).padStart(2, '0'),
-                tag: region === 'spb' ? s.tag_spb : s.tag_msk
+                tag: region === 'spb' ? s.tag_spb : (region === 'msk' ? s.tag_msk : (s.tag_spb || s.tag_msk))
             };
         })
         : services(region);

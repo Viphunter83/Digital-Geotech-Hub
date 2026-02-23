@@ -12,7 +12,7 @@ import InteractiveMap from "@/components/layout/InteractiveMap";
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const region = (cookieStore.get("x-geo-region")?.value as 'msk' | 'spb') || 'spb';
+  const region = (cookieStore.get("x-geo-region")?.value as 'msk' | 'spb' | 'all') || 'all';
 
   return (
     <main className="flex-1 relative">

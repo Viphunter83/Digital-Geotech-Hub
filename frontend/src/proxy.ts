@@ -8,13 +8,13 @@ export function proxy(request: NextRequest) {
     const response = NextResponse.next();
 
     // Имитация GEO-детекции: если в URL есть ?geo=..., запоминаем в куки
-    if (geoQuery === 'msk' || geoQuery === 'spb') {
+    if (geoQuery === 'msk' || geoQuery === 'spb' || geoQuery === 'all') {
         response.cookies.set('x-geo-region', geoQuery, { path: '/' });
     } else {
         // Дефолтное значение, если кука еще не установлена
         const existingGeo = request.cookies.get('x-geo-region')?.value;
         if (!existingGeo) {
-            response.cookies.set('x-geo-region', 'spb', { path: '/' });
+            response.cookies.set('x-geo-region', 'all', { path: '/' });
         }
     }
 

@@ -8,7 +8,7 @@ import { fetchFromDirectus, getDirectusFileUrl } from "@/lib/directus-fetch";
 import Link from "next/link";
 
 interface HeroProps {
-    region: 'msk' | 'spb';
+    region: 'msk' | 'spb' | 'all';
 }
 
 interface HeroBadge {
@@ -31,14 +31,19 @@ interface GeoConfig {
 }
 
 const geoConfigsFallback: Record<string, GeoConfig> = {
+    all: {
+        title: "Terra Expert",
+        usp: "Технологическое лидерство в фундаментостроении. 20+ лет опыта, собственный парк спецтехники и работа на всей территории РФ.",
+        cta: "Рассчитать стоимость проекта"
+    },
     spb: {
         title: "Terra Expert — СПб",
-        usp: "Нулевой цикл в условиях исторической застройки Санкт-Петербурга. 15+ лет опыта и деликатное погружение шпунта (Silent Piler).",
+        usp: "Нулевой цикл в условиях исторической застройки Санкт-Петербурга. 20+ лет опыта и деликатное погружение шпунта (Silent Piler).",
         cta: "Рассчитать смету для СПб"
     },
     msk: {
         title: "Terra Expert — МСК",
-        usp: "Оперативная перебазировка тяжелой техники в Москву и МО. Лидерное бурение и устройство свайных полей в рекордные сроки.",
+        usp: "Оперативная перебазировка тяжелой техники в Москву и МО. Лидерное бурение и устройство свайных полей в рекордные сроки. 20+ лет опыта.",
         cta: "Рассчитать смету для МСК"
     }
 };
@@ -46,7 +51,7 @@ const geoConfigsFallback: Record<string, GeoConfig> = {
 export function Hero({ region }: HeroProps) {
     const [geoConfigs, setGeoConfigs] = useState(geoConfigsFallback);
     const [badges, setBadges] = useState<HeroBadge[]>([]);
-    const config = geoConfigs[region] || geoConfigs.spb || geoConfigsFallback.spb;
+    const config = geoConfigs[region] || geoConfigs.all || geoConfigsFallback.all;
 
     // Load hero configs from Directus
     useEffect(() => {

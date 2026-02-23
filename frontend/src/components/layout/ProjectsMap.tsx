@@ -99,7 +99,7 @@ const REFERENCE_PROJECTS: MapProject[] = PROJECTS.map(p => ({
 
 
 interface ProjectMapProps {
-    region: 'msk' | 'spb';
+    region: 'msk' | 'spb' | 'all';
 }
 
 export default function ProjectsMap({ region }: ProjectMapProps) {
@@ -108,8 +108,8 @@ export default function ProjectsMap({ region }: ProjectMapProps) {
     const [loading, setLoading] = useState(true);
     const [activeLayer, setActiveLayer] = useState<'projects' | 'geology'>('projects');
 
-    const defaultCenter: [number, number] = region === 'msk' ? [55.75, 37.6] : [59.93, 30.3];
-    const defaultZoom = 11;
+    const defaultCenter: [number, number] = region === 'msk' ? [55.75, 37.6] : (region === 'spb' ? [59.93, 30.3] : [57.8, 34.0]);
+    const defaultZoom = region === 'all' ? 6 : 11;
 
     useEffect(() => {
         async function fetchPoints() {

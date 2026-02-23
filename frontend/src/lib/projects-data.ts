@@ -41,23 +41,22 @@ interface DirectusProject {
     title: string;
     location: string;
     region: string;
-    category: string;
+    work_type: string;
     description: string;
     challenge: string;
     solution: string;
-    year: string;
+    year: number;
     latitude: number;
     longitude: number;
-    image: string | null;
-    tags?: { tag: string }[];
-    technologies?: {
+    tags?: string[] | { tag: string }[];
+    technologies?: string | {
         name: string;
         type: string;
         description: string;
         image: string | null;
         specs?: { text: string }[];
     }[];
-    stats?: { label: string; value: string; sort: number }[];
+    stats?: string | { label: string; value: string; sort: number }[];
     used_machinery?: {
         machinery_id: {
             id: string;
@@ -68,6 +67,16 @@ interface DirectusProject {
             specs: { label: string; value: string; icon: string }[];
         };
     }[];
+    photos?: {
+        directus_files_id: {
+            id: string;
+        };
+    }[];
+    documents?: {
+        directus_files_id: {
+            id: string;
+        };
+    }[];
 }
 
 // ──────────────────────────────────────────────
@@ -75,13 +84,22 @@ interface DirectusProject {
 // ──────────────────────────────────────────────
 
 function transformProject(d: DirectusProject): Project {
+    // Parse tags (support both array and JSON string)
     const rawTags = d.tags ?? [];
-    const tags = Array.isArray(rawTags)
-        ? (rawTags.every(t => typeof t === 'string') ? rawTags : rawTags.map((t: { tag: string }) => t.tag))
-        : [];
+    let tags: string[] = [];
+    if (typeof rawTags === 'string') {
+        try { tags = JSON.parse(rawTags); } catch (e) { tags = []; }
+    } else if (Array.isArray(rawTags)) {
+        tags = rawTags.map(t => typeof t === 'string' ? t : (t as { tag: string }).tag);
+    }
 
-    const rawTech = d.technologies ?? [];
-    let technologies: ProjectTech[] = rawTech.map(t => ({
+    // Parse technologies
+    let rawTech = d.technologies ?? [];
+    if (typeof rawTech === 'string') {
+        try { rawTech = JSON.parse(rawTech); } catch (e) { rawTech = []; }
+    }
+
+    let technologies: ProjectTech[] = (rawTech as any[]).map(t => ({
         name: t.name,
         type: t.type ?? '',
         description: t.description ?? '',
@@ -110,30 +128,31 @@ function transformProject(d: DirectusProject): Project {
         technologies = [...technologies, ...linkedTech];
     }
 
-    // If dynamic technologies are empty, but we have a work_type, we can use it as a simulated tech
-    if (technologies.length === 0 && (d as unknown as { work_type: string }).work_type) {
-        technologies.push({
-            name: (d as unknown as { work_type: string }).work_type,
-            type: 'Метод',
-            description: 'Основной технологический метод, примененный в данном проекте.',
-        });
+    // Image from photos
+    const firstPhotoId = d.photos?.[0]?.directus_files_id?.id || d.photos?.[0]?.directus_files_id;
+    const coverImage = firstPhotoId ? getDirectusFileUrl(String(firstPhotoId)) : '/assets/project-placeholder.png';
+
+    // Parse stats
+    let rawStats = d.stats ?? [];
+    if (typeof rawStats === 'string') {
+        try { rawStats = JSON.parse(rawStats); } catch (e) { rawStats = []; }
     }
 
     return {
-        id: d.id,
+        id: String(d.id),
         title: d.title,
         location: d.location ?? '',
         region: d.region ?? 'spb',
-        category: d.category ?? '',
+        category: d.work_type ?? '',
         description: d.description ?? '',
         challenge: d.challenge ?? '',
         solution: d.solution ?? d.description ?? '',
-        year: d.year ?? '',
-        coordinates: [d.latitude ?? 0, d.longitude ?? 0],
-        image: getDirectusFileUrl(d.image) ?? '/assets/project-placeholder.png',
+        year: String(d.year ?? ''),
+        coordinates: [Number(d.latitude ?? 0), Number(d.longitude ?? 0)],
+        image: coverImage!,
         tags: tags,
         technologies: technologies,
-        stats: (d.stats ?? [])
+        stats: (rawStats as any[])
             .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
             .map(s => ({ label: s.label, value: s.value })),
     };
@@ -149,16 +168,16 @@ function transformProject(d: DirectusProject): Project {
 export async function fetchProjects(): Promise<Project[]> {
     const data = await fetchFromDirectus<DirectusProject>('projects', {
         fields: [
-            'id', 'title', 'location', 'region', 'category',
+            'id', 'title', 'location', 'region', 'work_type',
             'description', 'challenge', 'solution', 'year',
-            'latitude', 'longitude', 'image',
-            'tags.tag',
-            'technologies.name', 'technologies.type', 'technologies.description', 'technologies.image',
-            'stats.label', 'stats.value', 'stats.sort',
+            'latitude', 'longitude', 'status',
+            'tags', 'technologies', 'stats',
             'used_machinery.machinery_id.*',
+            'photos.directus_files_id',
+            'documents.directus_files_id',
         ],
         filter: { status: { _eq: 'published' } },
-        sort: ['sort'],
+        sort: ['-year'],
     });
 
     if (data.length > 0) return data.map(transformProject);
@@ -171,13 +190,13 @@ export async function fetchProjects(): Promise<Project[]> {
 export async function fetchProjectById(id: string): Promise<Project | null> {
     const data = await fetchFromDirectus<DirectusProject>('projects', {
         fields: [
-            'id', 'title', 'location', 'region', 'category',
+            'id', 'title', 'location', 'region', 'work_type',
             'description', 'challenge', 'solution', 'year',
-            'latitude', 'longitude', 'image',
-            'tags.tag',
-            'technologies.name', 'technologies.type', 'technologies.description', 'technologies.image',
-            'stats.label', 'stats.value', 'stats.sort',
+            'latitude', 'longitude', 'status',
+            'tags', 'technologies', 'stats',
             'used_machinery.machinery_id.*',
+            'photos.directus_files_id',
+            'documents.directus_files_id',
         ],
         filter: {
             id: { _eq: id },
