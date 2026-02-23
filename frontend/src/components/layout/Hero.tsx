@@ -144,24 +144,6 @@ export function Hero({ region }: HeroProps) {
                 style={{ x: contentX, y: contentY }}
                 className="container relative z-10 mx-auto text-center"
             >
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white/80 backdrop-blur-xl shadow-2xl"
-                >
-                    <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
-                    </span>
-                    <span className="flex items-center gap-2">
-                        <span className="text-accent/60">Status:</span>
-                        <span>Active System</span>
-                        <span className="mx-1 opacity-30">|</span>
-                        <span className="text-white">{region.toUpperCase()} v2.6.0</span>
-                    </span>
-                </motion.div>
-
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

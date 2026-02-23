@@ -300,9 +300,12 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         <p className="text-xs text-white/60 mb-4 font-medium leading-relaxed">
                             Если у вас возникли вопросы по документации или ходу работ, обратитесь к вашему персональному менеджеру.
                         </p>
-                        <button className="w-full py-3 rounded-xl bg-orange-500 text-white text-xs font-black uppercase tracking-widest hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20">
+                        <a
+                            href={`mailto:drilling.rigs.info@yandex.ru?subject=Вопрос по проекту: ${project?.title || ''}`}
+                            className="w-full py-3 rounded-xl bg-orange-500 text-white text-xs font-black uppercase tracking-widest hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 text-center block"
+                        >
                             Связаться
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
