@@ -99,16 +99,19 @@ function transformProject(d: DirectusProject): Project {
         try { rawTech = JSON.parse(rawTech); } catch (e) { rawTech = []; }
     }
 
-    let technologies: ProjectTech[] = (rawTech as any[]).map(t => ({
-        name: t.name,
-        type: t.type ?? '',
-        description: t.description ?? '',
-        image: getDirectusFileUrl(t.image) ?? undefined,
-        specs: (t as { specs?: { label?: string; text?: string; value: string }[] }).specs?.map((s) => ({
-            label: s.label || s.text || '',
-            value: s.value || '',
-        })) ?? [],
-    }));
+    let technologies: ProjectTech[] = (rawTech as any[]).map(t => {
+        if (typeof t === 'string') return { name: t, type: '', description: '' };
+        return {
+            name: t.name,
+            type: t.type ?? '',
+            description: t.description ?? '',
+            image: getDirectusFileUrl(t.image) ?? undefined,
+            specs: (t as { specs?: { label?: string; text?: string; value: string }[] }).specs?.map((s) => ({
+                label: s.label || s.text || '',
+                value: s.value || '',
+            })) ?? [],
+        };
+    });
 
     // Merge used_machinery from dynamic M2M
     if (d.used_machinery && d.used_machinery.length > 0) {
