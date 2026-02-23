@@ -118,7 +118,7 @@ export function Hero({ region }: HeroProps) {
                 className="absolute inset-0 z-0 overflow-hidden bg-transparent transition-opacity duration-1000"
             >
                 <img
-                    src={getDirectusFileUrl(config.background_image) || "/hero-main-v2.png"}
+                    src={getDirectusFileUrl(config.background_image) || "/hero-main-v3.webp"}
                     alt="Geotech Digital Hub"
                     className="w-full h-full object-cover scale-110"
                     style={{ opacity: (config.image_opacity ?? 60) / 100 }}
@@ -224,9 +224,10 @@ export function Hero({ region }: HeroProps) {
             ) : (
                 /* Fallback Badges */
                 <>
+                    {/* Drilling rig on the left, matching the visual drilling machine */}
                     <TechnicalBadge
                         image="/assets/hero/drilling-rig.png"
-                        className="top-[15%] left-[5%]"
+                        className="top-[25%] left-[8%]"
                         label="Буровые"
                         delay={0}
                         mouseX={smoothX}
@@ -234,9 +235,10 @@ export function Hero({ region }: HeroProps) {
                         factor={0.1}
                         href="/services#drilling"
                     />
+                    {/* Sheet pile matched to the right side where the vibro hammer is */}
                     <TechnicalBadge
                         image="/assets/hero/sheet-pile.png"
-                        className="bottom-[20%] right-[8%]"
+                        className="top-[15%] right-[10%]"
                         label="Шпунт"
                         delay={0.5}
                         mouseX={smoothX}
@@ -244,9 +246,10 @@ export function Hero({ region }: HeroProps) {
                         factor={-0.12}
                         href="/services#catalog"
                     />
+                    {/* Truck icon grouped underneath the sheet pile icon on the right */}
                     <TechnicalBadge
                         image="/assets/hero/truck.png"
-                        className="top-[30%] right-[5%]"
+                        className="bottom-[25%] right-[10%]"
                         label="Спецтехника"
                         delay={1}
                         mouseX={smoothX}
