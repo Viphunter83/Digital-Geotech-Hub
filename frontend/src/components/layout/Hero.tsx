@@ -114,13 +114,13 @@ export function Hero({ region }: HeroProps) {
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4 selection:bg-orange-500/30">
             {/* Background Image & Overlays - Parallax Layer */}
             <motion.div
-                style={{ x: bgX, y: bgY, scale: 1.15 }}
+                style={{ x: bgX, y: bgY, scale: 1.05 }}
                 className="absolute inset-0 z-0 overflow-hidden bg-transparent transition-opacity duration-1000"
             >
                 <img
                     src={getDirectusFileUrl(config.background_image) || "/hero-main-v4.webp"}
                     alt="Geotech Digital Hub"
-                    className="w-full h-full object-cover scale-110"
+                    className="w-full h-full object-cover"
                     style={{ opacity: (config.image_opacity ?? 60) / 100 }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/95 via-[#0F172A]/60 to-[#0F172A]" />
