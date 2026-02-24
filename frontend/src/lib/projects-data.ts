@@ -99,37 +99,77 @@ function transformProject(d: DirectusProject): Project {
         try { rawTech = JSON.parse(rawTech); } catch (e) { rawTech = []; }
     }
 
-    let technologies: ProjectTech[] = (rawTech as any[]).map(t => {
-        if (typeof t === 'string') return { name: t, type: '', description: '' };
-        return {
-            name: t.name,
-            type: t.type ?? '',
-            description: t.description ?? '',
-            image: getDirectusFileUrl(t.image) ?? undefined,
-            specs: (t as { specs?: { label?: string; text?: string; value: string }[] }).specs?.map((s) => ({
-                label: s.label || s.text || '',
-                value: s.value || '',
-            })) ?? [],
-        };
-    });
-
-    // Merge used_machinery from dynamic M2M
+    // 1. Extract linked machinery into a map for easy lookup
+    const linkedMachinery = new Map<string, ProjectTech>();
     if (d.used_machinery && d.used_machinery.length > 0) {
-        const linkedTech: ProjectTech[] = d.used_machinery
-            .filter(item => item.machinery_id)
-            .map(item => {
+        d.used_machinery.forEach(item => {
+            if (item.machinery_id) {
                 const m = item.machinery_id;
-                return {
+                linkedMachinery.set(m.name.toLowerCase().trim(), {
                     id: String(m.id),
                     name: m.name,
                     type: m.category_label || 'Оборудование',
                     description: m.description || '',
                     image: getDirectusFileUrl(m.image) || undefined,
                     specs: m.specs?.map(s => ({ label: s.label, value: s.value })) || []
-                };
-            });
-        technologies = [...technologies, ...linkedTech];
+                });
+            }
+        });
     }
+
+    // 2. Process manual technologies and link them if possible
+    const mergedTechnologies: ProjectTech[] = [];
+    const usedLinkedNames = new Set<string>();
+
+    (rawTech as any[]).forEach(t => {
+        const item: ProjectTech = typeof t === 'string'
+            ? { name: t, type: '', description: '' }
+            : {
+                name: t.name,
+                type: t.type ?? '',
+                description: t.description ?? '',
+                image: getDirectusFileUrl(t.image) ?? undefined,
+                specs: (t as any).specs?.map((s: any) => ({
+                    label: s.label || s.text || '',
+                    value: s.value || '',
+                })) ?? [],
+            };
+
+        const nameLower = item.name.toLowerCase().trim();
+
+        // Try to find a match in linked machinery
+        let match: ProjectTech | undefined;
+        for (const [linkedName, linkedData] of linkedMachinery.entries()) {
+            // Match if one name contains the other (e.g., "Giken Silent Piler F201" and "Giken Silent Piler")
+            if (nameLower.includes(linkedName) || linkedName.includes(nameLower)) {
+                match = linkedData;
+                usedLinkedNames.add(linkedName);
+                break;
+            }
+        }
+
+        if (match) {
+            // If matched, use the ID and enrichment from the machinery catalog
+            mergedTechnologies.push({
+                ...match,
+                // But prefer manual description if it's more project-specific
+                description: item.description && item.description.length > 10 ? item.description : match.description,
+                specs: item.specs && item.specs.length > 0 ? item.specs : match.specs,
+                image: item.image || match.image
+            });
+        } else {
+            mergedTechnologies.push(item);
+        }
+    });
+
+    // 3. Add any linked machinery that wasn't matched in manual technologies
+    for (const [linkedName, data] of linkedMachinery.entries()) {
+        if (!usedLinkedNames.has(linkedName)) {
+            mergedTechnologies.push(data);
+        }
+    }
+
+    let technologies = mergedTechnologies;
 
     // Image from photos
     const firstPhotoId = d.photos?.[0]?.directus_files_id?.id || d.photos?.[0]?.directus_files_id;

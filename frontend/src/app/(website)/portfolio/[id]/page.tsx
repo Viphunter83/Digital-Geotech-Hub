@@ -202,7 +202,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                                     transition={{ delay: i * 0.1, duration: 0.6 }}
                                     className={`group relative rounded-[32px] overflow-hidden ${item.image ? 'min-h-[450px] shadow-2xl' : 'h-full'}`}
                                 >
-                                    {item.id ? (
+                                    {item.id && !item.id.startsWith('tag-') ? (
                                         <Link href={`/machinery?id=${item.id}`} className="block h-full relative">
                                             {item.image && (
                                                 /* Image Background */
@@ -259,7 +259,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                                             </div>
                                         </Link>
                                     ) : (
-                                        /* Abstract Card for Methods */
                                         <div className="relative h-full p-10 flex flex-col bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 rounded-[32px] group-hover:border-orange-500/50 transition-all duration-500 overflow-hidden shadow-2xl">
                                             {/* Ambient Decoration */}
                                             <div className="absolute -right-16 -top-16 w-64 h-64 bg-orange-600/5 blur-[100px] rounded-full group-hover:bg-orange-600/15 transition-all duration-700" />
