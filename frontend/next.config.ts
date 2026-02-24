@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/directus/:path*",
+        destination: "http://geotech_cms:8055/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -133,7 +133,7 @@ function transformProject(d: DirectusProject): Project {
 
     // Image from photos
     const firstPhotoId = d.photos?.[0]?.directus_files_id?.id || d.photos?.[0]?.directus_files_id;
-    const coverImage = firstPhotoId ? getDirectusFileUrl(String(firstPhotoId)) : '/assets/project-placeholder.png';
+    const coverImage = firstPhotoId ? getDirectusFileUrl(String(firstPhotoId)) : '/assets/static_piling_expert.png';
 
     // Parse stats
     let rawStats = d.stats ?? [];
