@@ -125,11 +125,11 @@ export function Hero({ region }: HeroProps) {
                 <img
                     src={getDirectusFileUrl(config.background_image) || "/hero-main-v4.webp"}
                     alt="Geotech Digital Hub"
-                    className="w-full h-full object-cover"
-                    style={{ opacity: (config.image_opacity ?? 60) / 100 }}
+                    className="w-full h-full object-cover contrast-[1.12] saturate-[1.1] brightness-[1.1]"
+                    style={{ opacity: (config.image_opacity ?? 75) / 100 }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/95 via-[#0F172A]/60 to-[#0F172A]" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/90 via-transparent to-[#0F172A]/90" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A]/85 via-[#0F172A]/40 to-[#0F172A]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/80 via-transparent to-[#0F172A]/80" />
 
                 {/* Technical Grid Pattern */}
                 <div
