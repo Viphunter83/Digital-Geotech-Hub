@@ -32,6 +32,7 @@ interface Project {
     photos?: { directus_files_id: { id: string; filename_disk: string } }[];
     documents?: { directus_files_id: { id: string; filename_download: string; title?: string } }[];
     machinery_used?: { machinery_id: { id: string; name: string; category: string } }[];
+    client_id?: { manager_name: string | null; manager_contact: string | null };
 }
 
 const statusStyles: Record<string, string> = {
@@ -298,13 +299,16 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     <div className="p-6 rounded-3xl bg-gradient-to-br from-orange-500/10 to-transparent border border-orange-500/20">
                         <h3 className="text-xs font-black uppercase tracking-widest text-orange-500 mb-2">Техническая поддержка</h3>
                         <p className="text-xs text-white/60 mb-4 font-medium leading-relaxed">
-                            Если у вас возникли вопросы по документации или ходу работ, обратитесь к вашему персональному менеджеру.
+                            {project.client_id?.manager_name
+                                ? `Ваш персональный менеджер: ${project.client_id.manager_name}`
+                                : "Если у вас возникли вопросы по документации или ходу работ, обратитесь к вашему персональному менеджеру."
+                            }
                         </p>
                         <a
-                            href={`mailto:drilling.rigs.info@yandex.ru?subject=Вопрос по проекту: ${project?.title || ''}`}
+                            href={project.client_id?.manager_contact || `mailto:drilling.rigs.info@yandex.ru?subject=Вопрос по проекту: ${project?.title || ''}`}
                             className="w-full py-3 rounded-xl bg-orange-500 text-white text-xs font-black uppercase tracking-widest hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 text-center block"
                         >
-                            Связаться
+                            {project.client_id?.manager_contact?.startsWith('mailto:') ? 'Написать менеджеру' : 'Связаться'}
                         </a>
                     </div>
                 </div>

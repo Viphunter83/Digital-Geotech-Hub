@@ -108,7 +108,7 @@ async def get_projects(client: Dict = Depends(get_current_client)):
 
     projects = await _directus_get("/items/projects", {
         "filter[client_id][_eq]": client_id,
-        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title,machinery_used.machinery_id.*",
+        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title,machinery_used.machinery_id.*,client_id.manager_name,client_id.manager_contact",
         "sort": "-date_created",
     })
 
@@ -128,7 +128,7 @@ async def get_project_detail(project_id: int, client: Dict = Depends(get_current
         raise HTTPException(status_code=403, detail="Доступ запрещен")
 
     project = await _directus_get(f"/items/projects/{project_id}", {
-        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title,machinery_used.machinery_id.*",
+        "fields": "id,title,description,status,location,progress,work_type,start_date,end_date,tags,date_created,photos.directus_files_id.id,photos.directus_files_id.filename_disk,documents.directus_files_id.id,documents.directus_files_id.filename_download,documents.directus_files_id.title,machinery_used.machinery_id.*,client_id.manager_name,client_id.manager_contact",
     })
 
     if not project:
@@ -182,7 +182,7 @@ async def get_profile(client: Dict = Depends(get_current_client)):
     access_code = client.get("sub")
     data = await _directus_get("/items/clients", {
         "filter[access_code][_eq]": access_code,
-        "fields": "id,company_name,email,phone,access_level,date_created",
+        "fields": "id,company_name,email,phone,access_level,date_created,manager_name,manager_contact",
         "limit": 1,
     })
 
