@@ -42,7 +42,10 @@ async def _get_client_id(access_code: str) -> Optional[int]:
         "limit": 1,
     })
     if data and len(data) > 0:
-        return data[0].get("id")
+        cid = data[0].get("id")
+        logger.info(f"Resolved access_code {access_code} to client_id {cid}")
+        return cid
+    logger.warning(f"Failed to resolve access_code {access_code} to client_id in Directus")
     return None
 
 
@@ -104,6 +107,7 @@ async def get_projects(client: Dict = Depends(get_current_client)):
     client_id = await _get_client_id(access_code)
 
     if not client_id:
+        logger.warning(f"No client_id found for projects request (sub: {access_code})")
         return {"projects": []}
 
     projects = await _directus_get("/items/projects", {
@@ -112,6 +116,7 @@ async def get_projects(client: Dict = Depends(get_current_client)):
         "sort": "-date_created",
     })
 
+    logger.info(f"Fetched {len(projects) if projects else 0} projects for client_id {client_id}")
     return {"projects": projects or []}
 
 
