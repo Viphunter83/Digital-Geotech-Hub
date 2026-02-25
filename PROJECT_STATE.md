@@ -1,9 +1,9 @@
 # Project State: Terra Expert
 
 ## 🚀 Общий статус
-**Стадия**: Production Ready (v0.7.0)
-**Версия**: 0.7.0 (Production Hardening & Professional CMS)
-**Последнее обновление**: 24.02.2026 (Audit, Security, Backups, Directus Polish)
+**Стадия**: Production Ready (v0.7.1)
+**Версия**: 0.7.1 (B2B Restoration & Data Integrity)
+**Последнее обновление**: 25.02.2026 (B2B Dashboard, Portfolio Cleanup, Version Sync)
 
 ---
 
